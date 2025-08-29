@@ -68,6 +68,31 @@ private fun parsePostgreSQLUrl(jdbcUrl: String, username: String, password: Stri
       // Fallback if parsing fails
       Triple("jdbc:$jdbcUrl", username, password)
     }
+  } else if (jdbcUrl.startsWith("jdbc:postgresql://") && jdbcUrl.contains("@")) {
+    println("DEBUG: JDBC URL with embedded credentials - need to parse and fix")
+    // Handle jdbc:postgresql://user:password@host:port/database format
+    val urlWithoutPrefix = jdbcUrl.removePrefix("jdbc:postgresql://")
+    val parts = urlWithoutPrefix.split("@")
+    
+    if (parts.size == 2) {
+      val credentials = parts[0].split(":")
+      val hostAndDb = parts[1]
+      
+      if (credentials.size == 2) {
+        val parsedUsername = credentials[0]
+        val parsedPassword = credentials[1]
+        val properJdbcUrl = "jdbc:postgresql://$hostAndDb"
+        
+        println("DEBUG: Fixed JDBC URL - URL: $properJdbcUrl, User: $parsedUsername")
+        Triple(properJdbcUrl, parsedUsername, parsedPassword)
+      } else {
+        println("DEBUG: Failed to parse JDBC credentials, using as-is")
+        Triple(jdbcUrl, username, password)
+      }
+    } else {
+      println("DEBUG: Failed to split JDBC URL at @, using as-is")
+      Triple(jdbcUrl, username, password)
+    }
   } else if (jdbcUrl.startsWith("jdbc:postgresql://")) {
     println("DEBUG: URL already in correct JDBC format")
     // Already in correct format
