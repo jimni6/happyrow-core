@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory
 import javax.sql.DataSource
 
 fun dataSource(sqlDatabaseConfig: SqlDatabaseConfig): DataSource {
+  println("🚨🚨🚨 INFRASTRUCTURE MODULE dataSource function called! 🚨🚨🚨")
   println("DEBUG: dataSource function called with jdbcUrl: ${sqlDatabaseConfig.jdbcUrl}")
   
   val config = HikariConfig().apply {
