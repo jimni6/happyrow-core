@@ -1,0 +1,45 @@
+# Ignore build outputs
+build/
+.gradle/
+*.jar
+*.class
+
+# Ignore IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Ignore version control
+.git/
+.gitignore
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+*.log
+logs/
+
+# Ignore temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Ignore node modules (if any)
+node_modules/
+
+# Ignore Docker files
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Ignore documentation
+README.md
+docs/
+
+# Ignore test results
+test-results/
+.reports/

@@ -1,0 +1,124 @@
+[versions]
+arrow = "2.1.2"
+awaitility = "4.3.0"
+config4k = "0.7.0"
+datadog = "4.4.4"
+exposed = "0.61.0"
+hikari = "6.3.1"
+jackson = "2.19.2"
+jackson_datatype = "2.19.2"
+jacoco = "0.8.13"
+junit = "5.13.3"
+junit_params = "5.13.3"
+koin = "4.1.0"
+kotest = "5.9.1"
+kotest_assertions_arrow = "2.0.0"
+kotlin = "2.2.0"
+ktor = "3.2.2"
+liquibase = "4.33.0"
+logback = "1.5.18"
+mockk = "1.14.5"
+postgres = "42.7.7"
+swagger = "2.19.2"
+testcontainers = "1.21.3"
+
+[libraries]
+
+arrow-core = { group = "io.arrow-kt", name = "arrow-core", version.ref = "arrow" }
+arrow-fx-coroutines = { group = "io.arrow-kt", name = "arrow-fx-coroutines", version.ref = "arrow" }
+awaitility-kotlin = { group = "org.awaitility", name = "awaitility-kotlin", version.ref = "awaitility" }
+config4k = { group = "io.github.config4k", name = "config4k", version.ref = "config4k" }
+exposed-bom = { group = "org.jetbrains.exposed", name = "exposed-bom", version.ref = "exposed" }
+exposed-core = { group = "org.jetbrains.exposed", name = "exposed-core", version.ref = "exposed" }
+exposed-java-time = { group = "org.jetbrains.exposed", name = "exposed-java-time", version.ref = "exposed" }
+exposed-jdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc", version.ref = "exposed" }
+exposed-json = { group = "org.jetbrains.exposed", name = "exposed-json", version.ref = "exposed" }
+hikariCP = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikari" }
+jacoco-core = { group = "org.jacoco", name = "org.jacoco.core", version.ref = "jacoco" }
+jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson" }
+jackson-datatype-jsr310 = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310", version.ref = "jackson_datatype" }
+jackson-module-kotlin = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin", version.ref = "jackson" }
+java-dogstatsd-client = { group = "com.datadoghq", name = "java-dogstatsd-client", version.ref = "datadog" }
+junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit" }
+junit-jupiter-params = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junit_params" }
+koin-ktor = { group = "io.insert-koin", name = "koin-ktor", version.ref = "koin" }
+koin-logger-slf4j = { group = "io.insert-koin", name = "koin-logger-slf4j", version.ref = "koin" }
+kotest-assertions-arrow = { group = "io.kotest.extensions", name = "kotest-assertions-arrow", version.ref = "kotest_assertions_arrow" }
+kotest-assertions-core = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
+kotest-assertions-json = { group = "io.kotest", name = "kotest-assertions-json", version.ref = "kotest" }
+kotest-runner-junit5 = { group = "io.kotest", name = "kotest-runner-junit5", version.ref = "kotest" }
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
+ktor-client-mock = { group = "io.ktor", name = "ktor-client-mock", version.ref = "ktor" }
+ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-serialization = { group = "io.ktor", name = "ktor-client-serialization", version.ref = "ktor" }
+ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
+ktor-serialization-jackson = { group = "io.ktor", name = "ktor-serialization-jackson", version.ref = "ktor" }
+ktor-server-auto-head-response = { group = "io.ktor", name = "ktor-server-auto-head-response", version.ref = "ktor" }
+ktor-server-content-negotiation = { group = "io.ktor", name = "ktor-server-content-negotiation", version.ref = "ktor" }
+ktor-server-core = { group = "io.ktor", name = "ktor-server-core", version.ref = "ktor" }
+ktor-server-double-receive = { group = "io.ktor", name = "ktor-server-double-receive", version.ref = "ktor" }
+ktor-server-netty = { group = "io.ktor", name = "ktor-server-netty", version.ref = "ktor" }
+ktor-server-partial-content = { group = "io.ktor", name = "ktor-server-partial-content", version.ref = "ktor" }
+ktor-server-resources = { group = "io.ktor", name = "ktor-server-resources", version.ref = "ktor" }
+ktor-server-test-host = { group = "io.ktor", name = "ktor-server-test-host", version.ref = "ktor" }
+ktor-server-swagger = { group = "io.ktor", name = "ktor-server-swagger", version.ref = "ktor" }
+
+# Tests
+koin-test-junit5 = { group = "io.insert-koin", name = "koin-test-junit5", version.ref = "koin" }
+liquibase-core = { group = "org.liquibase", name = "liquibase-core", version.ref = "liquibase" }
+localstack = { group = "org.testcontainers", name = "localstack", version.ref = "testcontainers" }
+logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgres" }
+testcontainers = { group = "org.testcontainers", name = "testcontainers", version.ref = "testcontainers" }
+
+[bundles]
+
+exposed = [
+    "exposed-core",
+    "exposed-java-time",
+    "exposed-jdbc",
+    "exposed-json",
+]
+jackson = [
+    "jackson-databind",
+    "jackson-datatype-jsr310",
+    "jackson-module-kotlin"
+]
+kotest-assertions = [
+    "kotest-assertions-arrow",
+    "kotest-assertions-core",
+    "kotest-assertions-json",
+]
+ktor-client = [
+    "ktor-client-core",
+    "ktor-client-serialization",
+    "ktor-client-content-negotiation",
+    "ktor-client-logging",
+    "ktor-client-cio"
+]
+ktor-server = [
+    "ktor-server-auto-head-response",
+    "ktor-server-content-negotiation",
+    "ktor-server-core",
+    "ktor-server-double-receive",
+    "ktor-server-partial-content",
+    "ktor-server-netty",
+    "ktor-server-resources",
+    "ktor-server-swagger"
+]
+
+ktor-test = [
+    "ktor-client-content-negotiation",
+    "ktor-client-logging",
+    "ktor-client-mock",
+    "ktor-client-serialization",
+    "ktor-server-test-host"
+]
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+swagger = { id = "org.hidetake.swagger.generator", version.ref = "swagger" }

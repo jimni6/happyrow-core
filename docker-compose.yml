@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  happyrow-core:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      # Use your Render PostgreSQL connection string
+      - DATABASE_URL=postgresql://happy_row_db_user:bL9NQFAUWaftEZ6RyOEPrPshMS0Mk8BF@dpg-d1t9faffte5s73c557l0-a.frankfurt-postgres.render.com:5432/happy_row_db
+      # Override port if needed
+      - PORT=8080
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - happyrow-network
+
+networks:
+  happyrow-network:
+    driver: bridge

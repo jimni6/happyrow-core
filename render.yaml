@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: happyrow-core
+    runtime: docker
+    plan: starter
+    region: frankfurt
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    buildCommand: ""
+    startCommand: ""
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: KTOR_ENV
+        value: production
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        value: postgresql://happyrow_db_user:f5UHnVPffThr6kywOUEVJF9NsNPZ6j65@dpg-d2oqeb8gjchc73f386qg-a.frankfurt-postgres.render.com/happyrow_db
+    healthCheckPath: /
