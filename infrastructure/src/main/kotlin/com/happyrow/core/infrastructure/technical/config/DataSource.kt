@@ -7,9 +7,6 @@ import org.slf4j.LoggerFactory
 import javax.sql.DataSource
 
 fun dataSource(sqlDatabaseConfig: SqlDatabaseConfig): DataSource {
-  println("🚨🚨🚨 INFRASTRUCTURE MODULE dataSource function called! 🚨🚨🚨")
-  println("DEBUG: dataSource function called with jdbcUrl: ${sqlDatabaseConfig.jdbcUrl}")
-  
   val config = HikariConfig().apply {
     // Parse and convert Render PostgreSQL URL format
     val (jdbcUrl, username, password) = parsePostgreSQLUrl(
@@ -17,8 +14,6 @@ fun dataSource(sqlDatabaseConfig: SqlDatabaseConfig): DataSource {
       sqlDatabaseConfig.username,
       sqlDatabaseConfig.password
     )
-    
-    println("DEBUG: After parsing - jdbcUrl: $jdbcUrl, username: $username")
     
     this.jdbcUrl = jdbcUrl
     this.username = username
@@ -39,38 +34,8 @@ fun dataSource(sqlDatabaseConfig: SqlDatabaseConfig): DataSource {
 }
 
 private fun parsePostgreSQLUrl(jdbcUrl: String, username: String, password: String): Triple<String, String, String> {
-  println("DEBUG: parsePostgreSQLUrl called with: $jdbcUrl")
-  
-  return if (jdbcUrl.startsWith("postgresql://")) {
-    println("DEBUG: Parsing Render format URL")
-    // Parse Render format: postgresql://user:password@host:port/database
-    val urlWithoutPrefix = jdbcUrl.removePrefix("postgresql://")
-    val parts = urlWithoutPrefix.split("@")
-    
-    if (parts.size == 2) {
-      val credentials = parts[0].split(":")
-      val hostAndDb = parts[1]
-      
-      if (credentials.size == 2) {
-        val parsedUsername = credentials[0]
-        val parsedPassword = credentials[1]
-        val properJdbcUrl = "jdbc:postgresql://$hostAndDb"
-        
-        println("DEBUG: Parsed successfully - URL: $properJdbcUrl, User: $parsedUsername")
-        Triple(properJdbcUrl, parsedUsername, parsedPassword)
-      } else {
-        println("DEBUG: Failed to parse credentials, using fallback")
-        // Fallback if parsing fails
-        Triple("jdbc:$jdbcUrl", username, password)
-      }
-    } else {
-      println("DEBUG: Failed to split URL at @, using fallback")
-      // Fallback if parsing fails
-      Triple("jdbc:$jdbcUrl", username, password)
-    }
-  } else if (jdbcUrl.startsWith("jdbc:postgresql://") && jdbcUrl.contains("@")) {
-    println("DEBUG: JDBC URL with embedded credentials - need to parse and fix")
-    // Handle jdbc:postgresql://user:password@host:port/database format
+  return if (jdbcUrl.startsWith("jdbc:postgresql://") && jdbcUrl.contains("@")) {
+    // Handle Render format: jdbc:postgresql://user:password@host:port/database
     val urlWithoutPrefix = jdbcUrl.removePrefix("jdbc:postgresql://")
     val parts = urlWithoutPrefix.split("@")
     
@@ -81,26 +46,20 @@ private fun parsePostgreSQLUrl(jdbcUrl: String, username: String, password: Stri
       if (credentials.size == 2) {
         val parsedUsername = credentials[0]
         val parsedPassword = credentials[1]
-        val properJdbcUrl = "jdbc:postgresql://$hostAndDb"
+        val cleanJdbcUrl = "jdbc:postgresql://$hostAndDb"
         
-        println("DEBUG: Fixed JDBC URL - URL: $properJdbcUrl, User: $parsedUsername")
-        Triple(properJdbcUrl, parsedUsername, parsedPassword)
+        Triple(cleanJdbcUrl, parsedUsername, parsedPassword)
       } else {
-        println("DEBUG: Failed to parse JDBC credentials, using as-is")
+        // Fallback if parsing fails
         Triple(jdbcUrl, username, password)
       }
     } else {
-      println("DEBUG: Failed to split JDBC URL at @, using as-is")
+      // Fallback if parsing fails
       Triple(jdbcUrl, username, password)
     }
-  } else if (jdbcUrl.startsWith("jdbc:postgresql://")) {
-    println("DEBUG: URL already in correct JDBC format")
-    // Already in correct format
-    Triple(jdbcUrl, username, password)
   } else {
-    println("DEBUG: Adding jdbc: prefix")
-    // Add jdbc: prefix
-    Triple("jdbc:$jdbcUrl", username, password)
+    // URL is already in correct format or use provided credentials
+    Triple(jdbcUrl, username, password)
   }
 }
 
