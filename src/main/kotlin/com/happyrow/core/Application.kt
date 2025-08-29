@@ -17,6 +17,8 @@ import io.ktor.server.plugins.doublereceive.DoubleReceive
 import io.ktor.server.plugins.partialcontent.PartialContent
 import io.ktor.server.resources.Resources
 import kotlinx.coroutines.runBlocking
+import org.koin.core.logger.Level
+import org.koin.core.logger.PrintLogger
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
 import org.slf4j.LoggerFactory
@@ -35,7 +37,10 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
-  install(Koin) { modules(clockModule, configurationModule, infrastructureModule) }
+  install(Koin) {
+    logger(PrintLogger(Level.DEBUG))
+    modules(clockModule, configurationModule, infrastructureModule)
+  }
   application()
   addShutdownHook()
 }
