@@ -58,6 +58,7 @@ ktor-serialization-jackson = { group = "io.ktor", name = "ktor-serialization-jac
 ktor-server-auto-head-response = { group = "io.ktor", name = "ktor-server-auto-head-response", version.ref = "ktor" }
 ktor-server-content-negotiation = { group = "io.ktor", name = "ktor-server-content-negotiation", version.ref = "ktor" }
 ktor-server-core = { group = "io.ktor", name = "ktor-server-core", version.ref = "ktor" }
+ktor-server-cors = { group = "io.ktor", name = "ktor-server-cors", version.ref = "ktor" }
 ktor-server-double-receive = { group = "io.ktor", name = "ktor-server-double-receive", version.ref = "ktor" }
 ktor-server-netty = { group = "io.ktor", name = "ktor-server-netty", version.ref = "ktor" }
 ktor-server-partial-content = { group = "io.ktor", name = "ktor-server-partial-content", version.ref = "ktor" }
@@ -103,6 +104,7 @@ ktor-server = [
     "ktor-server-auto-head-response",
     "ktor-server-content-negotiation",
     "ktor-server-core",
+    "ktor-server-cors",
     "ktor-server-double-receive",
     "ktor-server-partial-content",
     "ktor-server-netty",
