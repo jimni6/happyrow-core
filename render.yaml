@@ -16,8 +16,6 @@ services:
         value: production
       - key: ENVIRONMENT
         value: production
-      # DATABASE_URL should be set in Render dashboard as environment variable
-      # Connected to your PostgreSQL database service
       - key: DB_MAX_POOL_SIZE
         value: 10
       - key: DB_CONNECTION_TIMEOUT
