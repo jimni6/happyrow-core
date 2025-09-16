@@ -40,6 +40,21 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
       
+    - name: Check if baseline exists
+      id: baseline-check
+      run: |
+        if [ -f "detekt-baseline.xml" ]; then
+          echo "baseline-exists=true" >> $GITHUB_OUTPUT
+          echo "Baseline file found, running Detekt with baseline"
+        else
+          echo "baseline-exists=false" >> $GITHUB_OUTPUT
+          echo "No baseline file found, creating baseline first"
+        fi
+        
+    - name: Create baseline if missing
+      if: steps.baseline-check.outputs.baseline-exists == 'false'
+      run: ./gradlew detektBaseline
+      
     - name: Run Detekt
       run: ./gradlew detekt
       

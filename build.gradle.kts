@@ -57,7 +57,10 @@ detekt {
     allRules = false
     config.setFrom("$projectDir/detekt.yml")
     baseline = file("$projectDir/detekt-baseline.xml")
-    
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    jvmTarget = "21"
     reports {
         html.required.set(true)
         xml.required.set(true)
@@ -67,9 +70,6 @@ detekt {
     }
 }
 
-tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
-    jvmTarget = "21"
-}
 tasks.withType<io.gitlab.arturbosch.detekt.DetektCreateBaselineTask>().configureEach {
     jvmTarget = "21"
 }
