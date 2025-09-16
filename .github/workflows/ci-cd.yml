@@ -43,17 +43,37 @@ jobs:
     - name: Run tests
       run: ./gradlew test -PWithoutIntegrationTests
       
+    - name: Check for test results
+      id: test-results
+      run: |
+        if find . -name "TEST-*.xml" -path "*/build/test-results/test/*" | head -1 | grep -q .; then
+          echo "test-files-found=true" >> $GITHUB_OUTPUT
+        else
+          echo "test-files-found=false" >> $GITHUB_OUTPUT
+          echo "No test result files found - this is normal if no tests exist yet"
+        fi
+      
     - name: Generate test report
       uses: dorny/test-reporter@v1
-      if: success() || failure()
+      if: (success() || failure()) && steps.test-results.outputs.test-files-found == 'true'
       with:
         name: Gradle Tests
         path: '**/build/test-results/test/TEST-*.xml'
         reporter: java-junit
         
+    - name: Check for coverage reports
+      id: coverage-check
+      run: |
+        if find . -name "jacocoTestReport.xml" -path "*/build/reports/jacoco/test/*" | head -1 | grep -q .; then
+          echo "coverage-files-found=true" >> $GITHUB_OUTPUT
+        else
+          echo "coverage-files-found=false" >> $GITHUB_OUTPUT
+          echo "No coverage report files found - this is normal if no tests exist yet"
+        fi
+        
     - name: Upload coverage reports
       uses: codecov/codecov-action@v4
-      if: success()
+      if: success() && steps.coverage-check.outputs.coverage-files-found == 'true'
       with:
         files: '**/build/reports/jacoco/test/jacocoTestReport.xml'
         fail_ci_if_error: false
