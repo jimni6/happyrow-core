@@ -64,6 +64,11 @@ fun Application.application() {
     allowHost("127.0.0.1:8080")
     allowHost("127.0.0.1:8081")
     allowHost("jimni6.github.io")
+    allowHost("happyrow-front-lyayzeci9-jimni6s-projects.vercel.app")
+    allowHost("happyrow-front-git-main-jimni6s-projects.vercel.app")
+    allowHost("happyrow-front.vercel.app")
+    allowHost("happyrow-front-jimni6s-projects.vercel.app")
+
     
     // Allow common HTTP methods
     allowMethod(HttpMethod.Get)
