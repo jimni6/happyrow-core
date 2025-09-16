@@ -63,6 +63,7 @@ fun Application.application() {
     allowHost("127.0.0.1:5173")
     allowHost("127.0.0.1:8080")
     allowHost("127.0.0.1:8081")
+    allowHost("jimni6.github.io")
     
     // Allow common HTTP methods
     allowMethod(HttpMethod.Get)
