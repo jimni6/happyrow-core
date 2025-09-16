@@ -12,9 +12,48 @@ env:
   GRADLE_VERSION: 'wrapper'
 
 jobs:
+  detekt:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+        
+    - name: Cache Gradle packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+          
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+      
+    - name: Run Detekt
+      run: ./gradlew detekt
+      
+    - name: Upload Detekt reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: detekt-reports
+        path: |
+          **/build/reports/detekt/
+
   test:
     name: Run Tests
     runs-on: ubuntu-latest
+    needs: detekt
     
     steps:
     - name: Checkout code
@@ -64,7 +103,7 @@ jobs:
   build:
     name: Build Application
     runs-on: ubuntu-latest
-    needs: test
+    needs: [detekt, test]
     if: github.ref == 'refs/heads/main'
     
     steps:

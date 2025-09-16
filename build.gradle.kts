@@ -3,6 +3,7 @@ version = System.getProperty("app.version")
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.detekt)
     application
     `maven-publish`
     `java-test-fixtures`
@@ -17,6 +18,7 @@ allprojects {
     val libs = rootProject.libs
     apply(plugin = "kotlin")
     apply(plugin = "java-test-fixtures")
+    apply(plugin = "io.gitlab.arturbosch.detekt")
 
     repositories {
         mavenCentral()
@@ -39,12 +41,37 @@ allprojects {
         testFixturesImplementation(libs.bundles.kotest.assertions)
         testFixturesImplementation(libs.arrow.core)
         testFixturesImplementation(libs.awaitility.kotlin)
+
+        detektPlugins(libs.detekt.formatting)
     }
 
     tasks.withType<Test> {
         environment("DB_CHANGELOG_FILEPATH", File("${project.rootDir}/deploy/db").absolutePath)
         useJUnitPlatform()
     }
+}
+
+// Detekt configuration
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+    config.setFrom("$projectDir/detekt.yml")
+    baseline = file("$projectDir/detekt-baseline.xml")
+    
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        txt.required.set(true)
+        sarif.required.set(true)
+        md.required.set(true)
+    }
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    jvmTarget = "21"
+}
+tasks.withType<io.gitlab.arturbosch.detekt.DetektCreateBaselineTask>().configureEach {
+    jvmTarget = "21"
 }
 
 dependencies {
