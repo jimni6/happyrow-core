@@ -1,6 +1,7 @@
 package com.happyrow.core.modules.internal
 
 import com.happyrow.core.ConfigLoader
+import com.typesafe.config.ConfigException
 import org.koin.dsl.module
 
 val configurationModule = module {
@@ -10,7 +11,7 @@ val configurationModule = module {
             val config = ConfigLoader.getConfig()
             println("DEBUG: AppConfig created successfully: $config")
             config
-        } catch (e: Exception) {
+        } catch (e: ConfigException) {
             println("DEBUG: Failed to create AppConfig: ${e.message}")
             e.printStackTrace()
             throw e

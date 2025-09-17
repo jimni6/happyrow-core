@@ -1,25 +1,30 @@
 package com.happyrow.core
 
-import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.Application
+import io.ktor.server.response.respond
+import io.ktor.server.response.respondText
+import io.ktor.server.routing.get
+import io.ktor.server.routing.routing
 import org.koin.ktor.ext.inject
+import java.sql.SQLException
 import javax.sql.DataSource
+
+private const val DB_CONNECTION_TIMEOUT_SECONDS = 5
 
 fun Application.configureRouting() {
     routing {
         get("/") {
             call.respondText("Hello from happyrow-core! 🎉", ContentType.Text.Plain)
         }
-        
+
         get("/health") {
             val dataSource by inject<DataSource>()
-            
             try {
                 // Test database connection
                 dataSource.connection.use { connection ->
-                    val isValid = connection.isValid(5) // 5 second timeout
+                    val isValid = connection.isValid(DB_CONNECTION_TIMEOUT_SECONDS)
                     if (isValid) {
                         call.respond(
                             HttpStatusCode.OK,
@@ -40,7 +45,7 @@ fun Application.configureRouting() {
                         )
                     }
                 }
-            } catch (e: Exception) {
+            } catch (e: SQLException) {
                 call.respond(
                     HttpStatusCode.ServiceUnavailable,
                     mapOf(
@@ -52,7 +57,7 @@ fun Application.configureRouting() {
                 )
             }
         }
-        
+
         get("/info") {
             call.respond(
                 mapOf(
