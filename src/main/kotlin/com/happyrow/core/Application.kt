@@ -2,6 +2,7 @@ package com.happyrow.core
 
 import com.happyrow.core.infrastructure.technical.config.shutdownDataSource
 import com.happyrow.core.infrastructure.technical.jackson.JsonObjectMapper
+import com.happyrow.core.modules.domainModule
 import com.happyrow.core.modules.infrastucture.infrastructureModule
 import com.happyrow.core.modules.internal.clockModule
 import com.happyrow.core.modules.internal.configurationModule
@@ -19,96 +20,96 @@ import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.doublereceive.DoubleReceive
 import io.ktor.server.plugins.partialcontent.PartialContent
 import io.ktor.server.resources.Resources
-import javax.sql.DataSource
-import kotlin.system.exitProcess
 import kotlinx.coroutines.runBlocking
 import org.koin.core.logger.Level
 import org.koin.core.logger.PrintLogger
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
 import org.slf4j.LoggerFactory
+import javax.sql.DataSource
+import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
-    val logger = LoggerFactory.getLogger(Application::class.java)
-    @Suppress("TooGenericExceptionCaught", "MagicNumber")
-    try {
-        EngineMain.main(args)
-    } catch (throwable: Throwable) {
-        logger.error("Unexpected error", throwable)
-        exitProcess(42)
-    }
+  val logger = LoggerFactory.getLogger(Application::class.java)
+  @Suppress("TooGenericExceptionCaught", "MagicNumber")
+  try {
+    EngineMain.main(args)
+  } catch (throwable: Throwable) {
+    logger.error("Unexpected error", throwable)
+    exitProcess(42)
+  }
 }
 
 fun Application.module() {
-    install(Koin) {
-        logger(PrintLogger(Level.DEBUG))
-        modules(clockModule, configurationModule, infrastructureModule)
-    }
-    application()
-    addShutdownHook()
+  install(Koin) {
+    logger(PrintLogger(Level.DEBUG))
+    modules(clockModule, configurationModule, infrastructureModule, domainModule)
+  }
+  application()
+  addShutdownHook()
 }
 
 fun Application.application() {
-    install(CORS) {
-        // Allow requests from common frontend development ports
-        allowHost("localhost:3000") // React default
-        allowHost("localhost:3001") // Alternative React port
-        allowHost("localhost:4200") // Angular default
-        allowHost("localhost:5173") // Vite default
-        allowHost("localhost:8080") // Vue default
-        allowHost("localhost:8081") // Alternative Vue port
-        allowHost("127.0.0.1:3000")
-        allowHost("127.0.0.1:3001")
-        allowHost("127.0.0.1:4200")
-        allowHost("127.0.0.1:5173")
-        allowHost("127.0.0.1:8080")
-        allowHost("127.0.0.1:8081")
-        allowHost("jimni6.github.io")
-        allowHost("happyrow-front-lyayzeci9-jimni6s-projects.vercel.app")
-        allowHost("happyrow-front-git-main-jimni6s-projects.vercel.app")
-        allowHost("happyrow-front.vercel.app")
-        allowHost("happyrow-front-jimni6s-projects.vercel.app")
+  install(CORS) {
+    // Allow requests from common frontend development ports
+    allowHost("localhost:3000") // React default
+    allowHost("localhost:3001") // Alternative React port
+    allowHost("localhost:4200") // Angular default
+    allowHost("localhost:5173") // Vite default
+    allowHost("localhost:8080") // Vue default
+    allowHost("localhost:8081") // Alternative Vue port
+    allowHost("127.0.0.1:3000")
+    allowHost("127.0.0.1:3001")
+    allowHost("127.0.0.1:4200")
+    allowHost("127.0.0.1:5173")
+    allowHost("127.0.0.1:8080")
+    allowHost("127.0.0.1:8081")
+    allowHost("jimni6.github.io")
+    allowHost("happyrow-front-lyayzeci9-jimni6s-projects.vercel.app")
+    allowHost("happyrow-front-git-main-jimni6s-projects.vercel.app")
+    allowHost("happyrow-front.vercel.app")
+    allowHost("happyrow-front-jimni6s-projects.vercel.app")
 
-        // Allow common HTTP methods
-        allowMethod(HttpMethod.Get)
-        allowMethod(HttpMethod.Post)
-        allowMethod(HttpMethod.Put)
-        allowMethod(HttpMethod.Delete)
-        allowMethod(HttpMethod.Patch)
-        allowMethod(HttpMethod.Options)
-        allowMethod(HttpMethod.Head)
+    // Allow common HTTP methods
+    allowMethod(HttpMethod.Get)
+    allowMethod(HttpMethod.Post)
+    allowMethod(HttpMethod.Put)
+    allowMethod(HttpMethod.Delete)
+    allowMethod(HttpMethod.Patch)
+    allowMethod(HttpMethod.Options)
+    allowMethod(HttpMethod.Head)
 
-        // Allow common headers
-        allowHeader(HttpHeaders.Authorization)
-        allowHeader(HttpHeaders.ContentType)
-        allowHeader(HttpHeaders.Accept)
-        allowHeader(HttpHeaders.Origin)
+    // Allow common headers
+    allowHeader(HttpHeaders.Authorization)
+    allowHeader(HttpHeaders.ContentType)
+    allowHeader(HttpHeaders.Accept)
+    allowHeader(HttpHeaders.Origin)
 
-        // Allow credentials (cookies, authorization headers)
-        allowCredentials = true
+    // Allow credentials (cookies, authorization headers)
+    allowCredentials = true
 
-        // Allow any header (more permissive, can be restricted later)
-        allowNonSimpleContentTypes = true
-    }
-    install(DoubleReceive)
-    install(ContentNegotiation) {
-        register(
-            ContentType.Application.Json,
-            JacksonConverter(JsonObjectMapper.defaultMapper)
-        )
-    }
-    install(Resources)
-    install(PartialContent)
-    install(AutoHeadResponse)
-    configureRouting()
+    // Allow any header (more permissive, can be restricted later)
+    allowNonSimpleContentTypes = true
+  }
+  install(DoubleReceive)
+  install(ContentNegotiation) {
+    register(
+      ContentType.Application.Json,
+      JacksonConverter(JsonObjectMapper.defaultMapper),
+    )
+  }
+  install(Resources)
+  install(PartialContent)
+  install(AutoHeadResponse)
+  configureRouting()
 }
 
 fun Application.addShutdownHook() {
-    val dataSource by inject<DataSource>()
+  val dataSource by inject<DataSource>()
 
-    monitor.subscribe(ApplicationStopPreparing) {
-        runBlocking {
-            shutdownDataSource(dataSource)
-        }
+  monitor.subscribe(ApplicationStopPreparing) {
+    runBlocking {
+      shutdownDataSource(dataSource)
     }
+  }
 }

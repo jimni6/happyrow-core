@@ -6,11 +6,11 @@ import com.typesafe.config.ConfigFactory
 import io.github.config4k.extract
 
 data class AppConfig(
-    val sql: SqlDatabaseConfig,
+  val sql: SqlDatabaseConfig,
 )
 
 object ConfigLoader {
-    private val config: Config = ConfigFactory.load("application.conf")
+  private val config: Config = ConfigFactory.load("application.conf")
 
-    fun getConfig(): AppConfig = config.extract<AppConfig>("application")
+  fun getConfig(): AppConfig = config.extract<AppConfig>("application")
 }

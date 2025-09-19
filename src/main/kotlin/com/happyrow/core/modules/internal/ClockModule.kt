@@ -5,5 +5,5 @@ import java.time.Clock
 import java.time.ZoneId
 
 val clockModule = module {
-    single<Clock> { Clock.system(ZoneId.systemDefault()) }
+  single<Clock> { Clock.system(ZoneId.systemDefault()) }
 }

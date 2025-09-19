@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.detekt)
+    id("com.diffplug.spotless") version "6.25.0"
     application
     `maven-publish`
     `java-test-fixtures`
@@ -42,7 +43,7 @@ allprojects {
         testFixturesImplementation(libs.arrow.core)
         testFixturesImplementation(libs.awaitility.kotlin)
 
-        detektPlugins(libs.detekt.formatting)
+        // detektPlugins(libs.detekt.formatting) // Disabled to avoid conflicts with Spotless formatting
     }
 
     tasks.withType<Test> {
@@ -72,6 +73,22 @@ tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
 
 tasks.withType<io.gitlab.arturbosch.detekt.DetektCreateBaselineTask>().configureEach {
     jvmTarget = "21"
+}
+
+// Spotless configuration for auto-formatting
+spotless {
+    kotlin {
+        ktlint().editorConfigOverride(mapOf(
+            "ktlint_standard_property-naming" to "disabled",
+            "ktlint_standard_value-argument-comment" to "disabled",
+            "ktlint_standard_value-parameter-comment" to "disabled",
+            "ktlint_standard_comment-spacing" to "disabled",
+            "ktlint_standard_discouraged-comment-location" to "disabled"
+        ))
+        target("src/**/*.kt", "domain/src/**/*.kt", "infrastructure/src/**/*.kt")
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
 }
 
 dependencies {
