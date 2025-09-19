@@ -3,6 +3,7 @@ package com.happyrow.core.modules.infrastucture.driven
 import com.happyrow.core.AppConfig
 import com.happyrow.core.domain.event.common.driven.event.EventRepository
 import com.happyrow.core.infrastructure.common.driven.event.SqlEventRepository
+import com.happyrow.core.infrastructure.technical.config.DatabaseInitializer
 import com.happyrow.core.infrastructure.technical.config.ExposedDatabase
 import com.happyrow.core.infrastructure.technical.config.dataSource
 import org.koin.core.module.dsl.singleOf
@@ -42,5 +43,6 @@ val postgresqlModule = module {
   }
 
   singleOf(::ExposedDatabase)
+  singleOf(::DatabaseInitializer)
   singleOf(::SqlEventRepository) bind EventRepository::class
 }
