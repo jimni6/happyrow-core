@@ -5,9 +5,9 @@ import com.happyrow.core.modules.infrastucture.driven.postgresqlModule
 import org.koin.dsl.module
 
 private val drivenModule = module {
-    includes(postgresqlModule, httpClientModule)
+  includes(postgresqlModule, httpClientModule)
 }
 
 val infrastructureModule = module {
-    includes(drivenModule)
+  includes(drivenModule)
 }

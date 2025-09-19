@@ -12,18 +12,18 @@ fun dataSource(sqlDatabaseConfig: SqlDatabaseConfig): DataSource {
     val (jdbcUrl, username, password) = parsePostgreSQLUrl(
       sqlDatabaseConfig.jdbcUrl,
       sqlDatabaseConfig.username,
-      sqlDatabaseConfig.password
+      sqlDatabaseConfig.password,
     )
-    
+
     this.jdbcUrl = jdbcUrl
     this.username = username
     this.password = password
     driverClassName = "org.postgresql.Driver"
     maximumPoolSize = sqlDatabaseConfig.maximumPoolSize
-    
+
     // SSL configuration for Render PostgreSQL
     addDataSourceProperty("sslmode", "require")
-    
+
     // Connection validation
     isAutoCommit = false
     validate()
@@ -38,16 +38,16 @@ private fun parsePostgreSQLUrl(jdbcUrl: String, username: String, password: Stri
     // Handle Render format: jdbc:postgresql://user:password@host:port/database
     val urlWithoutPrefix = jdbcUrl.removePrefix("jdbc:postgresql://")
     val parts = urlWithoutPrefix.split("@")
-    
+
     if (parts.size == 2) {
       val credentials = parts[0].split(":")
       val hostAndDb = parts[1]
-      
+
       if (credentials.size == 2) {
         val parsedUsername = credentials[0]
         val parsedPassword = credentials[1]
         val cleanJdbcUrl = "jdbc:postgresql://$hostAndDb"
-        
+
         Triple(cleanJdbcUrl, parsedUsername, parsedPassword)
       } else {
         // Fallback if parsing fails

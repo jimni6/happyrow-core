@@ -11,8 +11,8 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 
 object JsonObjectMapper {
   val defaultMapper: ObjectMapper by lazy {
-      ObjectMapper()
-          .setConfig()
+    ObjectMapper()
+      .setConfig()
   }
 }
 
@@ -20,7 +20,7 @@ fun ObjectMapper.setConfig(): ObjectMapper {
   registerModule(
     KotlinModule.Builder()
       .configure(KotlinFeature.StrictNullChecks, true)
-      .build()
+      .build(),
   )
   registerModule(JavaTimeModule())
   configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
