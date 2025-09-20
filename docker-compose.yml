@@ -3,16 +3,28 @@ version: '3.8'
 services:
   happyrow-core:
     build: .
+    container_name: happyrow-app
     ports:
       - "8080:8080"
     environment:
-      # Database connection from environment variables
+      # Database connection to Render PostgreSQL (production)
+      # These will be loaded from .env file or environment variables
       - DATABASE_URL=${DATABASE_URL}
-      # Override port if needed
-      - PORT=${PORT:-8080}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_SSL_MODE=${DB_SSL_MODE:-require}
+      - DB_MAX_POOL_SIZE=${DB_MAX_POOL_SIZE:-10}
+      - DB_CONNECTION_TIMEOUT=${DB_CONNECTION_TIMEOUT:-30000}
+      - DB_IDLE_TIMEOUT=${DB_IDLE_TIMEOUT:-600000}
+      - DB_MAX_LIFETIME=${DB_MAX_LIFETIME:-1800000}
+      # Application settings
+      - PORT=8080
       - ENVIRONMENT=${ENVIRONMENT:-development}
+      - KTOR_ENV=${KTOR_ENV:-development}
+    env_file:
+      - .env
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/"]
       interval: 30s
       timeout: 10s
       retries: 3

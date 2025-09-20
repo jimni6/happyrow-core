@@ -1,5 +1,6 @@
 package com.happyrow.core
 
+import com.happyrow.core.infrastructure.technical.config.DatabaseInitializer
 import com.happyrow.core.infrastructure.technical.config.shutdownDataSource
 import com.happyrow.core.infrastructure.technical.jackson.JsonObjectMapper
 import com.happyrow.core.modules.domainModule
@@ -45,6 +46,11 @@ fun Application.module() {
     logger(PrintLogger(Level.DEBUG))
     modules(clockModule, configurationModule, infrastructureModule, domainModule)
   }
+
+  // Initialize database schema for Render PostgreSQL
+  val databaseInitializer by inject<DatabaseInitializer>()
+  databaseInitializer.initializeDatabase()
+
   application()
   addShutdownHook()
 }
