@@ -90,6 +90,7 @@ fun Application.application() {
     allowHeader(HttpHeaders.ContentType)
     allowHeader(HttpHeaders.Accept)
     allowHeader(HttpHeaders.Origin)
+    allowHeader("x-user-id")
 
     // Allow credentials (cookies, authorization headers)
     allowCredentials = true
