@@ -1,6 +1,9 @@
 package com.happyrow.core.infrastructure.technical.config
 
+import com.happyrow.core.infrastructure.contribution.common.driven.ContributionTable
 import com.happyrow.core.infrastructure.event.common.driven.event.EventTable
+import com.happyrow.core.infrastructure.participant.common.driven.ParticipantTable
+import com.happyrow.core.infrastructure.resource.common.driven.ResourceTable
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
@@ -30,9 +33,24 @@ class DatabaseInitializer(
         """.trimIndent(),
       )
 
+      // Create RESOURCE_CATEGORY enum if it doesn't exist
+      logger.info("Creating RESOURCE_CATEGORY enum...")
+      exec(
+        """
+        DO $$ BEGIN
+          CREATE TYPE RESOURCE_CATEGORY AS ENUM ('FOOD', 'DRINK', 'UTENSIL', 'DECORATION', 'OTHER');
+        EXCEPTION
+          WHEN duplicate_object THEN null;
+        END $$;
+        """.trimIndent(),
+      )
+
       // Create tables using Exposed SchemaUtils
       logger.info("Creating database tables...")
       SchemaUtils.create(EventTable)
+      SchemaUtils.create(ParticipantTable)
+      SchemaUtils.create(ResourceTable)
+      SchemaUtils.create(ContributionTable)
 
       logger.info("Database initialization completed successfully!")
     }
