@@ -2,7 +2,9 @@ package com.happyrow.core.modules.infrastucture.driven
 
 import com.happyrow.core.AppConfig
 import com.happyrow.core.domain.event.common.driven.event.EventRepository
+import com.happyrow.core.domain.participant.common.driven.ParticipantRepository
 import com.happyrow.core.infrastructure.common.driven.event.SqlEventRepository
+import com.happyrow.core.infrastructure.participant.common.driven.SqlParticipantRepository
 import com.happyrow.core.infrastructure.technical.config.DatabaseInitializer
 import com.happyrow.core.infrastructure.technical.config.ExposedDatabase
 import com.happyrow.core.infrastructure.technical.config.dataSource
@@ -45,4 +47,5 @@ val postgresqlModule = module {
   singleOf(::ExposedDatabase)
   singleOf(::DatabaseInitializer)
   singleOf(::SqlEventRepository) bind EventRepository::class
+  singleOf(::SqlParticipantRepository) bind ParticipantRepository::class
 }
