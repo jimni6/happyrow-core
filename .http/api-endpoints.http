@@ -1,0 +1,104 @@
+# ============================================================================
+# HappyRow Core API - HTTP Client Endpoints
+# ============================================================================
+# Use IntelliJ's environment selector to switch between:
+#   - local (localhost:8080)
+#   - render (Render.com deployment)
+#   - raspberry (Raspberry Pi deployment)
+#
+# Variables are defined in http-client.env.json
+# ============================================================================
+
+# ============================================================================
+# Health Check Endpoints
+# ============================================================================
+
+### Get Server Info
+GET {{baseUrl}}/info
+
+### Health Check
+GET {{baseUrl}}/health
+
+# ============================================================================
+# Event Management Endpoints
+# ============================================================================
+
+### Create Event - Party
+POST {{baseUrl}}{{apiPath}}/events
+x-user-id: {{userId}}
+Content-Type: application/json
+
+{
+  "name": "Summer Party 2025",
+  "description": "Annual summer celebration with friends",
+  "event_date": "2025-06-15T19:00:00Z",
+  "location": "Backyard Garden",
+  "type": "PARTY"
+}
+
+### Create Event - Birthday
+POST {{baseUrl}}{{apiPath}}/events
+x-user-id: {{userId}}
+Content-Type: application/json
+
+{
+  "name": "John's 30th Birthday",
+  "description": "Birthday celebration dinner",
+  "event_date": "2025-03-20T18:30:00Z",
+  "location": "Italian Restaurant",
+  "type": "BIRTHDAY"
+}
+
+### Create Event - Dinner
+POST {{baseUrl}}{{apiPath}}/events
+x-user-id: {{userId}}
+Content-Type: application/json
+
+{
+  "name": "Team Dinner",
+  "description": "Quarterly team dinner",
+  "event_date": "2025-04-10T19:00:00Z",
+  "location": "Downtown Restaurant",
+  "type": "DINER"
+}
+
+### Create Event - Snack
+POST {{baseUrl}}{{apiPath}}/events
+x-user-id: {{userId}}
+Content-Type: application/json
+
+{
+  "name": "Coffee Break",
+  "description": "Afternoon snack and coffee",
+  "event_date": "2025-02-05T15:00:00Z",
+  "location": "Office Lounge",
+  "type": "SNACK"
+}
+
+### Get Events by Organizer
+GET {{baseUrl}}{{apiPath}}/events?organizerId={{userId}}
+x-user-id: {{userId}}
+
+### Get Event by ID (replace {eventId} with actual ID)
+GET {{baseUrl}}{{apiPath}}/events/{eventId}
+x-user-id: {{userId}}
+
+# ============================================================================
+# cURL Examples (for command line usage)
+# ============================================================================
+
+### Example: Create Event via cURL (localhost)
+# curl -X POST http://localhost:8080/event/configuration/api/v1/events \
+#   -H "Content-Type: application/json" \
+#   -H "x-user-id: ab70634a-345e-415e-8417-60841b6bcb20" \
+#   -d '{
+#     "name": "Summer Party 2025",
+#     "description": "Annual summer celebration",
+#     "event_date": "2025-06-15T19:00:00Z",
+#     "location": "Backyard Garden",
+#     "type": "PARTY"
+#   }'
+
+### Example: Get Events via cURL (localhost)
+# curl -X GET "http://localhost:8080/event/configuration/api/v1/events?organizer=ab70634a-345e-415e-8417-60841b6bcb20" \
+#   -H "x-user-id: ab70634a-345e-415e-8417-60841b6bcb20"

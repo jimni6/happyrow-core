@@ -75,9 +75,13 @@ class SqlEventRepository(
         transaction(exposedDatabase.database) {
           EventTable
             .selectAll().where { EventTable.creator eq organizer.toString() }
-            .mapNotNull { row ->
+            .map { row ->
               row.toEvent().fold(
-                { null },
+                { error ->
+                  println("ERROR: Failed to parse event row: ${row[EventTable.id].value} - ${error.message}")
+                  error.cause?.printStackTrace()
+                  throw error
+                },
                 { it },
               )
             }
