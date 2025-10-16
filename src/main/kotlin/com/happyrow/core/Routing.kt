@@ -1,6 +1,7 @@
 package com.happyrow.core
 
 import com.happyrow.core.domain.event.create.CreateEventUseCase
+import com.happyrow.core.domain.event.get.GetEventsByOrganizerUseCase
 import com.happyrow.core.infrastructure.event.eventEndpoints
 import io.ktor.http.ContentType
 import io.ktor.server.application.Application
@@ -15,11 +16,12 @@ const val BASE_PATH = "/event/configuration"
 
 fun Application.configureRouting() {
   val createEventUseCase: CreateEventUseCase by inject()
+  val getEventsByOrganizerUseCase: GetEventsByOrganizerUseCase by inject()
 
   routing {
     route(BASE_PATH) {
       route("/api/v1") {
-        eventEndpoints(createEventUseCase)
+        eventEndpoints(createEventUseCase, getEventsByOrganizerUseCase)
       }
     }
 
