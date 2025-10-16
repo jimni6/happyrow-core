@@ -70,11 +70,27 @@ fun Application.application() {
     allowHost("127.0.0.1:5173")
     allowHost("127.0.0.1:8080")
     allowHost("127.0.0.1:8081")
+
+    // Static allowed hosts
     allowHost("jimni6.github.io")
     allowHost("happyrow-front-lyayzeci9-jimni6s-projects.vercel.app")
     allowHost("happyrow-front-git-main-jimni6s-projects.vercel.app")
     allowHost("happyrow-front.vercel.app")
     allowHost("happyrow-front-jimni6s-projects.vercel.app")
+
+    // Dynamic allowed origins from environment variable (for Vercel and custom domains)
+    // Set ALLOWED_ORIGINS as comma-separated list: "https://your-app.vercel.app,https://custom.domain.com"
+    val allowedOrigins = System.getenv("ALLOWED_ORIGINS") ?: ""
+    if (allowedOrigins.isNotEmpty()) {
+      allowedOrigins.split(",").forEach { origin ->
+        val cleanOrigin = origin.trim()
+        if (cleanOrigin.isNotEmpty()) {
+          // Extract host from URL (remove protocol)
+          val host = cleanOrigin.removePrefix("https://").removePrefix("http://")
+          allowHost(host, schemes = listOf("http", "https"))
+        }
+      }
+    }
 
     // Allow common HTTP methods
     allowMethod(HttpMethod.Get)

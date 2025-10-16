@@ -6,8 +6,9 @@ import com.happyrow.core.domain.event.common.driven.event.EventRepository
 import com.happyrow.core.domain.event.common.error.CreateEventRepositoryException
 import com.happyrow.core.domain.event.common.error.EventNotFoundException
 import com.happyrow.core.domain.event.common.model.event.Event
-import com.happyrow.core.domain.event.create.error.GetEventException
 import com.happyrow.core.domain.event.create.model.CreateEventRequest
+import com.happyrow.core.domain.event.creator.model.Creator
+import com.happyrow.core.domain.event.get.error.GetEventException
 import com.happyrow.core.infrastructure.event.common.driven.event.EventTable
 import com.happyrow.core.infrastructure.event.common.driven.event.toEvent
 import com.happyrow.core.infrastructure.event.create.error.UnicityConflictException
@@ -25,7 +26,7 @@ class SqlEventRepository(
   private val clock: Clock,
   private val exposedDatabase: ExposedDatabase,
 ) : EventRepository {
-  override fun create(request: CreateEventRequest): Either<CreateEventRepositoryException, Event> = Either.Companion
+  override fun create(request: CreateEventRequest): Either<CreateEventRepositoryException, Event> = Either
     .catch {
       transaction(exposedDatabase.database) {
         EventTable.insertAndGetId {
@@ -66,6 +67,23 @@ class SqlEventRepository(
         it?.toEvent() ?: Either.Left(EventNotFoundException(identifier))
       }
       .mapLeft { GetEventException(identifier, it) }
+  }
+
+  override fun findByOrganizer(organizer: Creator): Either<GetEventException, List<Event>> {
+    return Either
+      .catch {
+        transaction(exposedDatabase.database) {
+          EventTable
+            .selectAll().where { EventTable.creator eq organizer.toString() }
+            .mapNotNull { row ->
+              row.toEvent().fold(
+                { null },
+                { it },
+              )
+            }
+        }
+      }
+      .mapLeft { GetEventException(null, it) }
   }
 
   private fun Throwable.isUnicityConflictException() =
