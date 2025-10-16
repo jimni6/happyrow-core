@@ -1,6 +1,7 @@
 package com.happyrow.core
 
 import com.happyrow.core.domain.event.create.CreateEventUseCase
+import com.happyrow.core.domain.event.delete.DeleteEventUseCase
 import com.happyrow.core.domain.event.get.GetEventsByOrganizerUseCase
 import com.happyrow.core.domain.event.update.UpdateEventUseCase
 import com.happyrow.core.infrastructure.event.eventEndpoints
@@ -19,11 +20,12 @@ fun Application.configureRouting() {
   val createEventUseCase: CreateEventUseCase by inject()
   val getEventsByOrganizerUseCase: GetEventsByOrganizerUseCase by inject()
   val updateEventUseCase: UpdateEventUseCase by inject()
+  val deleteEventUseCase: DeleteEventUseCase by inject()
 
   routing {
     route(BASE_PATH) {
       route("/api/v1") {
-        eventEndpoints(createEventUseCase, getEventsByOrganizerUseCase, updateEventUseCase)
+        eventEndpoints(createEventUseCase, getEventsByOrganizerUseCase, updateEventUseCase, deleteEventUseCase)
       }
     }
 

@@ -68,6 +68,7 @@ Click the green play button next to any request to execute it.
 |--------|----------|-------------|
 | POST | `/event/configuration/api/v1/events` | Create a new event |
 | PUT | `/event/configuration/api/v1/events/{eventId}` | Update an existing event |
+| DELETE | `/event/configuration/api/v1/events/{eventId}` | Delete an event |
 | GET | `/event/configuration/api/v1/events?organizerId={userId}` | Get events by organizer |
 | GET | `/event/configuration/api/v1/events/{eventId}` | Get specific event by ID |
 
@@ -125,6 +126,12 @@ curl -X PUT http://localhost:8080/event/configuration/api/v1/events/{event-id} \
     "location": "Updated Location",
     "type": "BIRTHDAY"
   }'
+```
+
+**Delete Event:**
+```bash
+curl -X DELETE http://localhost:8080/event/configuration/api/v1/events/{event-id} \
+  -H "x-user-id: your-user-id"
 ```
 
 ## Testing Different Environments

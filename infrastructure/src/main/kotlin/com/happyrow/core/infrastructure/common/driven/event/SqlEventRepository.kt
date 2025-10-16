@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.flatMap
 import com.happyrow.core.domain.event.common.driven.event.EventRepository
 import com.happyrow.core.domain.event.common.error.CreateEventRepositoryException
+import com.happyrow.core.domain.event.common.error.DeleteEventRepositoryException
 import com.happyrow.core.domain.event.common.error.EventNotFoundException
 import com.happyrow.core.domain.event.common.error.UpdateEventRepositoryException
 import com.happyrow.core.domain.event.common.model.event.Event
@@ -16,6 +17,8 @@ import com.happyrow.core.infrastructure.event.common.driven.event.toEvent
 import com.happyrow.core.infrastructure.event.create.error.UnicityConflictException
 import com.happyrow.core.infrastructure.technical.config.ExposedDatabase
 import org.jetbrains.exposed.exceptions.ExposedSQLException
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -84,6 +87,22 @@ class SqlEventRepository(
         )
         it is EventNotFoundException -> UpdateEventRepositoryException(request, it)
         else -> UpdateEventRepositoryException(request, it)
+      }
+    }
+
+  override fun delete(identifier: UUID): Either<DeleteEventRepositoryException, Unit> = Either
+    .catch {
+      transaction(exposedDatabase.database) {
+        val deletedRows = EventTable.deleteWhere { EventTable.id eq identifier }
+        if (deletedRows == 0) {
+          throw EventNotFoundException(identifier)
+        }
+      }
+    }
+    .mapLeft {
+      when (it) {
+        is EventNotFoundException -> DeleteEventRepositoryException(identifier, it)
+        else -> DeleteEventRepositoryException(identifier, it)
       }
     }
 

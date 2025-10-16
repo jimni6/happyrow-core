@@ -95,6 +95,11 @@ Content-Type: application/json
   "location": "Updated Location",
   "type": "SNACK"
 }
+
+### Delete Event (replace {eventId} with actual ID)
+DELETE {{baseUrl}}{{apiPath}}/events/{eventId}
+x-user-id: {{userId}}
+
 ###
 # ============================================================================
 # cURL Examples (for command line usage)
