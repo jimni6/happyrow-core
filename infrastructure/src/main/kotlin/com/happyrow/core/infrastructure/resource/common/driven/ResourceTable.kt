@@ -1,13 +1,12 @@
 package com.happyrow.core.infrastructure.resource.common.driven
 
 import com.happyrow.core.infrastructure.event.common.driven.event.EventTable
-import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.javatime.timestamp
 
 private const val RESOURCE_NAME_MAX_LENGTH = 255
 
-object ResourceTable : Table("configuration.resource") {
-  val id = uuid("id").autoGenerate()
+object ResourceTable : UUIDTable("configuration.resource", "id") {
   val name = varchar("name", RESOURCE_NAME_MAX_LENGTH)
   val category = customEnumeration(
     "category",
@@ -21,8 +20,6 @@ object ResourceTable : Table("configuration.resource") {
   val version = integer("version").default(1)
   val createdAt = timestamp("created_at")
   val updatedAt = timestamp("updated_at")
-
-  override val primaryKey = PrimaryKey(id)
 
   init {
     index("idx_resource_event", false, eventId)
