@@ -5,10 +5,12 @@ import arrow.core.flatMap
 import com.happyrow.core.domain.event.common.driven.event.EventRepository
 import com.happyrow.core.domain.event.common.error.CreateEventRepositoryException
 import com.happyrow.core.domain.event.common.error.EventNotFoundException
+import com.happyrow.core.domain.event.common.error.UpdateEventRepositoryException
 import com.happyrow.core.domain.event.common.model.event.Event
 import com.happyrow.core.domain.event.create.model.CreateEventRequest
 import com.happyrow.core.domain.event.creator.model.Creator
 import com.happyrow.core.domain.event.get.error.GetEventException
+import com.happyrow.core.domain.event.update.model.UpdateEventRequest
 import com.happyrow.core.infrastructure.event.common.driven.event.EventTable
 import com.happyrow.core.infrastructure.event.common.driven.event.toEvent
 import com.happyrow.core.infrastructure.event.create.error.UnicityConflictException
@@ -17,6 +19,7 @@ import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import java.time.Clock
 import java.util.UUID
 
@@ -51,6 +54,36 @@ class SqlEventRepository(
         )
 
         else -> CreateEventRepositoryException(request, it)
+      }
+    }
+
+  override fun update(request: UpdateEventRequest): Either<UpdateEventRepositoryException, Event> = Either
+    .catch {
+      transaction(exposedDatabase.database) {
+        val updatedRows = EventTable.update({ EventTable.id eq request.identifier }) {
+          it[name] = request.name
+          it[description] = request.description
+          it[eventDate] = request.eventDate
+          it[location] = request.location
+          it[type] = request.type
+          it[updateDate] = clock.instant()
+          it[members] = request.members.map { member -> UUID.fromString(member.toString()) }
+        }
+        if (updatedRows == 0) {
+          throw EventNotFoundException(request.identifier)
+        }
+        request.identifier
+      }
+    }
+    .flatMap { find(it) }
+    .mapLeft {
+      when {
+        it.isUnicityConflictException() -> UpdateEventRepositoryException(
+          request = request,
+          cause = UnicityConflictException("An event with this name already exists", it),
+        )
+        it is EventNotFoundException -> UpdateEventRepositoryException(request, it)
+        else -> UpdateEventRepositoryException(request, it)
       }
     }
 

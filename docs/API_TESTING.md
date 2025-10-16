@@ -67,7 +67,8 @@ Click the green play button next to any request to execute it.
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/event/configuration/api/v1/events` | Create a new event |
-| GET | `/event/configuration/api/v1/events?organizer={userId}` | Get events by organizer |
+| PUT | `/event/configuration/api/v1/events/{eventId}` | Update an existing event |
+| GET | `/event/configuration/api/v1/events?organizerId={userId}` | Get events by organizer |
 | GET | `/event/configuration/api/v1/events/{eventId}` | Get specific event by ID |
 
 ## Event Types
@@ -98,6 +99,7 @@ Content-Type: application/json
 
 ### Using cURL
 
+**Create Event:**
 ```bash
 curl -X POST http://localhost:8080/event/configuration/api/v1/events \
   -H "Content-Type: application/json" \
@@ -108,6 +110,20 @@ curl -X POST http://localhost:8080/event/configuration/api/v1/events \
     "event_date": "2025-06-15T19:00:00Z",
     "location": "Backyard Garden",
     "type": "PARTY"
+  }'
+```
+
+**Update Event:**
+```bash
+curl -X PUT http://localhost:8080/event/configuration/api/v1/events/{event-id} \
+  -H "Content-Type: application/json" \
+  -H "x-user-id: your-user-id" \
+  -d '{
+    "name": "Updated Event Name",
+    "description": "Updated description",
+    "event_date": "2025-10-25T17:00:00Z",
+    "location": "Updated Location",
+    "type": "BIRTHDAY"
   }'
 ```
 
@@ -181,8 +197,29 @@ If testing from a browser or web app, ensure CORS is properly configured in the 
 
 ```json
 {
-  "error": "Invalid request",
-  "message": "Event date must be in the future"
+  "type": "INVALID_BODY",
+  "message": "Failed to parse body",
+  "detail": "Failed to parse body"
+}
+```
+
+### Error Response (404 Not Found)
+
+```json
+{
+  "type": "EVENT_NOT_FOUND",
+  "message": "Event with id {id} not found",
+  "detail": "Event with id {id} not found"
+}
+```
+
+### Error Response (409 Conflict)
+
+```json
+{
+  "type": "NAME_ALREADY_EXISTS",
+  "message": "An event with this name already exists",
+  "detail": "Event Name"
 }
 ```
 
