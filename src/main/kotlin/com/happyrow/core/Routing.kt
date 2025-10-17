@@ -1,10 +1,16 @@
 package com.happyrow.core
 
+import com.happyrow.core.domain.contribution.add.AddContributionUseCase
+import com.happyrow.core.domain.contribution.delete.DeleteContributionUseCase
 import com.happyrow.core.domain.event.create.CreateEventUseCase
 import com.happyrow.core.domain.event.delete.DeleteEventUseCase
 import com.happyrow.core.domain.event.get.GetEventsByOrganizerUseCase
 import com.happyrow.core.domain.event.update.UpdateEventUseCase
+import com.happyrow.core.domain.resource.create.CreateResourceUseCase
+import com.happyrow.core.domain.resource.get.GetResourcesByEventUseCase
+import com.happyrow.core.infrastructure.contribution.contributionEndpoints
 import com.happyrow.core.infrastructure.event.eventEndpoints
+import com.happyrow.core.infrastructure.resource.resourceEndpoints
 import io.ktor.http.ContentType
 import io.ktor.server.application.Application
 import io.ktor.server.response.respond
@@ -21,11 +27,17 @@ fun Application.configureRouting() {
   val getEventsByOrganizerUseCase: GetEventsByOrganizerUseCase by inject()
   val updateEventUseCase: UpdateEventUseCase by inject()
   val deleteEventUseCase: DeleteEventUseCase by inject()
+  val createResourceUseCase: CreateResourceUseCase by inject()
+  val getResourcesByEventUseCase: GetResourcesByEventUseCase by inject()
+  val addContributionUseCase: AddContributionUseCase by inject()
+  val deleteContributionUseCase: DeleteContributionUseCase by inject()
 
   routing {
     route(BASE_PATH) {
       route("/api/v1") {
         eventEndpoints(createEventUseCase, getEventsByOrganizerUseCase, updateEventUseCase, deleteEventUseCase)
+        resourceEndpoints(createResourceUseCase, getResourcesByEventUseCase)
+        contributionEndpoints(addContributionUseCase, deleteContributionUseCase)
       }
     }
 

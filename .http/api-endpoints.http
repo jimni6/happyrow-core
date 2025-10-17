@@ -100,6 +100,164 @@ Content-Type: application/json
 DELETE {{baseUrl}}{{apiPath}}/events/{eventId}
 x-user-id: {{userId}}
 
+# ============================================================================
+# Resource Management Endpoints
+# ============================================================================
+
+### Create Resource - Food (replace {eventId} with actual event ID)
+POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources
+Content-Type: application/json
+
+{
+  "name": "Pizza",
+  "category": "FOOD",
+  "suggestedQuantity": 5
+}
+
+### Create Resource - Drink
+POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources
+Content-Type: application/json
+
+{
+  "name": "Soda (2L bottles)",
+  "category": "DRINK",
+  "suggestedQuantity": 10
+}
+
+### Create Resource - Utensil
+POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources
+Content-Type: application/json
+
+{
+  "name": "Plates",
+  "category": "UTENSIL",
+  "suggestedQuantity": 30
+}
+
+### Create Resource - Decoration
+POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources
+Content-Type: application/json
+
+{
+  "name": "Balloons",
+  "category": "DECORATION",
+  "suggestedQuantity": 20
+}
+
+### Create Resource - Other
+POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources
+Content-Type: application/json
+
+{
+  "name": "Music Playlist",
+  "category": "OTHER",
+  "suggestedQuantity": 1
+}
+
+### Get All Resources for Event
+GET {{baseUrl}}{{apiPath}}/events/{eventId}/resources
+
+# ============================================================================
+# Contribution Management Endpoints
+# ============================================================================
+
+### Add Contribution - User 1 brings 2 pizzas
+POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources/{resourceId}/contributions
+x-user-id: {{userId}}
+Content-Type: application/json
+
+{
+  "quantity": 2
+}
+
+### Add Contribution - User 2 brings 3 sodas
+POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources/{resourceId}/contributions
+x-user-id: user-2-uuid
+Content-Type: application/json
+
+{
+  "quantity": 3
+}
+
+### Update Contribution - User 1 changes to 3 pizzas (optimistic locking test)
+POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources/{resourceId}/contributions
+x-user-id: {{userId}}
+Content-Type: application/json
+
+{
+  "quantity": 3
+}
+
+### Delete Contribution - User 1 removes contribution
+DELETE {{baseUrl}}{{apiPath}}/events/{eventId}/resources/{resourceId}/contributions
+x-user-id: {{userId}}
+
+# ============================================================================
+# Complete Flow Example
+# ============================================================================
+# This demonstrates the full collaborative resource management flow:
+# 1. Create an event
+# 2. Add resources to the event
+# 3. Multiple users contribute quantities
+# 4. View updated resources with current quantities
+# 5. Test optimistic locking with concurrent updates
+
+### STEP 1: Create Event for Party
+POST {{baseUrl}}{{apiPath}}/events
+x-user-id: {{userId}}
+Content-Type: application/json
+
+{
+  "name": "Community BBQ 2025",
+  "description": "Neighborhood barbecue party",
+  "event_date": "2025-07-20T17:00:00Z",
+  "location": "Central Park",
+  "type": "PARTY"
+}
+
+### STEP 2: Add Pizza Resource (copy eventId from step 1 response)
+POST {{baseUrl}}{{apiPath}}/events/518a8d20-de14-4e0e-b913-8cb62dc8367d/resources
+Content-Type: application/json
+
+{
+  "name": "Pizzas",
+  "category": "FOOD",
+  "suggestedQuantity": 10
+}
+
+### STEP 3: User 1 contributes 3 pizzas (copy resourceId from step 2 response)
+POST {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources/PASTE_RESOURCE_ID_HERE/contributions
+x-user-id: ab70634a-345e-415e-8417-60841b6bcb20
+Content-Type: application/json
+
+{
+  "quantity": 3
+}
+
+### STEP 4: User 2 contributes 2 pizzas
+POST {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources/PASTE_RESOURCE_ID_HERE/contributions
+x-user-id: cd80734b-456f-526f-9528-71952c7cdc31
+Content-Type: application/json
+
+{
+  "quantity": 2
+}
+
+### STEP 5: View all resources (should show currentQuantity: 5, suggestedQuantity: 10)
+GET {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources
+
+### STEP 6: User 1 updates contribution to 4 pizzas (tests update logic)
+POST {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources/PASTE_RESOURCE_ID_HERE/contributions
+x-user-id: ab70634a-345e-415e-8417-60841b6bcb20
+Content-Type: application/json
+
+{
+  "quantity": 4
+}
+
+### STEP 7: View resources again (should show currentQuantity: 6)
+GET {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources
+
 ###
 # ============================================================================
 # cURL Examples (for command line usage)
@@ -119,4 +277,28 @@ x-user-id: {{userId}}
 
 ### Example: Get Events via cURL (localhost)
 # curl -X GET "http://localhost:8080/event/configuration/api/v1/events?organizerId=ab70634a-345e-415e-8417-60841b6bcb20" \
+#   -H "x-user-id: ab70634a-345e-415e-8417-60841b6bcb20"
+
+### Example: Create Resource via cURL (localhost)
+# curl -X POST http://localhost:8080/event/configuration/api/v1/events/{eventId}/resources \
+#   -H "Content-Type: application/json" \
+#   -d '{
+#     "name": "Pizza",
+#     "category": "FOOD",
+#     "suggestedQuantity": 5
+#   }'
+
+### Example: Get Resources via cURL (localhost)
+# curl -X GET http://localhost:8080/event/configuration/api/v1/events/{eventId}/resources
+
+### Example: Add Contribution via cURL (localhost)
+# curl -X POST http://localhost:8080/event/configuration/api/v1/events/{eventId}/resources/{resourceId}/contributions \
+#   -H "Content-Type: application/json" \
+#   -H "x-user-id: ab70634a-345e-415e-8417-60841b6bcb20" \
+#   -d '{
+#     "quantity": 3
+#   }'
+
+### Example: Delete Contribution via cURL (localhost)
+# curl -X DELETE http://localhost:8080/event/configuration/api/v1/events/{eventId}/resources/{resourceId}/contributions \
 #   -H "x-user-id: ab70634a-345e-415e-8417-60841b6bcb20"
