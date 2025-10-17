@@ -5,6 +5,7 @@ import arrow.core.flatMap
 import com.happyrow.core.domain.participant.common.driven.ParticipantRepository
 import com.happyrow.core.domain.participant.common.error.CreateParticipantRepositoryException
 import com.happyrow.core.domain.participant.common.error.GetParticipantRepositoryException
+import com.happyrow.core.domain.participant.common.error.UpdateParticipantRepositoryException
 import com.happyrow.core.domain.participant.common.model.Participant
 import com.happyrow.core.domain.participant.common.model.ParticipantStatus
 import com.happyrow.core.domain.participant.create.model.CreateParticipantRequest
@@ -13,6 +14,7 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import java.time.Clock
 import java.util.UUID
 
@@ -46,6 +48,34 @@ class SqlParticipantRepository(
           }
       }
       .mapLeft { CreateParticipantRepositoryException(request, it) }
+
+  override fun update(participant: Participant): Either<UpdateParticipantRepositoryException, Participant> =
+    Either.catch {
+      transaction(exposedDatabase.database) {
+        ParticipantTable.update({
+          (ParticipantTable.userId eq participant.userId) and (ParticipantTable.eventId eq participant.eventId)
+        }) {
+          it[status] = participant.status.name
+          it[updatedAt] = clock.instant()
+        }
+      }
+    }
+      .flatMap {
+        find(participant.userId, participant.eventId)
+          .mapLeft { UpdateParticipantRepositoryException(participant.userId, participant.eventId, it) }
+          .flatMap {
+            it?.let {
+              Either.Right(it)
+            } ?: Either.Left(
+              UpdateParticipantRepositoryException(
+                participant.userId,
+                participant.eventId,
+                Exception("Participant not found after update"),
+              ),
+            )
+          }
+      }
+      .mapLeft { UpdateParticipantRepositoryException(participant.userId, participant.eventId, it) }
 
   override fun findOrCreate(userId: UUID, eventId: UUID): Either<CreateParticipantRepositoryException, Participant> {
     return find(userId, eventId)
