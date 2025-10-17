@@ -1,9 +1,7 @@
 package com.happyrow.core.infrastructure.resource.common.dto
 
 import com.happyrow.core.domain.resource.common.model.Resource
-import kotlinx.serialization.Serializable
 
-@Serializable
 data class ResourceDto(
   val identifier: String,
   val name: String,

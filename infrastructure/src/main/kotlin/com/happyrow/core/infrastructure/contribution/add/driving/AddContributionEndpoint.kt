@@ -6,7 +6,6 @@ import com.happyrow.core.domain.contribution.add.AddContributionUseCase
 import com.happyrow.core.domain.contribution.add.error.AddContributionException
 import com.happyrow.core.domain.resource.common.error.OptimisticLockException
 import com.happyrow.core.infrastructure.contribution.add.driving.dto.AddContributionRequestDto
-import com.happyrow.core.infrastructure.contribution.add.driving.dto.toDomain
 import com.happyrow.core.infrastructure.contribution.common.dto.toDto
 import com.happyrow.core.infrastructure.event.common.error.BadRequestException
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage

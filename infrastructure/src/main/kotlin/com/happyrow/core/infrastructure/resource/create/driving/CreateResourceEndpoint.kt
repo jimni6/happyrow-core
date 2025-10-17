@@ -7,7 +7,6 @@ import com.happyrow.core.domain.resource.create.error.CreateResourceException
 import com.happyrow.core.infrastructure.event.common.error.BadRequestException
 import com.happyrow.core.infrastructure.resource.common.dto.toDto
 import com.happyrow.core.infrastructure.resource.create.driving.dto.CreateResourceRequestDto
-import com.happyrow.core.infrastructure.resource.create.driving.dto.toDomain
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
 import com.happyrow.core.infrastructure.technical.ktor.logAndRespond

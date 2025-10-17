@@ -1,9 +1,7 @@
 package com.happyrow.core.infrastructure.contribution.common.dto
 
 import com.happyrow.core.domain.contribution.common.model.Contribution
-import kotlinx.serialization.Serializable
 
-@Serializable
 data class ContributionDto(
   val identifier: String,
   val participantId: String,

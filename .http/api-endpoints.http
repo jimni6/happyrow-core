@@ -101,6 +101,73 @@ DELETE {{baseUrl}}{{apiPath}}/events/{eventId}
 x-user-id: {{userId}}
 
 # ============================================================================
+# Participant Management Endpoints
+# ============================================================================
+
+### Create Participant - Confirmed (replace {eventId} with actual event ID)
+POST {{baseUrl}}{{apiPath}}/events/{{eventId}}/participants
+Content-Type: application/json
+
+{
+  "user_id": "ab70634a-345e-415e-8417-60841b6bcb20",
+  "status": "CONFIRMED"
+}
+
+### Create Participant - Invited
+POST {{baseUrl}}{{apiPath}}/events/{eventId}/participants
+Content-Type: application/json
+
+{
+  "user_id": "cd80734b-456f-526f-9528-71952c7cdc31",
+  "status": "INVITED"
+}
+
+### Create Participant - Maybe
+POST {{baseUrl}}{{apiPath}}/events/{eventId}/participants
+Content-Type: application/json
+
+{
+  "user_id": "ef90845c-567g-637g-0639-82063d8ded42",
+  "status": "MAYBE"
+}
+
+### Create Participant - Declined
+POST {{baseUrl}}{{apiPath}}/events/{eventId}/participants
+Content-Type: application/json
+
+{
+  "user_id": "gh01956d-678h-748h-1740-93174e9efe53",
+  "status": "DECLINED"
+}
+
+### Get All Participants for Event
+GET {{baseUrl}}{{apiPath}}/events/4f7e9c6f-cf3f-450e-8aff-0ac0b82f9c1f/participants
+
+### Update Participant Status - Change to CONFIRMED
+PUT {{baseUrl}}{{apiPath}}/events/{eventId}/participants/{userId}
+Content-Type: application/json
+
+{
+  "status": "CONFIRMED"
+}
+
+### Update Participant Status - Change to DECLINED
+PUT {{baseUrl}}{{apiPath}}/events/{eventId}/participants/{userId}
+Content-Type: application/json
+
+{
+  "status": "DECLINED"
+}
+
+### Update Participant Status - Change to MAYBE
+PUT {{baseUrl}}{{apiPath}}/events/{eventId}/participants/{userId}
+Content-Type: application/json
+
+{
+  "status": "MAYBE"
+}
+
+# ============================================================================
 # Resource Management Endpoints
 # ============================================================================
 
@@ -111,7 +178,7 @@ Content-Type: application/json
 {
   "name": "Pizza",
   "category": "FOOD",
-  "suggestedQuantity": 5
+  "suggested_quantity": 5
 }
 
 ### Create Resource - Drink
@@ -121,7 +188,7 @@ Content-Type: application/json
 {
   "name": "Soda (2L bottles)",
   "category": "DRINK",
-  "suggestedQuantity": 10
+  "suggested_quantity": 10
 }
 
 ### Create Resource - Utensil
@@ -131,7 +198,7 @@ Content-Type: application/json
 {
   "name": "Plates",
   "category": "UTENSIL",
-  "suggestedQuantity": 30
+  "suggested_quantity": 30
 }
 
 ### Create Resource - Decoration
@@ -141,7 +208,7 @@ Content-Type: application/json
 {
   "name": "Balloons",
   "category": "DECORATION",
-  "suggestedQuantity": 20
+  "suggested_quantity": 20
 }
 
 ### Create Resource - Other
@@ -151,7 +218,7 @@ Content-Type: application/json
 {
   "name": "Music Playlist",
   "category": "OTHER",
-  "suggestedQuantity": 1
+  "suggested_quantity": 1
 }
 
 ### Get All Resources for Event
@@ -197,10 +264,11 @@ x-user-id: {{userId}}
 # ============================================================================
 # This demonstrates the full collaborative resource management flow:
 # 1. Create an event
-# 2. Add resources to the event
-# 3. Multiple users contribute quantities
-# 4. View updated resources with current quantities
-# 5. Test optimistic locking with concurrent updates
+# 2. Add participants to the event
+# 3. Add resources to the event
+# 4. Multiple users contribute quantities
+# 5. View updated resources with current quantities
+# 6. Test optimistic locking with concurrent updates
 
 ### STEP 1: Create Event for Party
 POST {{baseUrl}}{{apiPath}}/events
@@ -215,17 +283,46 @@ Content-Type: application/json
   "type": "PARTY"
 }
 
-### STEP 2: Add Pizza Resource (copy eventId from step 1 response)
+### STEP 2a: Add Participant User 1 (copy eventId from step 1 response)
+POST {{baseUrl}}{{apiPath}}/events/9de31e71-135a-4a82-a301-6d2c90af2f81/participants
+Content-Type: application/json
+
+{
+  "user_id": "ab70634a-345e-415e-8417-60841b6bcb20",
+  "status": "INVITED"
+}
+
+### STEP 2b: Add Participant User 2
+POST {{baseUrl}}{{apiPath}}/events/9de31e71-135a-4a82-a301-6d2c90af2f81/participants
+Content-Type: application/json
+
+{
+  "user_id": "cd80734b-456f-526f-9528-71952c7cdc31",
+  "status": "INVITED"
+}
+
+### STEP 2c: Update Participant User 2 Status to DECLINED
+PUT {{baseUrl}}{{apiPath}}/events/9de31e71-135a-4a82-a301-6d2c90af2f81/participants/cd80734b-456f-526f-9528-71952c7cdc31
+Content-Type: application/json
+
+{
+  "status": "DECLINED"
+}
+
+### STEP 2d: View all participants
+GET {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/participants
+
+### STEP 3: Add Pizza Resource
 POST {{baseUrl}}{{apiPath}}/events/518a8d20-de14-4e0e-b913-8cb62dc8367d/resources
 Content-Type: application/json
 
 {
   "name": "Pizzas",
   "category": "FOOD",
-  "suggestedQuantity": 10
+  "suggested_quantity": 10
 }
 
-### STEP 3: User 1 contributes 3 pizzas (copy resourceId from step 2 response)
+### STEP 4: User 1 contributes 3 pizzas (copy resourceId from step 3 response)
 POST {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources/PASTE_RESOURCE_ID_HERE/contributions
 x-user-id: ab70634a-345e-415e-8417-60841b6bcb20
 Content-Type: application/json
@@ -234,7 +331,7 @@ Content-Type: application/json
   "quantity": 3
 }
 
-### STEP 4: User 2 contributes 2 pizzas
+### STEP 5: User 2 contributes 2 pizzas
 POST {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources/PASTE_RESOURCE_ID_HERE/contributions
 x-user-id: cd80734b-456f-526f-9528-71952c7cdc31
 Content-Type: application/json
@@ -243,10 +340,10 @@ Content-Type: application/json
   "quantity": 2
 }
 
-### STEP 5: View all resources (should show currentQuantity: 5, suggestedQuantity: 10)
+### STEP 6: View all resources (should show current_quantity: 5, suggested_quantity: 10)
 GET {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources
 
-### STEP 6: User 1 updates contribution to 4 pizzas (tests update logic)
+### STEP 7: User 1 updates contribution to 4 pizzas (tests update logic)
 POST {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources/PASTE_RESOURCE_ID_HERE/contributions
 x-user-id: ab70634a-345e-415e-8417-60841b6bcb20
 Content-Type: application/json
@@ -255,7 +352,7 @@ Content-Type: application/json
   "quantity": 4
 }
 
-### STEP 7: View resources again (should show currentQuantity: 6)
+### STEP 8: View resources again (should show current_quantity: 6)
 GET {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources
 
 ###
@@ -279,13 +376,24 @@ GET {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources
 # curl -X GET "http://localhost:8080/event/configuration/api/v1/events?organizerId=ab70634a-345e-415e-8417-60841b6bcb20" \
 #   -H "x-user-id: ab70634a-345e-415e-8417-60841b6bcb20"
 
+### Example: Create Participant via cURL (localhost)
+# curl -X POST http://localhost:8080/event/configuration/api/v1/events/{eventId}/participants \
+#   -H "Content-Type: application/json" \
+#   -d '{
+#     "user_id": "ab70634a-345e-415e-8417-60841b6bcb20",
+#     "status": "CONFIRMED"
+#   }'
+
+### Example: Get Participants via cURL (localhost)
+# curl -X GET http://localhost:8080/event/configuration/api/v1/events/{eventId}/participants
+
 ### Example: Create Resource via cURL (localhost)
 # curl -X POST http://localhost:8080/event/configuration/api/v1/events/{eventId}/resources \
 #   -H "Content-Type: application/json" \
 #   -d '{
 #     "name": "Pizza",
 #     "category": "FOOD",
-#     "suggestedQuantity": 5
+#     "suggested_quantity": 5
 #   }'
 
 ### Example: Get Resources via cURL (localhost)
