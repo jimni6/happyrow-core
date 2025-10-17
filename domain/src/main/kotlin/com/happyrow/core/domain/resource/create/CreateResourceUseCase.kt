@@ -26,7 +26,15 @@ class CreateResourceUseCase(
             quantity = request.initialQuantity,
           ),
         )
-          .map { resource } // Return the resource, not the contribution
           .mapLeft { CreateResourceException(request, it) }
+          .flatMap {
+            // Fetch the updated resource after contribution
+            resourceRepository.find(resource.identifier)
+              .mapLeft { CreateResourceException(request, it) }
+              .flatMap { updatedResource ->
+                updatedResource?.let { Either.Right(it) }
+                  ?: Either.Left(CreateResourceException(request, Exception("Resource not found after creation")))
+              }
+          }
       }
 }

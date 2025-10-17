@@ -105,11 +105,11 @@ x-user-id: {{userId}}
 # ============================================================================
 
 ### Create Participant - Confirmed (replace {eventId} with actual event ID)
-POST {{baseUrl}}{{apiPath}}/events/{{eventId}}/participants
+POST {{baseUrl}}{{apiPath}}/events/06f92b25-0cc4-4709-86c6-b556f304e876/participants
 Content-Type: application/json
 
 {
-  "user_id": "ab70634a-345e-415e-8417-60841b6bcb20",
+  "user_id": "ab70634a-345e-415e-8417-60841b6bcb21",
   "status": "CONFIRMED"
 }
 
@@ -141,7 +141,7 @@ Content-Type: application/json
 }
 
 ### Get All Participants for Event
-GET {{baseUrl}}{{apiPath}}/events/4f7e9c6f-cf3f-450e-8aff-0ac0b82f9c1f/participants
+GET {{baseUrl}}{{apiPath}}/events/06f92b25-0cc4-4709-86c6-b556f304e876/participants
 
 ### Update Participant Status - Change to CONFIRMED
 PUT {{baseUrl}}{{apiPath}}/events/{eventId}/participants/{userId}
@@ -172,14 +172,14 @@ Content-Type: application/json
 # ============================================================================
 
 ### Create Resource - Food (replace {eventId} with actual event ID)
-POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources
+POST {{baseUrl}}{{apiPath}}/events/06f92b25-0cc4-4709-86c6-b556f304e876/resources
 x-user-id: ab70634a-345e-415e-8417-60841b6bcb20
 Content-Type: application/json
 
 {
-  "name": "Pizza",
+  "name": "steak",
   "category": "FOOD",
-  "quantity": 5
+  "quantity": 1
 }
 
 ### Create Resource - Drink
