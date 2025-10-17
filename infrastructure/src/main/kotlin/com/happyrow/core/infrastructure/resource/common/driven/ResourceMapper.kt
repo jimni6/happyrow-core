@@ -9,7 +9,7 @@ fun ResultRow.toResource(): Either<Throwable, Resource> = Either.catch {
   Resource(
     identifier = this[ResourceTable.id].value,
     name = this[ResourceTable.name],
-    category = ResourceCategory.valueOf(this[ResourceTable.category].name),
+    category = ResourceCategory.valueOf(this[ResourceTable.category]),
     suggestedQuantity = this[ResourceTable.suggestedQuantity],
     currentQuantity = this[ResourceTable.currentQuantity],
     eventId = this[ResourceTable.eventId],

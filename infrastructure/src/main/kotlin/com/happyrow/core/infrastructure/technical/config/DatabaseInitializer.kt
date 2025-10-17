@@ -52,6 +52,29 @@ class DatabaseInitializer(
       SchemaUtils.create(ResourceTable)
       SchemaUtils.create(ContributionTable)
 
+      // Migrate resource.category column from enum to varchar if needed
+      logger.info("Migrating resource.category column type...")
+      exec(
+        """
+        DO $$ BEGIN
+          -- Check if column exists and is of type enum
+          IF EXISTS (
+            SELECT 1 FROM information_schema.columns
+            WHERE table_schema = 'configuration'
+            AND table_name = 'resource'
+            AND column_name = 'category'
+            AND udt_name = 'resource_category'
+          ) THEN
+            -- Alter column type from enum to varchar, keeping the data
+            ALTER TABLE configuration.resource
+            ALTER COLUMN category TYPE VARCHAR(50) USING category::text;
+
+            RAISE NOTICE 'Migrated resource.category from enum to varchar';
+          END IF;
+        END $$;
+        """.trimIndent(),
+      )
+
       logger.info("Database initialization completed successfully!")
     }
   }

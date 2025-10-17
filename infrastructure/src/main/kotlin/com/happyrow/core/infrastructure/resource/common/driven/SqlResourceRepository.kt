@@ -28,7 +28,7 @@ class SqlResourceRepository(
       transaction(exposedDatabase.database) {
         ResourceTable.insertAndGetId {
           it[name] = request.name
-          it[category] = ResourceCategoryDb.valueOf(request.category.name)
+          it[category] = request.category.name
           it[suggestedQuantity] = request.suggestedQuantity
           it[currentQuantity] = 0
           it[eventId] = request.eventId

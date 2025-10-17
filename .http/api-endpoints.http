@@ -166,7 +166,7 @@ Content-Type: application/json
 {
   "status": "MAYBE"
 }
-
+###
 # ============================================================================
 # Resource Management Endpoints
 # ============================================================================
@@ -297,7 +297,7 @@ POST {{baseUrl}}{{apiPath}}/events/9de31e71-135a-4a82-a301-6d2c90af2f81/particip
 Content-Type: application/json
 
 {
-  "user_id": "cd80734b-456f-526f-9528-71952c7cdc31",
+  "user_id": "cd80734b-456f-526f-9528-71952c7aaaa",
   "status": "INVITED"
 }
 
@@ -310,10 +310,10 @@ Content-Type: application/json
 }
 
 ### STEP 2d: View all participants
-GET {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/participants
+GET {{baseUrl}}{{apiPath}}/events/9de31e71-135a-4a82-a301-6d2c90af2f81/participants
 
 ### STEP 3: Add Pizza Resource
-POST {{baseUrl}}{{apiPath}}/events/518a8d20-de14-4e0e-b913-8cb62dc8367d/resources
+POST {{baseUrl}}{{apiPath}}/events/9de31e71-135a-4a82-a301-6d2c90af2f81/resources
 Content-Type: application/json
 
 {
