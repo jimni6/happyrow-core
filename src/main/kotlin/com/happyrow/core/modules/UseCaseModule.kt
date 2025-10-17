@@ -14,7 +14,7 @@ import com.happyrow.core.domain.resource.get.GetResourcesByEventUseCase
 import org.koin.dsl.module
 
 val domainModule = module {
-  single<CreateEventUseCase> { CreateEventUseCase(get()) }
+  single<CreateEventUseCase> { CreateEventUseCase(get(), get()) }
   single<GetEventsByOrganizerUseCase> { GetEventsByOrganizerUseCase(get()) }
   single<UpdateEventUseCase> { UpdateEventUseCase(get()) }
   single<DeleteEventUseCase> { DeleteEventUseCase(get()) }

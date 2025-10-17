@@ -6,6 +6,7 @@ import com.happyrow.core.domain.event.common.driven.event.EventRepository
 import com.happyrow.core.domain.event.common.error.CreateEventRepositoryException
 import com.happyrow.core.domain.event.create.error.CreateEventException
 import com.happyrow.core.domain.event.create.model.CreateEventRequest
+import com.happyrow.core.domain.participant.common.driven.ParticipantRepository
 import com.happyrow.core.extension.then
 import com.happyrow.core.persona.Persona
 import io.kotest.assertions.arrow.core.shouldBeLeft
@@ -18,7 +19,8 @@ import org.junit.jupiter.api.Test
 
 class CreateEventUseCaseTestUT {
   private val eventRepositoryMock = mockk<EventRepository>()
-  private val useCase = CreateEventUseCase(eventRepositoryMock)
+  private val participantRepositoryMock = mockk<ParticipantRepository>()
+  private val useCase = CreateEventUseCase(eventRepositoryMock, participantRepositoryMock)
 
   @BeforeEach
   fun beforeEach() {
@@ -51,6 +53,10 @@ class CreateEventUseCaseTestUT {
     every {
       eventRepositoryMock.create(Persona.Event.aCreateEventRequest)
     } returns Persona.Event.anEvent.right()
+
+    every {
+      participantRepositoryMock.create(any())
+    } returns mockk<com.happyrow.core.domain.participant.common.model.Participant>(relaxed = true).right()
   }
 
   private fun CreateEventRequest.andAFailingCreation(error: CreateEventRepositoryException) = also {
