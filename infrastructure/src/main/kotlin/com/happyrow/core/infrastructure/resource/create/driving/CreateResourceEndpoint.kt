@@ -9,6 +9,7 @@ import com.happyrow.core.infrastructure.resource.common.dto.toDto
 import com.happyrow.core.infrastructure.resource.create.driving.dto.CreateResourceRequestDto
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
+import com.happyrow.core.infrastructure.technical.ktor.getHeader
 import com.happyrow.core.infrastructure.technical.ktor.logAndRespond
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
@@ -17,6 +18,8 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import java.util.UUID
+
+private const val USER_ID_HEADER = "x-user-id"
 
 fun Route.createResourceEndpoint(createResourceUseCase: CreateResourceUseCase) {
   post {
@@ -27,7 +30,10 @@ fun Route.createResourceEndpoint(createResourceUseCase: CreateResourceUseCase) {
       call.receive<CreateResourceRequestDto>()
     }
       .mapLeft { BadRequestException.InvalidBodyException(it) }
-      .map { it.toDomain(eventId) }
+      .flatMap { requestDto ->
+        call.getHeader(USER_ID_HEADER)
+          .map { userId -> requestDto.toDomain(eventId, UUID.fromString(userId)) }
+      }
       .flatMap { request -> createResourceUseCase.execute(request) }
       .map { it.toDto() }
       .fold(

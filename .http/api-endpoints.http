@@ -173,52 +173,57 @@ Content-Type: application/json
 
 ### Create Resource - Food (replace {eventId} with actual event ID)
 POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources
+x-user-id: ab70634a-345e-415e-8417-60841b6bcb20
 Content-Type: application/json
 
 {
   "name": "Pizza",
   "category": "FOOD",
-  "suggested_quantity": 5
+  "quantity": 5
 }
 
 ### Create Resource - Drink
 POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources
+x-user-id: cd80734b-456f-526f-9528-71952c7cdc31
 Content-Type: application/json
 
 {
   "name": "Soda (2L bottles)",
   "category": "DRINK",
-  "suggested_quantity": 10
+  "quantity": 10
 }
 
 ### Create Resource - Utensil
 POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources
+x-user-id: ab70634a-345e-415e-8417-60841b6bcb20
 Content-Type: application/json
 
 {
   "name": "Plates",
   "category": "UTENSIL",
-  "suggested_quantity": 30
+  "quantity": 30
 }
 
 ### Create Resource - Decoration
 POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources
+x-user-id: cd80734b-456f-526f-9528-71952c7cdc31
 Content-Type: application/json
 
 {
   "name": "Balloons",
   "category": "DECORATION",
-  "suggested_quantity": 20
+  "quantity": 20
 }
 
 ### Create Resource - Other
 POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources
+x-user-id: ab70634a-345e-415e-8417-60841b6bcb20
 Content-Type: application/json
 
 {
   "name": "Music Playlist",
   "category": "OTHER",
-  "suggested_quantity": 1
+  "quantity": 1
 }
 
 ### Get All Resources for Event
@@ -312,26 +317,19 @@ Content-Type: application/json
 ### STEP 2d: View all participants
 GET {{baseUrl}}{{apiPath}}/events/9de31e71-135a-4a82-a301-6d2c90af2f81/participants
 
-### STEP 3: Add Pizza Resource
+### STEP 3: Add Pizza Resource (User 1 brings 3 pizzas)
 POST {{baseUrl}}{{apiPath}}/events/9de31e71-135a-4a82-a301-6d2c90af2f81/resources
+x-user-id: ab70634a-345e-415e-8417-60841b6bcb20
 Content-Type: application/json
 
 {
   "name": "Pizzas",
   "category": "FOOD",
+  "quantity": 3,
   "suggested_quantity": 10
 }
 
-### STEP 4: User 1 contributes 3 pizzas (copy resourceId from step 3 response)
-POST {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources/PASTE_RESOURCE_ID_HERE/contributions
-x-user-id: ab70634a-345e-415e-8417-60841b6bcb20
-Content-Type: application/json
-
-{
-  "quantity": 3
-}
-
-### STEP 5: User 2 contributes 2 pizzas
+### STEP 4: User 2 adds more pizzas (copy resourceId from step 3 response)
 POST {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources/PASTE_RESOURCE_ID_HERE/contributions
 x-user-id: cd80734b-456f-526f-9528-71952c7cdc31
 Content-Type: application/json
@@ -340,10 +338,10 @@ Content-Type: application/json
   "quantity": 2
 }
 
-### STEP 6: View all resources (should show current_quantity: 5, suggested_quantity: 10)
+### STEP 5: View all resources (should show current_quantity: 5, suggested_quantity: 10)
 GET {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources
 
-### STEP 7: User 1 updates contribution to 4 pizzas (tests update logic)
+### STEP 6: User 1 updates their contribution to 4 pizzas (tests update logic)
 POST {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources/PASTE_RESOURCE_ID_HERE/contributions
 x-user-id: ab70634a-345e-415e-8417-60841b6bcb20
 Content-Type: application/json
@@ -352,7 +350,7 @@ Content-Type: application/json
   "quantity": 4
 }
 
-### STEP 8: View resources again (should show current_quantity: 6)
+### STEP 7: View resources again (should show current_quantity: 6)
 GET {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources
 
 ###
@@ -390,10 +388,12 @@ GET {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources
 ### Example: Create Resource via cURL (localhost)
 # curl -X POST http://localhost:8080/event/configuration/api/v1/events/{eventId}/resources \
 #   -H "Content-Type: application/json" \
+#   -H "x-user-id: ab70634a-345e-415e-8417-60841b6bcb20" \
 #   -d '{
 #     "name": "Pizza",
 #     "category": "FOOD",
-#     "suggested_quantity": 5
+#     "quantity": 5,
+#     "suggested_quantity": 10
 #   }'
 
 ### Example: Get Resources via cURL (localhost)

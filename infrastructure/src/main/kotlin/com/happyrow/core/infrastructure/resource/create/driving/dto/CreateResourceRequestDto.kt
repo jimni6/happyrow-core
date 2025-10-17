@@ -7,12 +7,15 @@ import java.util.UUID
 class CreateResourceRequestDto(
   val name: String,
   val category: String,
-  val suggestedQuantity: Int,
+  val quantity: Int,
+  val suggestedQuantity: Int? = null,
 ) {
-  fun toDomain(eventId: UUID): CreateResourceRequest = CreateResourceRequest(
+  fun toDomain(eventId: UUID, userId: UUID): CreateResourceRequest = CreateResourceRequest(
     name = this.name,
     category = ResourceCategory.valueOf(this.category),
-    suggestedQuantity = this.suggestedQuantity,
+    initialQuantity = this.quantity,
     eventId = eventId,
+    userId = userId,
+    suggestedQuantity = this.suggestedQuantity ?: this.quantity,
   )
 }

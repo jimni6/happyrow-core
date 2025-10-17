@@ -21,7 +21,7 @@ val domainModule = module {
   single<CreateParticipantUseCase> { CreateParticipantUseCase(get()) }
   single<GetParticipantsByEventUseCase> { GetParticipantsByEventUseCase(get()) }
   single<UpdateParticipantUseCase> { UpdateParticipantUseCase(get()) }
-  single<CreateResourceUseCase> { CreateResourceUseCase(get()) }
+  single<CreateResourceUseCase> { CreateResourceUseCase(get(), get()) }
   single<GetResourcesByEventUseCase> { GetResourcesByEventUseCase(get()) }
   single<AddContributionUseCase> { AddContributionUseCase(get()) }
   single<DeleteContributionUseCase> { DeleteContributionUseCase(get()) }

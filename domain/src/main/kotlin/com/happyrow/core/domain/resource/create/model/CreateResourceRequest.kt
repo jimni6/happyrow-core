@@ -6,6 +6,8 @@ import java.util.UUID
 data class CreateResourceRequest(
   val name: String,
   val category: ResourceCategory,
-  val suggestedQuantity: Int,
+  val initialQuantity: Int,
   val eventId: UUID,
+  val userId: UUID,
+  val suggestedQuantity: Int = 0,
 )

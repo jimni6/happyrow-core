@@ -30,7 +30,7 @@ class SqlResourceRepository(
           it[name] = request.name
           it[category] = request.category.name
           it[suggestedQuantity] = request.suggestedQuantity
-          it[currentQuantity] = 0
+          it[currentQuantity] = request.initialQuantity
           it[eventId] = request.eventId
           it[version] = 1
           it[createdAt] = clock.instant()
