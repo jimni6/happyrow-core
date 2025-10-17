@@ -227,15 +227,15 @@ Content-Type: application/json
 }
 
 ### Get All Resources for Event
-GET {{baseUrl}}{{apiPath}}/events/{eventId}/resources
+GET {{baseUrl}}{{apiPath}}/events/06f92b25-0cc4-4709-86c6-b556f304e876/resources
 
 # ============================================================================
 # Contribution Management Endpoints
 # ============================================================================
 
 ### Add Contribution - User 1 brings 2 pizzas
-POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources/{resourceId}/contributions
-x-user-id: {{userId}}
+POST {{baseUrl}}{{apiPath}}/events/06f92b25-0cc4-4709-86c6-b556f304e876/resources/0acf72a9-a8cc-4ffa-be5c-331b0c6003be/contributions
+x-user-id: 06f92b25-0cc4-4709-86c6-b556f304e000
 Content-Type: application/json
 
 {

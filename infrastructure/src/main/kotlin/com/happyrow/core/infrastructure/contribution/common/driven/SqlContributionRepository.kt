@@ -44,18 +44,18 @@ class SqlContributionRepository(
 
         existingContribution.flatMap { existing ->
           if (existing != null) {
-            // Update existing contribution
+            // Update existing contribution - add delta to existing quantity
             val oldQuantity = existing[ContributionTable.quantity]
-            val quantityDelta = request.quantity - oldQuantity
+            val newQuantity = oldQuantity + request.quantity
 
-            updateContribution(participant.identifier, request.resourceId, request.quantity)
+            updateContribution(participant.identifier, request.resourceId, newQuantity)
               .flatMap { contribution ->
-                // Update resource quantity
+                // Update resource quantity by the delta (request.quantity is the amount to add)
                 resourceRepository.find(request.resourceId)
                   .mapLeft { ContributionRepositoryException(request.resourceId, it) }
                   .flatMap { resource ->
                     resource?.let {
-                      resourceRepository.updateQuantity(request.resourceId, quantityDelta, it.version)
+                      resourceRepository.updateQuantity(request.resourceId, request.quantity, it.version)
                         .mapLeft { ContributionRepositoryException(request.resourceId, it) }
                         .map { contribution }
                     } ?: Either.Left(
@@ -67,10 +67,10 @@ class SqlContributionRepository(
                   }
               }
           } else {
-            // Create new contribution
+            // Create new contribution - request.quantity is the amount to add
             createContribution(participant.identifier, request.resourceId, request.quantity)
               .flatMap { contribution ->
-                // Update resource quantity
+                // Update resource quantity by the delta
                 resourceRepository.find(request.resourceId)
                   .mapLeft { ContributionRepositoryException(request.resourceId, it) }
                   .flatMap { resource ->
