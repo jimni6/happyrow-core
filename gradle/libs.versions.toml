@@ -1,5 +1,7 @@
 [versions]
 arrow = "2.1.2"
+auth0-jwt = "4.4.0"
+auth0-jwks = "0.22.1"
 awaitility = "4.3.0"
 config4k = "0.7.0"
 datadog = "4.4.4"
@@ -27,6 +29,8 @@ testcontainers = "1.21.3"
 
 arrow-core = { group = "io.arrow-kt", name = "arrow-core", version.ref = "arrow" }
 arrow-fx-coroutines = { group = "io.arrow-kt", name = "arrow-fx-coroutines", version.ref = "arrow" }
+auth0-jwt = { group = "com.auth0", name = "java-jwt", version.ref = "auth0-jwt" }
+auth0-jwks = { group = "com.auth0", name = "jwks-rsa", version.ref = "auth0-jwks" }
 awaitility-kotlin = { group = "org.awaitility", name = "awaitility-kotlin", version.ref = "awaitility" }
 config4k = { group = "io.github.config4k", name = "config4k", version.ref = "config4k" }
 exposed-bom = { group = "org.jetbrains.exposed", name = "exposed-bom", version.ref = "exposed" }
