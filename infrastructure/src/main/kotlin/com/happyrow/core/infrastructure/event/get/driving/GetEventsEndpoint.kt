@@ -6,6 +6,7 @@ import com.happyrow.core.domain.event.creator.model.Creator
 import com.happyrow.core.domain.event.get.GetEventsByOrganizerUseCase
 import com.happyrow.core.domain.event.get.error.GetEventException
 import com.happyrow.core.infrastructure.event.common.dto.toDto
+import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
 import com.happyrow.core.infrastructure.technical.ktor.logAndRespond
@@ -22,14 +23,10 @@ private const val INVALID_ORGANIZER_ID_ERROR_TYPE = "INVALID_ORGANIZER_ID"
 fun Route.getEventsEndpoint(getEventsByOrganizerUseCase: GetEventsByOrganizerUseCase) {
   get {
     Either.catch {
-      call.request.queryParameters[ORGANIZER_ID_PARAM]
-        ?: throw IllegalArgumentException("Missing organizerId query parameter")
+      val user = call.authenticatedUser()
+      Creator(user.email)
     }
-      .mapLeft { MissingOrganizerIdException(it) }
-      .flatMap { organizerId ->
-        Either.catch { Creator(organizerId) }
-          .mapLeft { InvalidOrganizerIdException(organizerId, it) }
-      }
+      .mapLeft { InvalidOrganizerIdException("authenticated_user", it) }
       .flatMap { organizer -> getEventsByOrganizerUseCase.execute(organizer) }
       .map { events -> events.map { it.toDto() } }
       .fold(
