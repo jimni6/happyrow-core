@@ -1,0 +1,18 @@
+# Docker Compose override for LOCAL testing on Mac
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.local.yml up
+
+services:
+  backend:
+    # Build locally instead of pulling from Docker Hub
+    build:
+      context: ..
+      dockerfile: .raspberry/Dockerfile
+    image: happyrow-core:local
+    pull_policy: never
+
+  nginx:
+    # Use HTTP-only config for local testing (no SSL)
+    volumes:
+      - ./nginx.local.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
