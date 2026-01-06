@@ -39,4 +39,3 @@ If the server starts successfully, you'll see the following output:
 ```
 
 # happy-row-core
-# happy-row-core
