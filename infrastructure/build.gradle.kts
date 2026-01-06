@@ -24,7 +24,6 @@ dependencies {
     implementation(libs.bundles.jackson)
 
     implementation(libs.auth0.jwt)
-    implementation(libs.auth0.jwks)
 
     testImplementation(testFixtures(project(":domain")))
     testImplementation(libs.localstack)

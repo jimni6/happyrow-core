@@ -1,7 +1,7 @@
 package com.happyrow.core.infrastructure.technical.auth
 
 data class SupabaseJwtConfig(
-  val jwksUrl: String,
+  val jwtSecret: String,
   val issuer: String,
   val audience: String,
 ) {
@@ -9,9 +9,11 @@ data class SupabaseJwtConfig(
     fun fromEnvironment(): SupabaseJwtConfig {
       val supabaseUrl = System.getenv("SUPABASE_URL")
         ?: error("SUPABASE_URL environment variable is required")
+      val jwtSecret = System.getenv("SUPABASE_JWT_SECRET")
+        ?: error("SUPABASE_JWT_SECRET environment variable is required")
 
       return SupabaseJwtConfig(
-        jwksUrl = "$supabaseUrl/auth/v1/jwks",
+        jwtSecret = jwtSecret,
         issuer = "$supabaseUrl/auth/v1",
         audience = "authenticated",
       )
