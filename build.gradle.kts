@@ -97,6 +97,8 @@ dependencies {
 
     implementation(libs.config4k)
     implementation(libs.java.dogstatsd.client)
+    implementation(libs.auth0.jwt)
+    implementation(libs.auth0.jwks)
     implementation(libs.jackson.datatype.jsr310)
     implementation(libs.koin.ktor)
     implementation(libs.ktor.serialization.jackson)

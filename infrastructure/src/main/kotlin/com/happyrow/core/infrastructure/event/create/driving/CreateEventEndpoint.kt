@@ -5,14 +5,13 @@ import arrow.core.flatMap
 import com.happyrow.core.domain.event.create.CreateEventUseCase
 import com.happyrow.core.domain.event.create.error.CreateEventException
 import com.happyrow.core.domain.event.create.error.CreateEventRepositoryException
-import com.happyrow.core.infrastructure.event.CREATOR_HEADER
 import com.happyrow.core.infrastructure.event.common.dto.toDto
 import com.happyrow.core.infrastructure.event.common.error.BadRequestException
 import com.happyrow.core.infrastructure.event.create.driving.dto.CreateEventRequestDto
 import com.happyrow.core.infrastructure.event.create.error.UnicityConflictException
+import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
-import com.happyrow.core.infrastructure.technical.ktor.getHeader
 import com.happyrow.core.infrastructure.technical.ktor.logAndRespond
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
@@ -27,13 +26,11 @@ private const val NAME_ALREADY_EXISTS_ERROR_TYPE = "NAME_ALREADY_EXISTS"
 fun Route.createEventEndpoint(createEventUseCase: CreateEventUseCase) = route("") {
   post {
     Either.catch {
-      call.receive<CreateEventRequestDto>()
+      val user = call.authenticatedUser()
+      val requestDto = call.receive<CreateEventRequestDto>()
+      requestDto.toDomain(user.email)
     }
       .mapLeft { BadRequestException.InvalidBodyException(it) }
-      .flatMap { requestDto ->
-        call.getHeader(CREATOR_HEADER)
-          .map { requestDto.toDomain(it) }
-      }
       .flatMap { request -> createEventUseCase.create(request) }
       .map { it.toDto() }
       .fold(

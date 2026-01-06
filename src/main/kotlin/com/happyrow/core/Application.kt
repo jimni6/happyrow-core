@@ -1,9 +1,12 @@
 package com.happyrow.core
 
+import com.happyrow.core.infrastructure.technical.auth.JwtAuthenticationPlugin
+import com.happyrow.core.infrastructure.technical.auth.SupabaseJwtService
 import com.happyrow.core.infrastructure.technical.config.DatabaseInitializer
 import com.happyrow.core.infrastructure.technical.config.shutdownDataSource
 import com.happyrow.core.infrastructure.technical.jackson.JsonObjectMapper
 import com.happyrow.core.modules.domainModule
+import com.happyrow.core.modules.infrastucture.authModule
 import com.happyrow.core.modules.infrastucture.infrastructureModule
 import com.happyrow.core.modules.internal.clockModule
 import com.happyrow.core.modules.internal.configurationModule
@@ -44,7 +47,7 @@ fun main(args: Array<String>) {
 fun Application.module() {
   install(Koin) {
     logger(PrintLogger(Level.DEBUG))
-    modules(clockModule, configurationModule, infrastructureModule, domainModule)
+    modules(clockModule, configurationModule, authModule, infrastructureModule, domainModule)
   }
 
   // Initialize database schema for Render PostgreSQL
@@ -121,6 +124,13 @@ fun Application.application() {
       JacksonConverter(JsonObjectMapper.defaultMapper),
     )
   }
+  
+  // Install JWT authentication plugin
+  val jwtService by inject<SupabaseJwtService>()
+  install(JwtAuthenticationPlugin) {
+    this.jwtService = jwtService
+  }
+  
   install(Resources)
   install(PartialContent)
   install(AutoHeadResponse)
