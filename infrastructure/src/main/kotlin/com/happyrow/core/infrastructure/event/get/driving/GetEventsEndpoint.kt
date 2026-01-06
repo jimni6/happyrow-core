@@ -16,8 +16,6 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 
-private const val ORGANIZER_ID_PARAM = "organizerId"
-private const val MISSING_ORGANIZER_ID_ERROR_TYPE = "MISSING_ORGANIZER_ID"
 private const val INVALID_ORGANIZER_ID_ERROR_TYPE = "INVALID_ORGANIZER_ID"
 
 fun Route.getEventsEndpoint(getEventsByOrganizerUseCase: GetEventsByOrganizerUseCase) {
@@ -37,15 +35,6 @@ fun Route.getEventsEndpoint(getEventsByOrganizerUseCase: GetEventsByOrganizerUse
 }
 
 private suspend fun Exception.handleFailure(call: ApplicationCall) = when (this) {
-  is MissingOrganizerIdException -> call.logAndRespond(
-    status = HttpStatusCode.BadRequest,
-    responseMessage = ClientErrorMessage.of(
-      type = MISSING_ORGANIZER_ID_ERROR_TYPE,
-      detail = "Query parameter 'organizerId' is required",
-    ),
-    failure = this,
-  )
-
   is InvalidOrganizerIdException -> call.logAndRespond(
     status = HttpStatusCode.BadRequest,
     responseMessage = ClientErrorMessage.of(
@@ -68,5 +57,4 @@ private suspend fun Exception.handleFailure(call: ApplicationCall) = when (this)
   )
 }
 
-private class MissingOrganizerIdException(cause: Throwable) : Exception(cause)
 private class InvalidOrganizerIdException(val organizerId: String, cause: Throwable) : Exception(cause)

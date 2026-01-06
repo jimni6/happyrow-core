@@ -6,6 +6,8 @@ import io.ktor.server.application.createApplicationPlugin
 import io.ktor.server.response.respond
 import io.ktor.util.AttributeKey
 
+private const val BEARER_PREFIX_LENGTH = 7
+
 val SupabaseAuthKey = AttributeKey<AuthenticatedUser>("SupabaseAuth")
 
 val JwtAuthenticationPlugin = createApplicationPlugin(
@@ -13,10 +15,10 @@ val JwtAuthenticationPlugin = createApplicationPlugin(
   createConfiguration = ::JwtAuthConfig,
 ) {
   val jwtService = pluginConfig.jwtService
-  
+
   onCall { call ->
     val token = extractBearerToken(call)
-    
+
     if (token == null) {
       call.respond(
         HttpStatusCode.Unauthorized,
@@ -27,7 +29,7 @@ val JwtAuthenticationPlugin = createApplicationPlugin(
       )
       return@onCall
     }
-    
+
     jwtService.validateToken(token).fold(
       ifLeft = { exception ->
         call.respond(
@@ -50,16 +52,16 @@ class JwtAuthConfig {
 }
 
 private fun extractBearerToken(call: ApplicationCall): String? {
-  val authHeader = call.request.headers["Authorization"] ?: return null
-  
-  if (!authHeader.startsWith("Bearer ", ignoreCase = true)) {
-    return null
+  val authHeader = call.request.headers["Authorization"]
+
+  return when {
+    authHeader == null -> null
+    !authHeader.startsWith("Bearer ", ignoreCase = true) -> null
+    else -> authHeader.substring(BEARER_PREFIX_LENGTH).trim()
   }
-  
-  return authHeader.substring(7).trim()
 }
 
 fun ApplicationCall.authenticatedUser(): AuthenticatedUser {
   return attributes.getOrNull(SupabaseAuthKey)
-    ?: throw IllegalStateException("User not authenticated. JwtAuthenticationPlugin must be installed.")
+    ?: error("User not authenticated. JwtAuthenticationPlugin must be installed.")
 }
