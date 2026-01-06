@@ -10,14 +10,13 @@ exposed = "0.61.0"
 hikari = "6.3.1"
 jackson = "2.19.2"
 jackson_datatype = "2.19.2"
-jacoco = "0.8.13"
 junit = "5.13.3"
 junit_params = "5.13.3"
 koin = "4.1.0"
 kotest = "5.9.1"
 kotest_assertions_arrow = "2.0.0"
-kotlin = "2.0.0"
-ktor = "3.0.2"
+kotlin = "2.2.0"
+ktor = "3.2.2"
 liquibase = "4.33.0"
 logback = "1.5.17"
 mockk = "1.14.5"
@@ -39,7 +38,6 @@ exposed-java-time = { group = "org.jetbrains.exposed", name = "exposed-java-time
 exposed-jdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc", version.ref = "exposed" }
 exposed-json = { group = "org.jetbrains.exposed", name = "exposed-json", version.ref = "exposed" }
 hikariCP = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikari" }
-jacoco-core = { group = "org.jacoco", name = "org.jacoco.core", version.ref = "jacoco" }
 jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson" }
 jackson-datatype-jsr310 = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310", version.ref = "jackson_datatype" }
 jackson-module-kotlin = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin", version.ref = "jackson" }
@@ -70,9 +68,6 @@ ktor-server-partial-content = { group = "io.ktor", name = "ktor-server-partial-c
 ktor-server-resources = { group = "io.ktor", name = "ktor-server-resources", version.ref = "ktor" }
 ktor-server-test-host = { group = "io.ktor", name = "ktor-server-test-host", version.ref = "ktor" }
 ktor-server-swagger = { group = "io.ktor", name = "ktor-server-swagger", version.ref = "ktor" }
-
-# Code Quality
-detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
 
 # Tests
 koin-test-junit5 = { group = "io.insert-koin", name = "koin-test-junit5", version.ref = "koin" }
