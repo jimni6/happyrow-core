@@ -23,56 +23,37 @@ class SupabaseJwtService(
     .rateLimited(JWKS_RATE_LIMIT_BUCKET_SIZE, JWKS_RATE_LIMIT_REFILL_RATE_PER_MINUTE, TimeUnit.MINUTES)
     .build()
 
-  fun validateToken(token: String): Either<JwtValidationException, AuthenticatedUser> = Either.catch {
-    val decodedJWT = decodeAndVerify(token)
-    extractUser(decodedJWT)
-  }.mapLeft { exception ->
-    when (exception) {
-      is JWTVerificationException -> JwtValidationException.InvalidToken(exception.message ?: "Invalid token")
-      is JwtValidationException -> exception
-      else -> JwtValidationException.UnknownError(exception.message ?: "Unknown error")
+  fun validateToken(token: String): Either<Throwable, AuthenticatedUser> {
+    return Either.catch {
+      val jwt = JWT.decode(token)
+      val jwk = jwkProvider.get(jwt.keyId)
+      val algorithm = Algorithm.RSA256(jwk.publicKey as RSAPublicKey, null)
+
+      val verifier = JWT.require(algorithm)
+        .withIssuer(config.issuer)
+        .withAudience(config.audience)
+        .build()
+
+      val verifiedJwt = verifier.verify(token)
+      extractUser(verifiedJwt)
     }
-  }
-
-  private fun decodeAndVerify(token: String): DecodedJWT {
-    val jwt = JWT.decode(token)
-
-    val jwk = jwkProvider.get(jwt.keyId)
-    val algorithm = Algorithm.RSA256(jwk.publicKey as RSAPublicKey, null)
-
-    val verifier = JWT.require(algorithm)
-      .withIssuer(config.issuer)
-      .withAudience(config.audience)
-      .build()
-
-    return verifier.verify(token)
   }
 
   private fun extractUser(jwt: DecodedJWT): AuthenticatedUser {
     val userId = jwt.subject
-      ?: throw JwtValidationException.MissingClaim("sub (user ID)")
+      ?: throw JWTVerificationException("Token missing 'sub' claim")
 
     val email = jwt.getClaim("email").asString()
-      ?: throw JwtValidationException.MissingClaim("email")
-
-    val role = jwt.getClaim("role").asString() ?: "authenticated"
+      ?: throw JWTVerificationException("Token missing 'email' claim")
 
     return AuthenticatedUser(
-      id = userId,
+      userId = userId,
       email = email,
-      role = role,
     )
   }
 }
 
 data class AuthenticatedUser(
-  val id: String,
+  val userId: String,
   val email: String,
-  val role: String,
 )
-
-sealed class JwtValidationException(message: String, cause: Throwable? = null) : Exception(message, cause) {
-  class InvalidToken(message: String) : JwtValidationException(message)
-  class MissingClaim(claimName: String) : JwtValidationException("Missing required claim: $claimName")
-  class UnknownError(message: String) : JwtValidationException(message)
-}
