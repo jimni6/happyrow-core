@@ -1,5 +1,12 @@
 version = System.getProperty("app.version")
 
+buildscript {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
@@ -11,6 +18,7 @@ plugins {
 }
 repositories {
     mavenCentral()
+    gradlePluginPortal()
 }
 kotlin {
     jvmToolchain(21)
@@ -97,6 +105,8 @@ dependencies {
 
     implementation(libs.config4k)
     implementation(libs.java.dogstatsd.client)
+    implementation(libs.auth0.jwt)
+    implementation(libs.auth0.jwks)
     implementation(libs.jackson.datatype.jsr310)
     implementation(libs.koin.ktor)
     implementation(libs.ktor.serialization.jackson)

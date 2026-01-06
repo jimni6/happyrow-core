@@ -1,9 +1,12 @@
 package com.happyrow.core
 
+import com.happyrow.core.infrastructure.technical.auth.JwtAuthenticationPlugin
+import com.happyrow.core.infrastructure.technical.auth.SupabaseJwtService
 import com.happyrow.core.infrastructure.technical.config.DatabaseInitializer
 import com.happyrow.core.infrastructure.technical.config.shutdownDataSource
 import com.happyrow.core.infrastructure.technical.jackson.JsonObjectMapper
 import com.happyrow.core.modules.domainModule
+import com.happyrow.core.modules.infrastucture.authModule
 import com.happyrow.core.modules.infrastucture.infrastructureModule
 import com.happyrow.core.modules.internal.clockModule
 import com.happyrow.core.modules.internal.configurationModule
@@ -44,7 +47,7 @@ fun main(args: Array<String>) {
 fun Application.module() {
   install(Koin) {
     logger(PrintLogger(Level.DEBUG))
-    modules(clockModule, configurationModule, infrastructureModule, domainModule)
+    modules(clockModule, configurationModule, authModule, infrastructureModule, domainModule)
   }
 
   // Initialize database schema for Render PostgreSQL
@@ -56,43 +59,57 @@ fun Application.module() {
 }
 
 fun Application.application() {
+  configureCors()
+  install(DoubleReceive)
+  install(ContentNegotiation) {
+    register(
+      ContentType.Application.Json,
+      JacksonConverter(JsonObjectMapper.defaultMapper),
+    )
+  }
+
+  val jwtService by inject<SupabaseJwtService>()
+  install(JwtAuthenticationPlugin) {
+    this.jwtService = jwtService
+  }
+
+  install(Resources)
+  install(PartialContent)
+  install(AutoHeadResponse)
+  configureRouting()
+}
+
+private fun Application.configureCors() {
   install(CORS) {
-    // Allow requests from common frontend development ports
-    allowHost("localhost:3000") // React default
-    allowHost("localhost:3001") // Alternative React port
-    allowHost("localhost:4200") // Angular default
-    allowHost("localhost:5173") // Vite default
-    allowHost("localhost:8080") // Vue default
-    allowHost("localhost:8081") // Alternative Vue port
+    allowHost("localhost:3000")
+    allowHost("localhost:3001")
+    allowHost("localhost:4200")
+    allowHost("localhost:5173")
+    allowHost("localhost:8080")
+    allowHost("localhost:8081")
     allowHost("127.0.0.1:3000")
     allowHost("127.0.0.1:3001")
     allowHost("127.0.0.1:4200")
     allowHost("127.0.0.1:5173")
     allowHost("127.0.0.1:8080")
     allowHost("127.0.0.1:8081")
-
-    // Static allowed hosts
     allowHost("jimni6.github.io")
     allowHost("happyrow-front-lyayzeci9-jimni6s-projects.vercel.app")
     allowHost("happyrow-front-git-main-jimni6s-projects.vercel.app")
     allowHost("happyrow-front.vercel.app")
     allowHost("happyrow-front-jimni6s-projects.vercel.app")
 
-    // Dynamic allowed origins from environment variable (for Vercel and custom domains)
-    // Set ALLOWED_ORIGINS as comma-separated list: "https://your-app.vercel.app,https://custom.domain.com"
     val allowedOrigins = System.getenv("ALLOWED_ORIGINS") ?: ""
     if (allowedOrigins.isNotEmpty()) {
       allowedOrigins.split(",").forEach { origin ->
         val cleanOrigin = origin.trim()
         if (cleanOrigin.isNotEmpty()) {
-          // Extract host from URL (remove protocol)
           val host = cleanOrigin.removePrefix("https://").removePrefix("http://")
           allowHost(host, schemes = listOf("http", "https"))
         }
       }
     }
 
-    // Allow common HTTP methods
     allowMethod(HttpMethod.Get)
     allowMethod(HttpMethod.Post)
     allowMethod(HttpMethod.Put)
@@ -101,30 +118,14 @@ fun Application.application() {
     allowMethod(HttpMethod.Options)
     allowMethod(HttpMethod.Head)
 
-    // Allow common headers
     allowHeader(HttpHeaders.Authorization)
     allowHeader(HttpHeaders.ContentType)
     allowHeader(HttpHeaders.Accept)
     allowHeader(HttpHeaders.Origin)
-    allowHeader("x-user-id")
 
-    // Allow credentials (cookies, authorization headers)
     allowCredentials = true
-
-    // Allow any header (more permissive, can be restricted later)
     allowNonSimpleContentTypes = true
   }
-  install(DoubleReceive)
-  install(ContentNegotiation) {
-    register(
-      ContentType.Application.Json,
-      JacksonConverter(JsonObjectMapper.defaultMapper),
-    )
-  }
-  install(Resources)
-  install(PartialContent)
-  install(AutoHeadResponse)
-  configureRouting()
 }
 
 fun Application.addShutdownHook() {
