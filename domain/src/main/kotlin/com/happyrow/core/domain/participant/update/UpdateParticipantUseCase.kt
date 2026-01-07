@@ -11,12 +11,12 @@ class UpdateParticipantUseCase(
   private val participantRepository: ParticipantRepository,
 ) {
   fun execute(request: UpdateParticipantRequest): Either<Exception, Participant> = Either.catch {
-    participantRepository.find(request.userEmail, request.eventId)
+    participantRepository.find(request.userId, request.eventId)
       .getOrNull() ?: throw IllegalArgumentException("Participant not found")
-  }.mapLeft { UpdateParticipantException(request.userEmail, request.eventId, it) }
+  }.mapLeft { UpdateParticipantException(request.userId, request.eventId, it) }
     .flatMap { participant ->
       val updatedParticipant = participant.copy(status = request.status)
       participantRepository.update(updatedParticipant)
-        .mapLeft { UpdateParticipantException(request.userEmail, request.eventId, it) }
+        .mapLeft { UpdateParticipantException(request.userId, request.eventId, it) }
     }
 }

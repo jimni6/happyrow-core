@@ -20,7 +20,7 @@ class CreateEventUseCase(
       // Automatically add the event creator as a confirmed participant
       participantRepository.create(
         CreateParticipantRequest(
-          userEmail = request.creator.toString(),
+          userId = request.creatorId,
           eventId = event.identifier,
           status = ParticipantStatus.CONFIRMED,
         ),

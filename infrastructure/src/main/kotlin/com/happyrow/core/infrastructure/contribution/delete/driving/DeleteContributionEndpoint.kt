@@ -26,11 +26,11 @@ fun Route.deleteContributionEndpoint(deleteContributionUseCase: DeleteContributi
 
     Either.catch {
       val user = call.authenticatedUser()
-      user.email
+      UUID.fromString(user.userId)
     }
       .mapLeft { BadRequestException.InvalidBodyException(it) }
-      .flatMap { userEmail ->
-        deleteContributionUseCase.execute(userEmail, eventId, resourceId)
+      .flatMap { userId ->
+        deleteContributionUseCase.execute(userId, eventId, resourceId)
       }
       .fold(
         { it.handleFailure(call) },

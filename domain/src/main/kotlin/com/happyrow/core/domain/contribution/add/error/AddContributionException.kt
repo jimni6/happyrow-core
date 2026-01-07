@@ -6,6 +6,6 @@ class AddContributionException(
   val request: AddContributionRequest,
   override val cause: Throwable,
 ) : Exception(
-  "Failed to add contribution for resource ${request.resourceId} by user ${request.userEmail}",
+  "Failed to add contribution for resource ${request.resourceId} by user ${request.userId}",
   cause,
 )

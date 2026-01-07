@@ -27,7 +27,7 @@ class SqlParticipantRepository(
     Either.catch {
       transaction(exposedDatabase.database) {
         ParticipantTable.insertAndGetId {
-          it[userEmail] = request.userEmail
+          it[userId] = request.userId
           it[eventId] = request.eventId
           it[status] = request.status.name
           it[joinedAt] = clock.instant()
@@ -37,7 +37,7 @@ class SqlParticipantRepository(
       }
     }
       .flatMap { participantId ->
-        find(request.userEmail, request.eventId)
+        find(request.userId, request.eventId)
           .mapLeft { CreateParticipantRepositoryException(request, it) }
           .flatMap {
             it?.let {
@@ -53,7 +53,7 @@ class SqlParticipantRepository(
     Either.catch {
       transaction(exposedDatabase.database) {
         ParticipantTable.update({
-          (ParticipantTable.userEmail eq participant.userEmail) and (ParticipantTable.eventId eq participant.eventId)
+          (ParticipantTable.userId eq participant.userId) and (ParticipantTable.eventId eq participant.eventId)
         }) {
           it[status] = participant.status.name
           it[updatedAt] = clock.instant()
@@ -61,34 +61,31 @@ class SqlParticipantRepository(
       }
     }
       .flatMap {
-        find(participant.userEmail, participant.eventId)
-          .mapLeft { UpdateParticipantRepositoryException(participant.userEmail, participant.eventId, it) }
+        find(participant.userId, participant.eventId)
+          .mapLeft { UpdateParticipantRepositoryException(participant.userId, participant.eventId, it) }
           .flatMap {
             it?.let {
               Either.Right(it)
             } ?: Either.Left(
               UpdateParticipantRepositoryException(
-                participant.userEmail,
+                participant.userId,
                 participant.eventId,
                 Exception("Participant not found after update"),
               ),
             )
           }
       }
-      .mapLeft { UpdateParticipantRepositoryException(participant.userEmail, participant.eventId, it) }
+      .mapLeft { UpdateParticipantRepositoryException(participant.userId, participant.eventId, it) }
 
-  override fun findOrCreate(
-    userEmail: String,
-    eventId: UUID,
-  ): Either<CreateParticipantRepositoryException, Participant> {
-    return find(userEmail, eventId)
-      .mapLeft { CreateParticipantRepositoryException(CreateParticipantRequest(userEmail, eventId), it) }
+  override fun findOrCreate(userId: UUID, eventId: UUID): Either<CreateParticipantRepositoryException, Participant> {
+    return find(userId, eventId)
+      .mapLeft { CreateParticipantRepositoryException(CreateParticipantRequest(userId, eventId), it) }
       .flatMap { existing ->
         if (existing != null) {
           Either.Right(existing)
         } else {
           create(
-            CreateParticipantRequest(userEmail = userEmail, eventId = eventId, status = ParticipantStatus.CONFIRMED),
+            CreateParticipantRequest(userId = userId, eventId = eventId, status = ParticipantStatus.CONFIRMED),
           )
         }
       }
@@ -113,11 +110,11 @@ class SqlParticipantRepository(
     }.mapLeft { GetParticipantRepositoryException(eventId, it) }
   }
 
-  override fun find(userEmail: String, eventId: UUID): Either<GetParticipantRepositoryException, Participant?> {
+  override fun find(userId: UUID, eventId: UUID): Either<GetParticipantRepositoryException, Participant?> {
     return Either.catch {
       transaction(exposedDatabase.database) {
         ParticipantTable
-          .selectAll().where { (ParticipantTable.userEmail eq userEmail) and (ParticipantTable.eventId eq eventId) }
+          .selectAll().where { (ParticipantTable.userId eq userId) and (ParticipantTable.eventId eq eventId) }
           .singleOrNull()
       }
     }

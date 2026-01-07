@@ -33,7 +33,7 @@ fun Route.addContributionEndpoint(addContributionUseCase: AddContributionUseCase
     Either.catch {
       val user = call.authenticatedUser()
       val requestDto = call.receive<AddContributionRequestDto>()
-      requestDto.toDomain(user.email, eventId, resourceId)
+      requestDto.toDomain(UUID.fromString(user.userId), eventId, resourceId)
     }
       .mapLeft { BadRequestException.InvalidBodyException(it) }
       .flatMap { request -> addContributionUseCase.execute(request) }

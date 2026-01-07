@@ -9,6 +9,7 @@ data class CreateEventRequest(
   val description: String,
   val eventDate: Instant,
   val creator: Creator,
+  val creatorId: java.util.UUID,
   val location: String,
   val type: EventType,
   val members: List<Creator> = listOf(),

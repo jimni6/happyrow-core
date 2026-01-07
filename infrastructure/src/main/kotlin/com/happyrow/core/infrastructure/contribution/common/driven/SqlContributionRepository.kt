@@ -27,7 +27,7 @@ class SqlContributionRepository(
 ) : ContributionRepository {
 
   override fun addOrUpdate(request: AddContributionRequest): Either<ContributionRepositoryException, Contribution> {
-    return participantRepository.findOrCreate(request.userEmail, request.eventId)
+    return participantRepository.findOrCreate(request.userId, request.eventId)
       .mapLeft { ContributionRepositoryException(request.resourceId, it) }
       .flatMap { participant ->
         // Check if contribution already exists
@@ -91,12 +91,8 @@ class SqlContributionRepository(
       }
   }
 
-  override fun delete(
-    userEmail: String,
-    eventId: UUID,
-    resourceId: UUID,
-  ): Either<ContributionRepositoryException, Unit> {
-    return participantRepository.find(userEmail, eventId)
+  override fun delete(userId: UUID, eventId: UUID, resourceId: UUID): Either<ContributionRepositoryException, Unit> {
+    return participantRepository.find(userId, eventId)
       .mapLeft { ContributionRepositoryException(resourceId, it) }
       .flatMap { participant ->
         participant?.let {

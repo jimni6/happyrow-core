@@ -8,6 +8,6 @@ import java.util.UUID
 
 interface ContributionRepository {
   fun addOrUpdate(request: AddContributionRequest): Either<ContributionRepositoryException, Contribution>
-  fun delete(userEmail: String, eventId: UUID, resourceId: UUID): Either<ContributionRepositoryException, Unit>
+  fun delete(userId: UUID, eventId: UUID, resourceId: UUID): Either<ContributionRepositoryException, Unit>
   fun findByResource(resourceId: UUID): Either<ContributionRepositoryException, List<Contribution>>
 }
