@@ -22,7 +22,7 @@ fun Route.getEventsEndpoint(getEventsByOrganizerUseCase: GetEventsByOrganizerUse
   get {
     Either.catch {
       val user = call.authenticatedUser()
-      Creator(user.userId)
+      Creator(user.email)
     }
       .mapLeft { InvalidOrganizerIdException("authenticated_user", it) }
       .flatMap { organizer -> getEventsByOrganizerUseCase.execute(organizer) }

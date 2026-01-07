@@ -35,7 +35,7 @@ fun Route.updateEventEndpoint(updateEventUseCase: UpdateEventUseCase) {
       Either.catch {
         val user = call.authenticatedUser()
         val requestDto = call.receive<UpdateEventRequestDto>()
-        requestDto.toDomain(id, user.userId)
+        requestDto.toDomain(id, user.email)
       }
         .mapLeft { BadRequestException.InvalidBodyException(it) }
     }

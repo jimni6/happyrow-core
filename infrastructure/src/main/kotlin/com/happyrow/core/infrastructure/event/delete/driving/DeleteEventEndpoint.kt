@@ -31,11 +31,11 @@ fun Route.deleteEventEndpoint(deleteEventUseCase: DeleteEventUseCase) {
     eventId.flatMap { id ->
       Either.catch {
         val user = call.authenticatedUser()
-        Pair(id, user.userId)
+        Pair(id, user.email)
       }
         .mapLeft { BadRequestException.InvalidBodyException(it) }
     }
-      .flatMap { (id, userId) -> deleteEventUseCase.delete(id, userId) }
+      .flatMap { (id, userEmail) -> deleteEventUseCase.delete(id, userEmail) }
       .fold(
         { it.handleFailure(call) },
         { call.respond(HttpStatusCode.NoContent) },
