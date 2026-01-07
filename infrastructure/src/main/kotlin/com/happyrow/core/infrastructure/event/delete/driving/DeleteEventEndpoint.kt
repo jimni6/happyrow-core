@@ -7,6 +7,7 @@ import com.happyrow.core.domain.event.common.error.EventNotFoundException
 import com.happyrow.core.domain.event.delete.DeleteEventUseCase
 import com.happyrow.core.domain.event.delete.error.DeleteEventException
 import com.happyrow.core.infrastructure.event.common.error.BadRequestException
+import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
 import com.happyrow.core.infrastructure.technical.ktor.logAndRespond
@@ -21,11 +22,17 @@ private const val EVENT_NOT_FOUND_ERROR_TYPE = "EVENT_NOT_FOUND"
 
 fun Route.deleteEventEndpoint(deleteEventUseCase: DeleteEventUseCase) {
   delete("/{id}") {
-    val eventId = Either.catch {
-      UUID.fromString(call.parameters["id"])
-    }.mapLeft { BadRequestException.InvalidParameterException("id", call.parameters["id"] ?: "null") }
-
-    eventId.flatMap { id -> deleteEventUseCase.delete(id) }
+    Either.catch {
+      call.authenticatedUser()
+    }
+      .mapLeft { BadRequestException.InvalidBodyException(it) }
+      .flatMap {
+        val eventId = Either.catch {
+          UUID.fromString(call.parameters["id"])
+        }.mapLeft { BadRequestException.InvalidParameterException("id", call.parameters["id"] ?: "null") }
+        eventId
+      }
+      .flatMap { id -> deleteEventUseCase.delete(id) }
       .fold(
         { it.handleFailure(call) },
         { call.respond(HttpStatusCode.NoContent) },
