@@ -22,16 +22,17 @@ private const val EVENT_NOT_FOUND_ERROR_TYPE = "EVENT_NOT_FOUND"
 
 fun Route.deleteEventEndpoint(deleteEventUseCase: DeleteEventUseCase) {
   delete("/{id}") {
-    Either.catch {
-      call.authenticatedUser()
-    }
-      .mapLeft { BadRequestException.InvalidBodyException(it) }
-      .flatMap {
-        val eventId = Either.catch {
-          UUID.fromString(call.parameters["id"])
-        }.mapLeft { BadRequestException.InvalidParameterException("id", call.parameters["id"] ?: "null") }
-        eventId
+    val eventId = Either.catch {
+      UUID.fromString(call.parameters["id"])
+    }.mapLeft { BadRequestException.InvalidParameterException("id", call.parameters["id"] ?: "null") }
+
+    eventId.flatMap { id ->
+      Either.catch {
+        call.authenticatedUser()
+        id
       }
+        .mapLeft { BadRequestException.InvalidBodyException(it) }
+    }
       .flatMap { id -> deleteEventUseCase.delete(id) }
       .fold(
         { it.handleFailure(call) },
