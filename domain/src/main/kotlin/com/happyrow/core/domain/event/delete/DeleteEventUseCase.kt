@@ -8,6 +8,7 @@ import java.util.UUID
 class DeleteEventUseCase(
   private val eventRepository: EventRepository,
 ) {
-  fun delete(identifier: UUID): Either<DeleteEventException, Unit> = eventRepository.delete(identifier)
-    .mapLeft { DeleteEventException(identifier, it) }
+  fun delete(identifier: UUID, userId: String): Either<DeleteEventException, Unit> =
+    eventRepository.delete(identifier, userId)
+      .mapLeft { DeleteEventException(identifier, it) }
 }

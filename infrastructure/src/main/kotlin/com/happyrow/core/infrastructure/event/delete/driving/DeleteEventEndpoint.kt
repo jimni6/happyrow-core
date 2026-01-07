@@ -7,6 +7,7 @@ import com.happyrow.core.domain.event.common.error.EventNotFoundException
 import com.happyrow.core.domain.event.delete.DeleteEventUseCase
 import com.happyrow.core.domain.event.delete.error.DeleteEventException
 import com.happyrow.core.infrastructure.event.common.error.BadRequestException
+import com.happyrow.core.infrastructure.event.delete.error.UnauthorizedDeleteException
 import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
@@ -19,6 +20,7 @@ import io.ktor.server.routing.delete
 import java.util.UUID
 
 private const val EVENT_NOT_FOUND_ERROR_TYPE = "EVENT_NOT_FOUND"
+private const val UNAUTHORIZED_DELETE_ERROR_TYPE = "UNAUTHORIZED_DELETE"
 
 fun Route.deleteEventEndpoint(deleteEventUseCase: DeleteEventUseCase) {
   delete("/{id}") {
@@ -28,12 +30,12 @@ fun Route.deleteEventEndpoint(deleteEventUseCase: DeleteEventUseCase) {
 
     eventId.flatMap { id ->
       Either.catch {
-        call.authenticatedUser()
-        id
+        val user = call.authenticatedUser()
+        Pair(id, user.userId)
       }
         .mapLeft { BadRequestException.InvalidBodyException(it) }
     }
-      .flatMap { id -> deleteEventUseCase.delete(id) }
+      .flatMap { (id, userId) -> deleteEventUseCase.delete(id, userId) }
       .fold(
         { it.handleFailure(call) },
         { call.respond(HttpStatusCode.NoContent) },
@@ -73,6 +75,15 @@ private suspend fun DeleteEventRepositoryException.handleFailure(call: Applicati
     responseMessage = ClientErrorMessage.of(
       type = EVENT_NOT_FOUND_ERROR_TYPE,
       detail = "Event with id $identifier not found",
+    ),
+    failure = this,
+  )
+
+  is UnauthorizedDeleteException -> call.logAndRespond(
+    status = HttpStatusCode.Forbidden,
+    responseMessage = ClientErrorMessage.of(
+      type = UNAUTHORIZED_DELETE_ERROR_TYPE,
+      detail = "You are not authorized to delete this event. Only the creator can delete it.",
     ),
     failure = this,
   )

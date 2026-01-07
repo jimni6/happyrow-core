@@ -12,12 +12,17 @@ import com.happyrow.core.domain.event.create.model.CreateEventRequest
 import com.happyrow.core.domain.event.creator.model.Creator
 import com.happyrow.core.domain.event.get.error.GetEventException
 import com.happyrow.core.domain.event.update.model.UpdateEventRequest
+import com.happyrow.core.infrastructure.contribution.common.driven.ContributionTable
 import com.happyrow.core.infrastructure.event.common.driven.event.EventTable
 import com.happyrow.core.infrastructure.event.common.driven.event.toEvent
 import com.happyrow.core.infrastructure.event.create.error.UnicityConflictException
+import com.happyrow.core.infrastructure.event.delete.error.UnauthorizedDeleteException
+import com.happyrow.core.infrastructure.participant.common.driven.ParticipantTable
+import com.happyrow.core.infrastructure.resource.common.driven.ResourceTable
 import com.happyrow.core.infrastructure.technical.config.ExposedDatabase
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.selectAll
@@ -90,9 +95,51 @@ class SqlEventRepository(
       }
     }
 
-  override fun delete(identifier: UUID): Either<DeleteEventRepositoryException, Unit> = Either
+  override fun delete(identifier: UUID, userId: String): Either<DeleteEventRepositoryException, Unit> = Either
     .catch {
       transaction(exposedDatabase.database) {
+        // First check if event exists and get creator
+        val event = EventTable
+          .selectAll().where { EventTable.id eq identifier }
+          .singleOrNull()
+          ?: throw EventNotFoundException(identifier)
+
+        // Check if user is the creator
+        val creatorId = event[EventTable.creator]
+        if (creatorId != userId) {
+          throw UnauthorizedDeleteException(identifier, userId)
+        }
+
+        // Cascade delete: First delete contributions (they reference participants and resources)
+        val participantIds = ParticipantTable
+          .selectAll().where { ParticipantTable.eventId eq identifier }
+          .map { it[ParticipantTable.id].value }
+
+        val resourceIds = ResourceTable
+          .selectAll().where { ResourceTable.eventId eq identifier }
+          .map { it[ResourceTable.id].value }
+
+        // Delete contributions related to this event's participants
+        if (participantIds.isNotEmpty()) {
+          ContributionTable.deleteWhere {
+            ContributionTable.participantId inList participantIds
+          }
+        }
+
+        // Delete contributions related to this event's resources
+        if (resourceIds.isNotEmpty()) {
+          ContributionTable.deleteWhere {
+            ContributionTable.resourceId inList resourceIds
+          }
+        }
+
+        // Delete resources
+        ResourceTable.deleteWhere { ResourceTable.eventId eq identifier }
+
+        // Delete participants
+        ParticipantTable.deleteWhere { ParticipantTable.eventId eq identifier }
+
+        // Finally delete the event
         val deletedRows = EventTable.deleteWhere { EventTable.id eq identifier }
         if (deletedRows == 0) {
           throw EventNotFoundException(identifier)
@@ -102,6 +149,7 @@ class SqlEventRepository(
     .mapLeft {
       when (it) {
         is EventNotFoundException -> DeleteEventRepositoryException(identifier, it)
+        is UnauthorizedDeleteException -> DeleteEventRepositoryException(identifier, it)
         else -> DeleteEventRepositoryException(identifier, it)
       }
     }
