@@ -21,7 +21,6 @@ class DatabaseInitializer(
       createEnums()
       createTables()
       migrateResourceCategory()
-      migrateParticipantUserIdToEmail()
       logger.info("Database initialization completed successfully!")
     }
   }
@@ -78,42 +77,6 @@ class DatabaseInitializer(
           ALTER TABLE configuration.resource
           ALTER COLUMN category TYPE VARCHAR(50) USING category::text;
           RAISE NOTICE 'Migrated resource.category from enum to varchar';
-        END IF;
-      END $$;
-      """.trimIndent(),
-    )
-  }
-
-  private fun org.jetbrains.exposed.sql.Transaction.migrateParticipantUserIdToEmail() {
-    logger.info("Migrating participant.user_id to user_email...")
-    exec(
-      """
-      DO $$ BEGIN
-        IF EXISTS (
-          SELECT 1 FROM information_schema.columns
-          WHERE table_schema = 'configuration'
-          AND table_name = 'participant'
-          AND column_name = 'user_id'
-        ) AND NOT EXISTS (
-          SELECT 1 FROM information_schema.columns
-          WHERE table_schema = 'configuration'
-          AND table_name = 'participant'
-          AND column_name = 'user_email'
-        ) THEN
-          ALTER TABLE configuration.participant ADD COLUMN user_email VARCHAR(255);
-          ALTER TABLE configuration.contribution DROP CONSTRAINT IF EXISTS contribution_participant_id_fkey;
-          DROP INDEX IF EXISTS configuration.uq_participant_user_event;
-          DROP INDEX IF EXISTS configuration.idx_participant_user;
-          TRUNCATE TABLE configuration.participant CASCADE;
-          TRUNCATE TABLE configuration.contribution CASCADE;
-          ALTER TABLE configuration.participant DROP COLUMN user_id;
-          ALTER TABLE configuration.participant ALTER COLUMN user_email SET NOT NULL;
-          CREATE UNIQUE INDEX uq_participant_user_event ON configuration.participant (user_email, event_id);
-          CREATE INDEX idx_participant_user ON configuration.participant (user_email);
-          ALTER TABLE configuration.contribution
-          ADD CONSTRAINT contribution_participant_id_fkey
-          FOREIGN KEY (participant_id) REFERENCES configuration.participant(id);
-          RAISE NOTICE 'Migrated participant.user_id to user_email';
         END IF;
       END $$;
       """.trimIndent(),
