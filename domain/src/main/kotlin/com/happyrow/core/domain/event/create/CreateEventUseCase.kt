@@ -9,7 +9,6 @@ import com.happyrow.core.domain.event.create.model.CreateEventRequest
 import com.happyrow.core.domain.participant.common.driven.ParticipantRepository
 import com.happyrow.core.domain.participant.common.model.ParticipantStatus
 import com.happyrow.core.domain.participant.create.model.CreateParticipantRequest
-import java.util.UUID
 
 class CreateEventUseCase(
   private val eventRepository: EventRepository,
@@ -19,10 +18,9 @@ class CreateEventUseCase(
     .mapLeft { CreateEventException(request, it) }
     .flatMap { event ->
       // Automatically add the event creator as a confirmed participant
-      val creatorId = UUID.fromString(request.creator.toString())
       participantRepository.create(
         CreateParticipantRequest(
-          userId = creatorId,
+          userEmail = request.creator.toString(),
           eventId = event.identifier,
           status = ParticipantStatus.CONFIRMED,
         ),

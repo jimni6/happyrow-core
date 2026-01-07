@@ -24,15 +24,15 @@ fun Route.updateParticipantEndpoint(updateParticipantUseCase: UpdateParticipantU
     val eventId = call.parameters["eventId"]?.let { UUID.fromString(it) }
       ?: return@put call.respond(HttpStatusCode.BadRequest, "Missing eventId")
 
-    val userId = call.parameters["userId"]?.let { UUID.fromString(it) }
-      ?: return@put call.respond(HttpStatusCode.BadRequest, "Missing userId")
+    val userEmail = call.parameters["userEmail"]
+      ?: return@put call.respond(HttpStatusCode.BadRequest, "Missing userEmail")
 
     Either.catch {
       call.authenticatedUser()
       call.receive<UpdateParticipantRequestDto>()
     }
       .mapLeft { BadRequestException.InvalidBodyException(it) }
-      .map { it.toDomain(userId, eventId) }
+      .map { it.toDomain(userEmail, eventId) }
       .flatMap { request -> updateParticipantUseCase.execute(request) }
       .map { it.toDto() }
       .fold(

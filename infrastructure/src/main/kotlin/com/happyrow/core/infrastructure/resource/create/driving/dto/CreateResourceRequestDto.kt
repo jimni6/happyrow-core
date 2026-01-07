@@ -10,12 +10,12 @@ class CreateResourceRequestDto(
   val quantity: Int,
   val suggestedQuantity: Int? = null,
 ) {
-  fun toDomain(eventId: UUID, userId: UUID): CreateResourceRequest = CreateResourceRequest(
+  fun toDomain(eventId: UUID, userEmail: String): CreateResourceRequest = CreateResourceRequest(
     name = this.name,
     category = ResourceCategory.valueOf(this.category),
     initialQuantity = this.quantity,
     eventId = eventId,
-    userId = userId,
+    userEmail = userEmail,
     suggestedQuantity = this.suggestedQuantity ?: this.quantity,
   )
 }

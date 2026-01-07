@@ -8,7 +8,7 @@ import java.util.UUID
 class DeleteContributionUseCase(
   private val contributionRepository: ContributionRepository,
 ) {
-  fun execute(userId: UUID, eventId: UUID, resourceId: UUID): Either<DeleteContributionException, Unit> =
-    contributionRepository.delete(userId, eventId, resourceId)
-      .mapLeft { DeleteContributionException(userId, resourceId, it) }
+  fun execute(userEmail: String, eventId: UUID, resourceId: UUID): Either<DeleteContributionException, Unit> =
+    contributionRepository.delete(userEmail, eventId, resourceId)
+      .mapLeft { DeleteContributionException(userEmail, resourceId, it) }
 }

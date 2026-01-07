@@ -20,7 +20,7 @@ class CreateResourceUseCase(
         // Automatically add the creator's contribution
         contributionRepository.addOrUpdate(
           AddContributionRequest(
-            userId = request.userId,
+            userEmail = request.userEmail,
             eventId = request.eventId,
             resourceId = resource.identifier,
             quantity = request.initialQuantity,

@@ -98,7 +98,7 @@ Content-Type: application/json
 }
 
 ### Delete Event (replace {eventId} with actual ID)
-DELETE {{baseUrl}}{{apiPath}}/events/{eventId}
+DELETE {{baseUrl}}{{apiPath}}/events/5d421f59-89a2-49aa-a460-7a372d42fbd6
 Authorization: Bearer {{token}}
 
 # ============================================================================
@@ -181,7 +181,7 @@ Content-Type: application/json
 # ============================================================================
 
 ### Create Resource - Food (replace {eventId} with actual event ID)
-POST {{baseUrl}}{{apiPath}}/events/06f92b25-0cc4-4709-86c6-b556f304e876/resources
+POST {{baseUrl}}{{apiPath}}/events/0d5a0b57-3b86-432f-8fd9-91ab69b9b990/resources
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -236,7 +236,7 @@ Content-Type: application/json
 }
 
 ### Get All Resources for Event
-GET {{baseUrl}}{{apiPath}}/events/06f92b25-0cc4-4709-86c6-b556f304e876/resources
+GET {{baseUrl}}{{apiPath}}/events/0d5a0b57-3b86-432f-8fd9-91ab69b9b990/resources
 Authorization: Bearer {{token}}
 
 # ============================================================================
@@ -244,7 +244,7 @@ Authorization: Bearer {{token}}
 # ============================================================================
 
 ### Add Contribution - User 1 brings 2 pizzas
-POST {{baseUrl}}{{apiPath}}/events/06f92b25-0cc4-4709-86c6-b556f304e876/resources/0acf72a9-a8cc-4ffa-be5c-331b0c6003be/contributions
+POST {{baseUrl}}{{apiPath}}/events/0d5a0b57-3b86-432f-8fd9-91ab69b9b990/resources/8920eaa1-0c88-46f5-ab36-5113a1b2ee07/contributions
 Authorization: Bearer {{token}}
 Content-Type: application/json
 

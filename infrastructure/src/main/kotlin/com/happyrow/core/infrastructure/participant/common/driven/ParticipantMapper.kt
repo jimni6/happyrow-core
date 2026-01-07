@@ -8,7 +8,7 @@ import org.jetbrains.exposed.sql.ResultRow
 fun ResultRow.toParticipant(): Either<Throwable, Participant> = Either.catch {
   Participant(
     identifier = this[ParticipantTable.id].value,
-    userId = this[ParticipantTable.userId],
+    userEmail = this[ParticipantTable.userEmail],
     eventId = this[ParticipantTable.eventId],
     status = ParticipantStatus.valueOf(this[ParticipantTable.status]),
     joinedAt = this[ParticipantTable.joinedAt],

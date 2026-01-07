@@ -16,7 +16,7 @@ fun Route.participantEndpoints(
 ) = route("/events/{eventId}/participants") {
   createParticipantEndpoint(createParticipantUseCase)
   getParticipantsByEventEndpoint(getParticipantsByEventUseCase)
-  route("/{userId}") {
+  route("/{userEmail}") {
     updateParticipantEndpoint(updateParticipantUseCase)
   }
 }
