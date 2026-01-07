@@ -28,7 +28,7 @@ fun Route.createEventEndpoint(createEventUseCase: CreateEventUseCase) = route(""
     Either.catch {
       val user = call.authenticatedUser()
       val requestDto = call.receive<CreateEventRequestDto>()
-      requestDto.toDomain(user.userId, java.util.UUID.fromString(user.userId))
+      requestDto.toDomain(user.email)
     }
       .mapLeft { BadRequestException.InvalidBodyException(it) }
       .flatMap { request -> createEventUseCase.create(request) }

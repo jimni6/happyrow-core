@@ -4,7 +4,6 @@ import com.happyrow.core.domain.event.common.model.event.Event
 import com.happyrow.core.domain.event.common.model.event.EventType
 import com.happyrow.core.domain.event.create.model.CreateEventRequest
 import java.time.temporal.ChronoUnit
-import java.util.UUID
 
 object EventPersona {
   val Properties = EventPropertiesPersona
@@ -27,7 +26,6 @@ object EventPersona {
     description = Properties.description,
     eventDate = Persona.Time.now.plus(7, ChronoUnit.DAYS),
     creator = Persona.User.aUser,
-    creatorId = UUID.fromString("ab70634a-345e-415e-8417-60841b6bcb20"),
     location = Properties.location,
     type = EventType.DINER,
     members = listOf(Persona.User.aUser),

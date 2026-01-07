@@ -27,7 +27,7 @@ fun Route.createResourceEndpoint(createResourceUseCase: CreateResourceUseCase) {
     Either.catch {
       val user = call.authenticatedUser()
       val requestDto = call.receive<CreateResourceRequestDto>()
-      requestDto.toDomain(eventId, UUID.fromString(user.userId))
+      requestDto.toDomain(eventId, user.email)
     }
       .mapLeft { BadRequestException.InvalidBodyException(it) }
       .flatMap { request -> createResourceUseCase.execute(request) }

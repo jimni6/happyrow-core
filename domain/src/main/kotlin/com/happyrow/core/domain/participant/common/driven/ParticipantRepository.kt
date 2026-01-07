@@ -11,7 +11,7 @@ import java.util.UUID
 interface ParticipantRepository {
   fun create(request: CreateParticipantRequest): Either<CreateParticipantRepositoryException, Participant>
   fun update(participant: Participant): Either<UpdateParticipantRepositoryException, Participant>
-  fun findOrCreate(userId: UUID, eventId: UUID): Either<CreateParticipantRepositoryException, Participant>
+  fun findOrCreate(userEmail: String, eventId: UUID): Either<CreateParticipantRepositoryException, Participant>
   fun findByEvent(eventId: UUID): Either<GetParticipantRepositoryException, List<Participant>>
-  fun find(userId: UUID, eventId: UUID): Either<GetParticipantRepositoryException, Participant?>
+  fun find(userEmail: String, eventId: UUID): Either<GetParticipantRepositoryException, Participant?>
 }

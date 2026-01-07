@@ -7,8 +7,8 @@ import java.util.UUID
 class UpdateParticipantRequestDto(
   val status: String,
 ) {
-  fun toDomain(userId: UUID, eventId: UUID): UpdateParticipantRequest = UpdateParticipantRequest(
-    userId = userId,
+  fun toDomain(userEmail: String, eventId: UUID): UpdateParticipantRequest = UpdateParticipantRequest(
+    userEmail = userEmail,
     eventId = eventId,
     status = ParticipantStatus.valueOf(this.status),
   )

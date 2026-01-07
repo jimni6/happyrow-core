@@ -5,7 +5,7 @@ import java.util.UUID
 
 data class Participant(
   val identifier: UUID,
-  val userId: UUID,
+  val userEmail: String,
   val eventId: UUID,
   val status: ParticipantStatus,
   val joinedAt: Instant,

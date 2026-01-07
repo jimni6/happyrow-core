@@ -13,12 +13,11 @@ class CreateEventRequestDto(
   val type: EventType,
   val members: List<Creator> = listOf(),
 ) {
-  fun toDomain(creator: String, creatorId: java.util.UUID) = CreateEventRequest(
+  fun toDomain(creator: String) = CreateEventRequest(
     name.trim(),
     description,
     Instant.parse(eventDate),
     Creator(creator),
-    creatorId,
     location,
     type,
     members,

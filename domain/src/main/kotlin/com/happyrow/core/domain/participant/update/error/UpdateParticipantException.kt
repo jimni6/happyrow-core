@@ -1,9 +1,7 @@
 package com.happyrow.core.domain.participant.update.error
 
-import java.util.UUID
-
 class UpdateParticipantException(
-  userId: UUID,
-  eventId: UUID,
+  userEmail: String,
+  eventId: java.util.UUID,
   override val cause: Throwable,
-) : Exception("Failed to update participant for user $userId and event $eventId", cause)
+) : Exception("Failed to update participant for user $userEmail and event $eventId", cause)

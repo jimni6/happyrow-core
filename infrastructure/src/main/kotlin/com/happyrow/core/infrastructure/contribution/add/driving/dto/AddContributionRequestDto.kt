@@ -6,8 +6,8 @@ import java.util.UUID
 class AddContributionRequestDto(
   val quantity: Int,
 ) {
-  fun toDomain(userId: UUID, eventId: UUID, resourceId: UUID): AddContributionRequest = AddContributionRequest(
-    userId = userId,
+  fun toDomain(userEmail: String, eventId: UUID, resourceId: UUID): AddContributionRequest = AddContributionRequest(
+    userEmail = userEmail,
     eventId = eventId,
     resourceId = resourceId,
     quantity = this.quantity,

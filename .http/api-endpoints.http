@@ -106,12 +106,12 @@ Authorization: Bearer {{token}}
 # ============================================================================
 
 ### Create Participant - Confirmed (replace {eventId} with actual event ID)
-POST {{baseUrl}}{{apiPath}}/events/06f92b25-0cc4-4709-86c6-b556f304e876/participants
+POST {{baseUrl}}{{apiPath}}/events/d9dbafac-0107-43c4-a735-e4b6e481d0a6/participants
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "user_id": "ab70634a-345e-415e-8417-60841b6bcb21",
+  "user_id": "julien@gmail.com",
   "status": "CONFIRMED"
 }
 
