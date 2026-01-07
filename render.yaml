@@ -26,4 +26,8 @@ services:
         value: 1800000
       - key: DB_SSL_MODE
         value: require
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_JWT_SECRET
+        sync: false
     healthCheckPath: /health
