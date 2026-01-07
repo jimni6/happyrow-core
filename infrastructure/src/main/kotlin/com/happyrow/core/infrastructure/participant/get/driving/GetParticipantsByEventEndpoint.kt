@@ -1,8 +1,12 @@
 package com.happyrow.core.infrastructure.participant.get.driving
 
+import arrow.core.Either
+import arrow.core.flatMap
 import com.happyrow.core.domain.participant.get.GetParticipantsByEventUseCase
 import com.happyrow.core.domain.participant.get.error.GetParticipantsException
+import com.happyrow.core.infrastructure.event.common.error.BadRequestException
 import com.happyrow.core.infrastructure.participant.common.dto.toDto
+import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
 import com.happyrow.core.infrastructure.technical.ktor.logAndRespond
 import io.ktor.http.HttpStatusCode
@@ -14,10 +18,18 @@ import java.util.UUID
 
 fun Route.getParticipantsByEventEndpoint(getParticipantsByEventUseCase: GetParticipantsByEventUseCase) {
   get {
-    val eventId = call.parameters["eventId"]?.let { UUID.fromString(it) }
-      ?: return@get call.respond(HttpStatusCode.BadRequest, "Missing eventId")
-
-    getParticipantsByEventUseCase.execute(eventId)
+    Either.catch {
+      call.authenticatedUser()
+      call.parameters["eventId"]?.let { UUID.fromString(it) }
+        ?: throw IllegalArgumentException("Missing eventId")
+    }
+      .mapLeft {
+        BadRequestException.InvalidParameterException(
+          "auth_or_eventId",
+          it.message ?: "Authentication or eventId error",
+        )
+      }
+      .flatMap { eventId -> getParticipantsByEventUseCase.execute(eventId) }
       .map { participants -> participants.map { it.toDto() } }
       .fold(
         { it.handleFailure(call) },

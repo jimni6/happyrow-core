@@ -7,9 +7,9 @@ import com.happyrow.core.domain.resource.create.error.CreateResourceException
 import com.happyrow.core.infrastructure.event.common.error.BadRequestException
 import com.happyrow.core.infrastructure.resource.common.dto.toDto
 import com.happyrow.core.infrastructure.resource.create.driving.dto.CreateResourceRequestDto
+import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
-import com.happyrow.core.infrastructure.technical.ktor.getHeader
 import com.happyrow.core.infrastructure.technical.ktor.logAndRespond
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
@@ -19,21 +19,17 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import java.util.UUID
 
-private const val USER_ID_HEADER = "x-user-id"
-
 fun Route.createResourceEndpoint(createResourceUseCase: CreateResourceUseCase) {
   post {
     val eventId = call.parameters["eventId"]?.let { UUID.fromString(it) }
       ?: return@post call.respond(HttpStatusCode.BadRequest, "Missing eventId")
 
     Either.catch {
-      call.receive<CreateResourceRequestDto>()
+      val user = call.authenticatedUser()
+      val requestDto = call.receive<CreateResourceRequestDto>()
+      requestDto.toDomain(eventId, UUID.fromString(user.userId))
     }
       .mapLeft { BadRequestException.InvalidBodyException(it) }
-      .flatMap { requestDto ->
-        call.getHeader(USER_ID_HEADER)
-          .map { userId -> requestDto.toDomain(eventId, UUID.fromString(userId)) }
-      }
       .flatMap { request -> createResourceUseCase.execute(request) }
       .map { it.toDto() }
       .fold(

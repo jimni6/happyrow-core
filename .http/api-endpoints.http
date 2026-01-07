@@ -25,8 +25,9 @@ GET {{baseUrl}}/health
 
 ### Create Event - Party
 POST {{baseUrl}}{{apiPath}}/events
-x-user-id: {{userId}}
+#x-user-id: {{userId}}
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "name": "Summer Party 2025",
@@ -38,7 +39,7 @@ Content-Type: application/json
 
 ### Create Event - Birthday
 POST {{baseUrl}}{{apiPath}}/events
-x-user-id: {{userId}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -51,7 +52,7 @@ Content-Type: application/json
 
 ### Create Event - Dinner
 POST {{baseUrl}}{{apiPath}}/events
-x-user-id: {{userId}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -64,7 +65,7 @@ Content-Type: application/json
 
 ### Create Event - Snack
 POST {{baseUrl}}{{apiPath}}/events
-x-user-id: {{userId}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -76,16 +77,16 @@ Content-Type: application/json
 }
 
 ### Get Events by Organizer
-GET {{baseUrl}}{{apiPath}}/events?organizerId={{userId}}
-x-user-id: {{userId}}
+GET {{baseUrl}}{{apiPath}}/events
+Authorization: Bearer {{token}}
 
 ### Get Event by ID (replace {eventId} with actual ID)
 GET {{baseUrl}}{{apiPath}}/events/{eventId}
-x-user-id: {{userId}}
+Authorization: Bearer {{token}}
 
 ### Update Event (replace {eventId} with actual ID from a created event)
 PUT {{baseUrl}}{{apiPath}}/events/b0ad9e97-6a23-4d3d-ba30-5b79db695cc1
-x-user-id: {{userId}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -98,7 +99,7 @@ Content-Type: application/json
 
 ### Delete Event (replace {eventId} with actual ID)
 DELETE {{baseUrl}}{{apiPath}}/events/{eventId}
-x-user-id: {{userId}}
+Authorization: Bearer {{token}}
 
 # ============================================================================
 # Participant Management Endpoints
@@ -106,6 +107,7 @@ x-user-id: {{userId}}
 
 ### Create Participant - Confirmed (replace {eventId} with actual event ID)
 POST {{baseUrl}}{{apiPath}}/events/06f92b25-0cc4-4709-86c6-b556f304e876/participants
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -115,6 +117,7 @@ Content-Type: application/json
 
 ### Create Participant - Invited
 POST {{baseUrl}}{{apiPath}}/events/{eventId}/participants
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -124,6 +127,7 @@ Content-Type: application/json
 
 ### Create Participant - Maybe
 POST {{baseUrl}}{{apiPath}}/events/{eventId}/participants
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -133,6 +137,7 @@ Content-Type: application/json
 
 ### Create Participant - Declined
 POST {{baseUrl}}{{apiPath}}/events/{eventId}/participants
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -142,9 +147,11 @@ Content-Type: application/json
 
 ### Get All Participants for Event
 GET {{baseUrl}}{{apiPath}}/events/06f92b25-0cc4-4709-86c6-b556f304e876/participants
+Authorization: Bearer {{token}}
 
 ### Update Participant Status - Change to CONFIRMED
 PUT {{baseUrl}}{{apiPath}}/events/{eventId}/participants/{userId}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -153,6 +160,7 @@ Content-Type: application/json
 
 ### Update Participant Status - Change to DECLINED
 PUT {{baseUrl}}{{apiPath}}/events/{eventId}/participants/{userId}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -161,6 +169,7 @@ Content-Type: application/json
 
 ### Update Participant Status - Change to MAYBE
 PUT {{baseUrl}}{{apiPath}}/events/{eventId}/participants/{userId}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -173,7 +182,7 @@ Content-Type: application/json
 
 ### Create Resource - Food (replace {eventId} with actual event ID)
 POST {{baseUrl}}{{apiPath}}/events/06f92b25-0cc4-4709-86c6-b556f304e876/resources
-x-user-id: ab70634a-345e-415e-8417-60841b6bcb20
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -184,7 +193,7 @@ Content-Type: application/json
 
 ### Create Resource - Drink
 POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources
-x-user-id: cd80734b-456f-526f-9528-71952c7cdc31
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -195,7 +204,7 @@ Content-Type: application/json
 
 ### Create Resource - Utensil
 POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources
-x-user-id: ab70634a-345e-415e-8417-60841b6bcb20
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -206,7 +215,7 @@ Content-Type: application/json
 
 ### Create Resource - Decoration
 POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources
-x-user-id: cd80734b-456f-526f-9528-71952c7cdc31
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -217,7 +226,7 @@ Content-Type: application/json
 
 ### Create Resource - Other
 POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources
-x-user-id: ab70634a-345e-415e-8417-60841b6bcb20
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -228,6 +237,7 @@ Content-Type: application/json
 
 ### Get All Resources for Event
 GET {{baseUrl}}{{apiPath}}/events/06f92b25-0cc4-4709-86c6-b556f304e876/resources
+Authorization: Bearer {{token}}
 
 # ============================================================================
 # Contribution Management Endpoints
@@ -235,7 +245,7 @@ GET {{baseUrl}}{{apiPath}}/events/06f92b25-0cc4-4709-86c6-b556f304e876/resources
 
 ### Add Contribution - User 1 brings 2 pizzas
 POST {{baseUrl}}{{apiPath}}/events/06f92b25-0cc4-4709-86c6-b556f304e876/resources/0acf72a9-a8cc-4ffa-be5c-331b0c6003be/contributions
-x-user-id: 06f92b25-0cc4-4709-86c6-b556f304e000
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -244,7 +254,7 @@ Content-Type: application/json
 
 ### Add Contribution - User 2 brings 3 sodas
 POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources/{resourceId}/contributions
-x-user-id: user-2-uuid
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -253,7 +263,7 @@ Content-Type: application/json
 
 ### Update Contribution - User 1 changes to 3 pizzas (optimistic locking test)
 POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources/{resourceId}/contributions
-x-user-id: {{userId}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -262,7 +272,7 @@ Content-Type: application/json
 
 ### Delete Contribution - User 1 removes contribution
 DELETE {{baseUrl}}{{apiPath}}/events/{eventId}/resources/{resourceId}/contributions
-x-user-id: {{userId}}
+Authorization: Bearer {{token}}
 
 # ============================================================================
 # Complete Flow Example
@@ -277,7 +287,7 @@ x-user-id: {{userId}}
 
 ### STEP 1: Create Event for Party
 POST {{baseUrl}}{{apiPath}}/events
-x-user-id: {{userId}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -290,6 +300,7 @@ Content-Type: application/json
 
 ### STEP 2a: Add Participant User 1 (copy eventId from step 1 response)
 POST {{baseUrl}}{{apiPath}}/events/9de31e71-135a-4a82-a301-6d2c90af2f81/participants
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -299,6 +310,7 @@ Content-Type: application/json
 
 ### STEP 2b: Add Participant User 2
 POST {{baseUrl}}{{apiPath}}/events/9de31e71-135a-4a82-a301-6d2c90af2f81/participants
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -308,6 +320,7 @@ Content-Type: application/json
 
 ### STEP 2c: Update Participant User 2 Status to DECLINED
 PUT {{baseUrl}}{{apiPath}}/events/9de31e71-135a-4a82-a301-6d2c90af2f81/participants/cd80734b-456f-526f-9528-71952c7cdc31
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -316,10 +329,11 @@ Content-Type: application/json
 
 ### STEP 2d: View all participants
 GET {{baseUrl}}{{apiPath}}/events/9de31e71-135a-4a82-a301-6d2c90af2f81/participants
+Authorization: Bearer {{token}}
 
 ### STEP 3: Add Pizza Resource (User 1 brings 3 pizzas)
 POST {{baseUrl}}{{apiPath}}/events/9de31e71-135a-4a82-a301-6d2c90af2f81/resources
-x-user-id: ab70634a-345e-415e-8417-60841b6bcb20
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -331,7 +345,7 @@ Content-Type: application/json
 
 ### STEP 4: User 2 adds more pizzas (copy resourceId from step 3 response)
 POST {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources/PASTE_RESOURCE_ID_HERE/contributions
-x-user-id: cd80734b-456f-526f-9528-71952c7cdc31
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -340,10 +354,11 @@ Content-Type: application/json
 
 ### STEP 5: View all resources (should show current_quantity: 5, suggested_quantity: 10)
 GET {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources
+Authorization: Bearer {{token}}
 
 ### STEP 6: User 1 updates their contribution to 4 pizzas (tests update logic)
 POST {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources/PASTE_RESOURCE_ID_HERE/contributions
-x-user-id: ab70634a-345e-415e-8417-60841b6bcb20
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -352,6 +367,7 @@ Content-Type: application/json
 
 ### STEP 7: View resources again (should show current_quantity: 6)
 GET {{baseUrl}}{{apiPath}}/events/PASTE_EVENT_ID_HERE/resources
+Authorization: Bearer {{token}}
 
 ###
 # ============================================================================

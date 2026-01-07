@@ -7,6 +7,7 @@ import com.happyrow.core.domain.participant.create.error.CreateParticipantExcept
 import com.happyrow.core.infrastructure.event.common.error.BadRequestException
 import com.happyrow.core.infrastructure.participant.common.dto.toDto
 import com.happyrow.core.infrastructure.participant.create.driving.dto.CreateParticipantRequestDto
+import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
 import com.happyrow.core.infrastructure.technical.ktor.logAndRespond
@@ -24,6 +25,7 @@ fun Route.createParticipantEndpoint(createParticipantUseCase: CreateParticipantU
       ?: return@post call.respond(HttpStatusCode.BadRequest, "Missing eventId")
 
     Either.catch {
+      call.authenticatedUser()
       call.receive<CreateParticipantRequestDto>()
     }
       .mapLeft { BadRequestException.InvalidBodyException(it) }

@@ -6,14 +6,13 @@ import com.happyrow.core.domain.event.common.error.EventNotFoundException
 import com.happyrow.core.domain.event.common.error.UpdateEventRepositoryException
 import com.happyrow.core.domain.event.update.UpdateEventUseCase
 import com.happyrow.core.domain.event.update.error.UpdateEventException
-import com.happyrow.core.infrastructure.event.CREATOR_HEADER
 import com.happyrow.core.infrastructure.event.common.dto.toDto
 import com.happyrow.core.infrastructure.event.common.error.BadRequestException
 import com.happyrow.core.infrastructure.event.create.error.UnicityConflictException
 import com.happyrow.core.infrastructure.event.update.driving.dto.UpdateEventRequestDto
+import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
-import com.happyrow.core.infrastructure.technical.ktor.getHeader
 import com.happyrow.core.infrastructure.technical.ktor.logAndRespond
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
@@ -34,13 +33,11 @@ fun Route.updateEventEndpoint(updateEventUseCase: UpdateEventUseCase) {
 
     eventId.flatMap { id ->
       Either.catch {
-        call.receive<UpdateEventRequestDto>()
+        val user = call.authenticatedUser()
+        val requestDto = call.receive<UpdateEventRequestDto>()
+        requestDto.toDomain(id, user.userId)
       }
         .mapLeft { BadRequestException.InvalidBodyException(it) }
-        .flatMap { requestDto ->
-          call.getHeader(CREATOR_HEADER)
-            .map { requestDto.toDomain(id, it) }
-        }
     }
       .flatMap { request -> updateEventUseCase.update(request) }
       .map { it.toDto() }

@@ -7,6 +7,7 @@ import com.happyrow.core.domain.participant.update.error.UpdateParticipantExcept
 import com.happyrow.core.infrastructure.event.common.error.BadRequestException
 import com.happyrow.core.infrastructure.participant.common.dto.toDto
 import com.happyrow.core.infrastructure.participant.update.driving.dto.UpdateParticipantRequestDto
+import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
 import com.happyrow.core.infrastructure.technical.ktor.logAndRespond
@@ -27,6 +28,7 @@ fun Route.updateParticipantEndpoint(updateParticipantUseCase: UpdateParticipantU
       ?: return@put call.respond(HttpStatusCode.BadRequest, "Missing userId")
 
     Either.catch {
+      call.authenticatedUser()
       call.receive<UpdateParticipantRequestDto>()
     }
       .mapLeft { BadRequestException.InvalidBodyException(it) }

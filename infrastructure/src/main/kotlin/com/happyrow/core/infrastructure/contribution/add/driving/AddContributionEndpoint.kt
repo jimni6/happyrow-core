@@ -8,9 +8,9 @@ import com.happyrow.core.domain.resource.common.error.OptimisticLockException
 import com.happyrow.core.infrastructure.contribution.add.driving.dto.AddContributionRequestDto
 import com.happyrow.core.infrastructure.contribution.common.dto.toDto
 import com.happyrow.core.infrastructure.event.common.error.BadRequestException
+import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
-import com.happyrow.core.infrastructure.technical.ktor.getHeader
 import com.happyrow.core.infrastructure.technical.ktor.logAndRespond
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
@@ -20,7 +20,6 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import java.util.UUID
 
-private const val USER_ID_HEADER = "x-user-id"
 private const val OPTIMISTIC_LOCK_ERROR_TYPE = "OPTIMISTIC_LOCK_FAILURE"
 
 fun Route.addContributionEndpoint(addContributionUseCase: AddContributionUseCase) {
@@ -32,13 +31,11 @@ fun Route.addContributionEndpoint(addContributionUseCase: AddContributionUseCase
       ?: return@post call.respond(HttpStatusCode.BadRequest, "Missing resourceId")
 
     Either.catch {
-      call.receive<AddContributionRequestDto>()
+      val user = call.authenticatedUser()
+      val requestDto = call.receive<AddContributionRequestDto>()
+      requestDto.toDomain(UUID.fromString(user.userId), eventId, resourceId)
     }
       .mapLeft { BadRequestException.InvalidBodyException(it) }
-      .flatMap { requestDto ->
-        call.getHeader(USER_ID_HEADER)
-          .map { userId -> requestDto.toDomain(UUID.fromString(userId), eventId, resourceId) }
-      }
       .flatMap { request -> addContributionUseCase.execute(request) }
       .map { it.toDto() }
       .fold(
