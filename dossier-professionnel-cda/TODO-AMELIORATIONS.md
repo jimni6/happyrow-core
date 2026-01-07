@@ -113,37 +113,35 @@ infrastructure/src/test/kotlin/
 ---
 
 ### 🔐 Authentification robuste
-**Statut** : Header `x-user-id` simple (non sécurisé)
+**Statut** : ✅ JWT implémenté avec Supabase
 
-- [ ] **Implémenter JWT**
-  - [ ] Ajouter dépendance JWT (auth0/java-jwt ou nimbus)
-  - [ ] Créer `AuthService` pour génération/validation tokens
-  - [ ] Endpoint `POST /auth/login` (email + password)
-  - [ ] Endpoint `POST /auth/register`
-  - [ ] Middleware Ktor pour validation JWT
+- [x] **Implémenter JWT**
+  - [x] Ajout dépendance JWT (auth0/java-jwt)
+  - [x] Service `SupabaseJwtService` pour validation tokens
+  - [x] Validation avec signature HMAC256
+  - [x] Extraction userId et email depuis token
+  - [x] Plugin Ktor personnalisé `JwtAuthenticationPlugin`
+  - [ ] Endpoints `POST /auth/login` et `/auth/register` → Géré par Supabase
   
-- [ ] **Gestion des utilisateurs**
-  - [ ] Table `users` (id, email, password_hash, created_at)
-  - [ ] Hash des mots de passe (BCrypt)
-  - [ ] Entity `User` dans Domain
-  - [ ] `UserRepository` + `SqlUserRepository`
+- [x] **Intégration Supabase Auth**
+  - [x] Configuration depuis variables d'environnement
+  - [x] Validation issuer et audience
+  - [x] Gestion des erreurs de validation
+  - [x] Extraction sécurisée des claims
   
-- [ ] **Gestion des rôles**
+- [ ] **Gestion des rôles** (Phase 2)
   - [ ] Enum `UserRole` (ORGANIZER, PARTICIPANT, ADMIN)
   - [ ] Table `user_roles`
   - [ ] Middleware pour vérifier les rôles
   - [ ] Permissions granulaires
   
-- [ ] **Tokens de rafraîchissement**
+- [ ] **Tokens de rafraîchissement** (Phase 2)
   - [ ] Refresh tokens stockés en DB
   - [ ] Endpoint `POST /auth/refresh`
   - [ ] Expiration automatique
-  
-- [ ] **OAuth2 (optionnel)**
-  - [ ] Intégration Google OAuth2
-  - [ ] Intégration GitHub OAuth2
+  - [ ] Révocation des tokens (blacklist)
 
-**Estimation** : 2-3 semaines
+**Estimation phase 2** : 1-2 semaines
 
 ---
 

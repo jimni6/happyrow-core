@@ -244,9 +244,9 @@ allowedOrigins.split(",").forEach { origin ->
 ### 12.4.1 Court terme (Q1-Q2 2025)
 
 **Authentification robuste** :
-- Intégration JWT/OAuth2
-- Gestion des rôles (ORGANIZER, PARTICIPANT, ADMIN)
-- Double authentification (2FA)
+- ✅ Intégration JWT avec Supabase → **Implémenté**
+- 🔄 Gestion des rôles (ORGANIZER, PARTICIPANT, ADMIN) → Phase 2
+- 🔄 Double authentification (2FA) → Phase 2
 
 **Tests automatisés** :
 - Implémentation des tests unitaires (Use Cases)

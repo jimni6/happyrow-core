@@ -25,7 +25,8 @@ GET {{baseUrl}}/health
 
 ### Create Event - Party
 POST {{baseUrl}}{{apiPath}}/events
-x-user-id: {{userId}}
+#x-user-id: {{userId}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {

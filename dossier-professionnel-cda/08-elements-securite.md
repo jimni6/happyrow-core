@@ -49,18 +49,19 @@ fun Route.getEventsEndpoint(getEventsByOrganizerUseCase: GetEventsByOrganizerUse
 - Les événements ne peuvent être récupérés que pour un organisateur spécifique
 - Pas d'endpoint pour lister tous les événements (évite l'énumération)
 
-**3. Limitations actuelles et évolutions prévues**
+**3. Implémentation JWT avec Supabase**
 
-⚠️ **À améliorer** :
-- Actuellement, pas de vérification JWT/OAuth2
-- L'authentification complète sera ajoutée dans une version future
-- Le header `x-user-id` sera remplacé par un token JWT vérifié
+✅ **Authentification JWT opérationnelle** :
+- Validation des tokens JWT avec signature HMAC256
+- Intégration avec Supabase Auth
+- Extraction automatique des informations utilisateur (userId, email)
+- Plugin Ktor personnalisé pour la gestion des tokens
 
-**Plan d'évolution** :
-1. Intégration de Spring Security ou Auth0
-2. Validation JWT avec signature
-3. Gestion des rôles (ADMIN, ORGANIZER, PARTICIPANT)
-4. Filtrage des ressources selon le rôle
+**Évolutions prévues** :
+1. ✅ Validation JWT avec signature → **Implémenté**
+2. 🔄 Gestion des rôles (ADMIN, ORGANIZER, PARTICIPANT) → Prévu phase 2
+3. 🔄 Filtrage des ressources selon le rôle → Prévu phase 2
+4. 🔄 Refresh tokens et révocation → Prévu phase 2
 
 ---
 
@@ -450,59 +451,96 @@ Mécanismes d'authentification faibles ou absents.
 
 #### État actuel
 
-⚠️ **Limitations** :
-- Authentification basique via header `x-user-id`
-- Pas de vérification du token
-- Pas de gestion de session
+✅ **Authentification JWT implémentée** :
+- Validation des tokens JWT avec Supabase
+- Vérification de la signature avec HMAC256
+- Extraction sécurisée des claims (userId, email)
+- Plugin Ktor dédié à l'authentification
 
-**Justification du choix** :
-- Version MVP (Minimum Viable Product)
-- Authentification déléguée au frontend/API Gateway
-- Focus sur la logique métier
-
-#### Plan d'implémentation (phase 2)
-
-**1. Authentification JWT**
+**Architecture implémentée** :
 
 ```kotlin
-install(Authentication) {
-  jwt("auth-jwt") {
-    realm = "HappyRow Core"
-    verifier(
-      JWT.require(Algorithm.HMAC256(secret))
-        .withIssuer("happyrow-core")
+class SupabaseJwtService(private val config: SupabaseJwtConfig) {
+  private val algorithm = Algorithm.HMAC256(config.jwtSecret)
+  
+  fun validateToken(token: String): Either<Throwable, AuthenticatedUser> {
+    return Either.catch {
+      val verifier = JWT.require(algorithm)
+        .withIssuer(config.issuer)
+        .withAudience(config.audience)
         .build()
-    )
-    validate { credential ->
-      if (credential.payload.getClaim("userId").asString() != "") {
-        JWTPrincipal(credential.payload)
-      } else {
-        null
-      }
+      
+      val verifiedJwt = verifier.verify(token)
+      extractUser(verifiedJwt)
     }
   }
 }
 ```
 
-**2. Endpoints protégés**
+**Configuration sécurisée** :
+```kotlin
+data class SupabaseJwtConfig(
+  val jwtSecret: String,    // Depuis variable d'environnement
+  val issuer: String,       // URL Supabase
+  val audience: String      // "authenticated"
+)
+```
+
+⚠️ **Évolutions prévues (phase 2)** :
+- Gestion des rôles et permissions
+- Refresh tokens
+- Révocation des tokens (blacklist)
+
+#### Implémentation existante
+
+**Plugin Ktor personnalisé**
 
 ```kotlin
-authenticate("auth-jwt") {
-  route("/events") {
-    createEventEndpoint(createEventUseCase)
-    updateEventEndpoint(updateEventUseCase)
-    deleteEventEndpoint(deleteEventUseCase)
+class JwtAuthenticationPlugin(private val jwtService: SupabaseJwtService) {
+  fun intercept(call: ApplicationCall) {
+    val authHeader = call.request.header("Authorization")
+    if (authHeader?.startsWith("Bearer ") == true) {
+      val token = authHeader.removePrefix("Bearer ")
+      jwtService.validateToken(token)
+        .map { user -> call.attributes.put(authenticatedUserKey, user) }
+    }
   }
 }
 ```
 
-**3. Gestion des rôles**
+**Extraction de l'utilisateur authentifié**
+
+```kotlin
+fun ApplicationCall.getAuthenticatedUser(): Either<Throwable, AuthenticatedUser> {
+  return Either.catch {
+    attributes[authenticatedUserKey]
+  }
+}
+
+// Utilisation dans les endpoints
+post {
+  call.getAuthenticatedUser()
+    .flatMap { user -> 
+      // user.userId et user.email disponibles
+      createEventUseCase.execute(request.copy(creator = user.userId))
+    }
+}
+```
+
+**Sécurité actuelle** :
+- ✅ Tokens JWT signés avec HMAC256
+- ✅ Vérification de l'issuer et audience
+- ✅ Extraction sécurisée des claims
+- ✅ Intégration avec Supabase Auth
+- ✅ Gestion des erreurs de validation
+
+**Phase 2 - Améliorations prévues** :
 
 ```kotlin
 data class UserPrincipal(
   val userId: UUID,
   val email: String,
-  val roles: Set<Role>
+  val roles: Set<Role>  // À implémenter
 )
 
 enum class Role {
@@ -512,9 +550,9 @@ enum class Role {
 }
 ```
 
-**Sécurité renforcée** :
-- Tokens JWT signés et vérifiés
-- Expiration des tokens (1h)
+**Fonctionnalités futures** :
+- Gestion des rôles et permissions
+- Expiration personnalisée des tokens
 - Refresh tokens pour le renouvellement
 - Révocation des tokens (blacklist)
 

@@ -304,9 +304,10 @@ Ce projet vise à démontrer la maîtrise des compétences du référentiel CDA 
 
 **Moyen terme (après CDA)** :
 - Frontend React + TypeScript
-- Authentification JWT/OAuth2
+- ✅ Authentification JWT avec Supabase → **Implémenté**
 - Tests automatisés (couverture ≥ 80%)
 - Monitoring et observabilité
+- Gestion des rôles et permissions
 
 **Long terme (évolution du projet)** :
 - Application mobile (Kotlin Multiplatform)

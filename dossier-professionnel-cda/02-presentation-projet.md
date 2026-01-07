@@ -113,10 +113,11 @@
 
 ### 2.2.2 Fonctionnalités exclues (hors périmètre MVP)
 
-**Authentification complète** :
-- ❌ Pas de système JWT/OAuth2 dans cette version
-- ⚠️ Header `x-user-id` simple pour identifier l'utilisateur
-- 🔄 Prévu pour version 2.0
+**Authentification** :
+- ✅ Système JWT intégré avec Supabase
+- ✅ Validation des tokens avec signature HMAC256
+- ✅ Extraction automatique de l'utilisateur authentifié (userId, email)
+- 🔄 Gestion des rôles et permissions prévue pour version 2.0
 
 **Gestion des invitations** :
 - ❌ Pas d'envoi d'emails automatiques
