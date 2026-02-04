@@ -235,7 +235,31 @@ Content-Type: application/json
   "quantity": 1
 }
 
-### Get All Resources for Event
+### Get All Resources for Event (with contributors)
+# Response now includes contributors array for each resource:
+# {
+#   "identifier": "resource-uuid",
+#   "name": "Pizza",
+#   "category": "FOOD",
+#   "suggested_quantity": 10,
+#   "current_quantity": 5,
+#   "event_id": "event-uuid",
+#   "contributors": [
+#     {
+#       "user_id": "user1@example.com",
+#       "quantity": 3,
+#       "contributed_at": 1706972400000
+#     },
+#     {
+#       "user_id": "user2@example.com",
+#       "quantity": 2,
+#       "contributed_at": 1706974000000
+#     }
+#   ],
+#   "version": 1,
+#   "created_at": 1706972400000,
+#   "updated_at": 1706976000000
+# }
 GET {{baseUrl}}{{apiPath}}/events/0d5a0b57-3b86-432f-8fd9-91ab69b9b990/resources
 Authorization: Bearer {{token}}
 
@@ -261,7 +285,7 @@ Content-Type: application/json
   "quantity": 3
 }
 
-### Update Contribution - User 1 changes to 3 pizzas (optimistic locking test)
+### Update Contribution - User 1 changes to 3 pizzas (adds more)
 POST {{baseUrl}}{{apiPath}}/events/{eventId}/resources/{resourceId}/contributions
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -270,7 +294,18 @@ Content-Type: application/json
   "quantity": 3
 }
 
-### Delete Contribution - User 1 removes contribution
+### Reduce Contribution - User reduces their contribution by 1
+# This decreases the user's contribution quantity
+# If quantity reaches 0, the contribution is deleted
+PUT {{baseUrl}}{{apiPath}}/events/{eventId}/resources/{resourceId}/contributions/reduce
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "quantity": 1
+}
+
+### Delete Contribution - User 1 removes their entire contribution
 DELETE {{baseUrl}}{{apiPath}}/events/{eventId}/resources/{resourceId}/contributions
 Authorization: Bearer {{token}}
 

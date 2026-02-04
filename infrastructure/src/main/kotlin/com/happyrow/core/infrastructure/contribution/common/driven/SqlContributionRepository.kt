@@ -46,18 +46,18 @@ class SqlContributionRepository(
 
         existingContribution.flatMap { existing ->
           if (existing != null) {
-            // Update existing contribution - add delta to existing quantity
+            // Update existing contribution - request.quantity is the new absolute quantity
             val oldQuantity = existing[ContributionTable.quantity]
-            val newQuantity = oldQuantity + request.quantity
+            val delta = request.quantity - oldQuantity
 
-            updateContribution(participant.identifier, request.resourceId, newQuantity)
+            updateContribution(participant.identifier, request.resourceId, request.quantity)
               .flatMap { contribution ->
-                // Update resource quantity by the delta (request.quantity is the amount to add)
+                // Update resource quantity by the delta
                 resourceRepository.find(request.resourceId)
                   .mapLeft { ContributionRepositoryException(request.resourceId, it) }
                   .flatMap { resource ->
                     resource?.let {
-                      resourceRepository.updateQuantity(request.resourceId, request.quantity, it.version)
+                      resourceRepository.updateQuantity(request.resourceId, delta, it.version)
                         .mapLeft { ContributionRepositoryException(request.resourceId, it) }
                         .map { contribution }
                     } ?: Either.Left(
