@@ -6,6 +6,8 @@ import com.happyrow.core.domain.contribution.add.model.AddContributionRequest
 import com.happyrow.core.domain.contribution.common.driven.ContributionRepository
 import com.happyrow.core.domain.contribution.common.error.ContributionRepositoryException
 import com.happyrow.core.domain.contribution.common.model.Contribution
+import com.happyrow.core.domain.contribution.reduce.error.InsufficientContributionException
+import com.happyrow.core.domain.contribution.reduce.model.ReduceContributionRequest
 import com.happyrow.core.domain.participant.common.driven.ParticipantRepository
 import com.happyrow.core.domain.resource.common.driven.ResourceRepository
 import com.happyrow.core.infrastructure.technical.config.ExposedDatabase
@@ -88,6 +90,100 @@ class SqlContributionRepository(
               }
           }
         }
+      }
+  }
+
+  override fun reduce(request: ReduceContributionRequest): Either<ContributionRepositoryException, Contribution?> {
+    return participantRepository.find(request.userEmail, request.eventId)
+      .mapLeft { ContributionRepositoryException(request.resourceId, it) }
+      .flatMap { participant ->
+        participant?.let {
+          Either.catch {
+            transaction(exposedDatabase.database) {
+              ContributionTable
+                .selectAll().where {
+                  (ContributionTable.participantId eq participant.identifier) and
+                    (ContributionTable.resourceId eq request.resourceId)
+                }
+                .singleOrNull()
+            }
+          }.mapLeft { ContributionRepositoryException(request.resourceId, it) }
+            .flatMap { contribution ->
+              contribution?.let {
+                processReduction(participant.identifier, request, it[ContributionTable.quantity])
+              } ?: Either.Left(
+                ContributionRepositoryException(request.resourceId, Exception("Contribution not found")),
+              )
+            }
+        } ?: Either.Left(
+          ContributionRepositoryException(request.resourceId, Exception("Participant not found")),
+        )
+      }
+  }
+
+  private fun processReduction(
+    participantId: UUID,
+    request: ReduceContributionRequest,
+    currentQuantity: Int,
+  ): Either<ContributionRepositoryException, Contribution?> {
+    if (request.quantity > currentQuantity) {
+      return Either.Left(
+        ContributionRepositoryException(
+          request.resourceId,
+          InsufficientContributionException(currentQuantity, request.quantity),
+        ),
+      )
+    }
+
+    val newQuantity = currentQuantity - request.quantity
+    return if (newQuantity == 0) {
+      deleteContributionAndUpdateResource(participantId, request.resourceId, request.quantity)
+    } else {
+      reduceContributionAndUpdateResource(participantId, request.resourceId, newQuantity, request.quantity)
+    }
+  }
+
+  private fun deleteContributionAndUpdateResource(
+    participantId: UUID,
+    resourceId: UUID,
+    quantityToReduce: Int,
+  ): Either<ContributionRepositoryException, Contribution?> {
+    return Either.catch {
+      transaction(exposedDatabase.database) {
+        ContributionTable.deleteWhere {
+          (ContributionTable.participantId eq participantId) and
+            (ContributionTable.resourceId eq resourceId)
+        }
+      }
+    }
+      .mapLeft { ContributionRepositoryException(resourceId, it) }
+      .flatMap { updateResourceQuantity(resourceId, -quantityToReduce).map { null } }
+  }
+
+  private fun reduceContributionAndUpdateResource(
+    participantId: UUID,
+    resourceId: UUID,
+    newQuantity: Int,
+    quantityToReduce: Int,
+  ): Either<ContributionRepositoryException, Contribution?> {
+    return updateContribution(participantId, resourceId, newQuantity)
+      .flatMap { updatedContribution ->
+        updateResourceQuantity(resourceId, -quantityToReduce).map { updatedContribution }
+      }
+  }
+
+  private fun updateResourceQuantity(
+    resourceId: UUID,
+    quantityDelta: Int,
+  ): Either<ContributionRepositoryException, Unit> {
+    return resourceRepository.find(resourceId)
+      .mapLeft { ContributionRepositoryException(resourceId, it) }
+      .flatMap { resource ->
+        resource?.let {
+          resourceRepository.updateQuantity(resourceId, quantityDelta, it.version)
+            .mapLeft { ContributionRepositoryException(resourceId, it) }
+            .map { }
+        } ?: Either.Left(ContributionRepositoryException(resourceId, Exception("Resource not found")))
       }
   }
 

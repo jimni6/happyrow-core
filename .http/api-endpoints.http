@@ -106,12 +106,12 @@ Authorization: Bearer {{token}}
 # ============================================================================
 
 ### Create Participant - Confirmed (replace {eventId} with actual event ID)
-POST {{baseUrl}}{{apiPath}}/events/d9dbafac-0107-43c4-a735-e4b6e481d0a6/participants
+POST {{baseUrl}}{{apiPath}}/events/9b51ff47-014d-4bc2-866e-85ce03c704ac/participants
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "user_id": "julien@gmail.com",
+  "user_email": "juli@gmail.com",
   "status": "CONFIRMED"
 }
 
@@ -121,7 +121,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "user_id": "cd80734b-456f-526f-9528-71952c7cdc31",
+  "user_email": "alice@gmail.com",
   "status": "INVITED"
 }
 
@@ -131,7 +131,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "user_id": "ef90845c-567g-637g-0639-82063d8ded42",
+  "user_email": "bob@gmail.com",
   "status": "MAYBE"
 }
 
@@ -141,16 +141,16 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "user_id": "gh01956d-678h-748h-1740-93174e9efe53",
+  "user_email": "charlie@gmail.com",
   "status": "DECLINED"
 }
 
 ### Get All Participants for Event
-GET {{baseUrl}}{{apiPath}}/events/06f92b25-0cc4-4709-86c6-b556f304e876/participants
+GET {{baseUrl}}{{apiPath}}/events/9b51ff47-014d-4bc2-866e-85ce03c704ac/participants
 Authorization: Bearer {{token}}
 
 ### Update Participant Status - Change to CONFIRMED
-PUT {{baseUrl}}{{apiPath}}/events/{eventId}/participants/{userId}
+PUT {{baseUrl}}{{apiPath}}/events/{eventId}/participants/{userEmail}
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -159,7 +159,7 @@ Content-Type: application/json
 }
 
 ### Update Participant Status - Change to DECLINED
-PUT {{baseUrl}}{{apiPath}}/events/{eventId}/participants/{userId}
+PUT {{baseUrl}}{{apiPath}}/events/{eventId}/participants/{userEmail}
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -168,7 +168,7 @@ Content-Type: application/json
 }
 
 ### Update Participant Status - Change to MAYBE
-PUT {{baseUrl}}{{apiPath}}/events/{eventId}/participants/{userId}
+PUT {{baseUrl}}{{apiPath}}/events/{eventId}/participants/{userEmail}
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -304,7 +304,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "user_id": "ab70634a-345e-415e-8417-60841b6bcb20",
+  "user_email": "user1@gmail.com",
   "status": "INVITED"
 }
 
@@ -314,12 +314,12 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "user_id": "cd80734b-456f-526f-9528-71952c7aaaa",
+  "user_email": "user2@gmail.com",
   "status": "INVITED"
 }
 
 ### STEP 2c: Update Participant User 2 Status to DECLINED
-PUT {{baseUrl}}{{apiPath}}/events/9de31e71-135a-4a82-a301-6d2c90af2f81/participants/cd80734b-456f-526f-9528-71952c7cdc31
+PUT {{baseUrl}}{{apiPath}}/events/9de31e71-135a-4a82-a301-6d2c90af2f81/participants/user2@gmail.com
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -394,7 +394,7 @@ Authorization: Bearer {{token}}
 # curl -X POST http://localhost:8080/event/configuration/api/v1/events/{eventId}/participants \
 #   -H "Content-Type: application/json" \
 #   -d '{
-#     "user_id": "ab70634a-345e-415e-8417-60841b6bcb20",
+#     "user_email": "user@gmail.com",
 #     "status": "CONFIRMED"
 #   }'
 

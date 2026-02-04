@@ -2,6 +2,7 @@ package com.happyrow.core.modules
 
 import com.happyrow.core.domain.contribution.add.AddContributionUseCase
 import com.happyrow.core.domain.contribution.delete.DeleteContributionUseCase
+import com.happyrow.core.domain.contribution.reduce.ReduceContributionUseCase
 import com.happyrow.core.domain.event.create.CreateEventUseCase
 import com.happyrow.core.domain.event.delete.DeleteEventUseCase
 import com.happyrow.core.domain.event.get.GetEventsByOrganizerUseCase
@@ -25,4 +26,5 @@ val domainModule = module {
   single<GetResourcesByEventUseCase> { GetResourcesByEventUseCase(get()) }
   single<AddContributionUseCase> { AddContributionUseCase(get()) }
   single<DeleteContributionUseCase> { DeleteContributionUseCase(get()) }
+  single<ReduceContributionUseCase> { ReduceContributionUseCase(get()) }
 }
