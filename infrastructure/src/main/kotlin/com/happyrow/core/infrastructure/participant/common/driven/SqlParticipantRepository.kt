@@ -126,4 +126,18 @@ class SqlParticipantRepository(
       }
       .mapLeft { GetParticipantRepositoryException(eventId, it) }
   }
+
+  override fun findById(participantId: UUID): Either<GetParticipantRepositoryException, Participant?> {
+    return Either.catch {
+      transaction(exposedDatabase.database) {
+        ParticipantTable
+          .selectAll().where { ParticipantTable.id eq participantId }
+          .singleOrNull()
+      }
+    }
+      .flatMap { row ->
+        row?.toParticipant() ?: Either.Right(null)
+      }
+      .mapLeft { GetParticipantRepositoryException(participantId, it) }
+  }
 }

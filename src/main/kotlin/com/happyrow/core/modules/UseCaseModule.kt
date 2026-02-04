@@ -23,7 +23,7 @@ val domainModule = module {
   single<GetParticipantsByEventUseCase> { GetParticipantsByEventUseCase(get()) }
   single<UpdateParticipantUseCase> { UpdateParticipantUseCase(get()) }
   single<CreateResourceUseCase> { CreateResourceUseCase(get(), get()) }
-  single<GetResourcesByEventUseCase> { GetResourcesByEventUseCase(get()) }
+  single<GetResourcesByEventUseCase> { GetResourcesByEventUseCase(get(), get(), get()) }
   single<AddContributionUseCase> { AddContributionUseCase(get()) }
   single<DeleteContributionUseCase> { DeleteContributionUseCase(get()) }
   single<ReduceContributionUseCase> { ReduceContributionUseCase(get()) }

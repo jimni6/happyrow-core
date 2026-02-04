@@ -14,4 +14,5 @@ interface ParticipantRepository {
   fun findOrCreate(userEmail: String, eventId: UUID): Either<CreateParticipantRepositoryException, Participant>
   fun findByEvent(eventId: UUID): Either<GetParticipantRepositoryException, List<Participant>>
   fun find(userEmail: String, eventId: UUID): Either<GetParticipantRepositoryException, Participant?>
+  fun findById(participantId: UUID): Either<GetParticipantRepositoryException, Participant?>
 }
