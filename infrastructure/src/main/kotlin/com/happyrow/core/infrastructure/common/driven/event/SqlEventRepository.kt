@@ -28,6 +28,7 @@ import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
+import org.slf4j.LoggerFactory
 import java.time.Clock
 import java.util.UUID
 
@@ -37,6 +38,7 @@ class SqlEventRepository(
   private val clock: Clock,
   private val exposedDatabase: ExposedDatabase,
 ) : EventRepository {
+  private val logger = LoggerFactory.getLogger(SqlEventRepository::class.java)
   override fun create(request: CreateEventRequest): Either<CreateEventRepositoryException, Event> = Either
     .catch {
       transaction(exposedDatabase.database) {
@@ -178,8 +180,7 @@ class SqlEventRepository(
             .map { row ->
               row.toEvent().fold(
                 { error ->
-                  println("ERROR: Failed to parse event row: ${row[EventTable.id].value} - ${error.message}")
-                  error.cause?.printStackTrace()
+                  logger.error("Failed to parse event row: ${row[EventTable.id].value}", error)
                   throw error
                 },
                 { it },

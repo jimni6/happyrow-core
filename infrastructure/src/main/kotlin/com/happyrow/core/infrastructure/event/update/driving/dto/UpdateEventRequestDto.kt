@@ -14,14 +14,18 @@ class UpdateEventRequestDto(
   val type: EventType,
   val members: List<Creator> = listOf(),
 ) {
-  fun toDomain(identifier: UUID, updater: String) = UpdateEventRequest(
-    identifier = identifier,
-    name = name.trim(),
-    description = description,
-    eventDate = Instant.parse(eventDate),
-    location = location,
-    type = type,
-    updater = Creator(updater),
-    members = members,
-  )
+  fun toDomain(identifier: UUID, updater: String): UpdateEventRequest {
+    require(name.isNotBlank()) { "Event name must not be blank" }
+    require(location.isNotBlank()) { "Event location must not be blank" }
+    return UpdateEventRequest(
+      identifier = identifier,
+      name = name.trim(),
+      description = description,
+      eventDate = Instant.parse(eventDate),
+      location = location.trim(),
+      type = type,
+      updater = Creator(updater),
+      members = members,
+    )
+  }
 }

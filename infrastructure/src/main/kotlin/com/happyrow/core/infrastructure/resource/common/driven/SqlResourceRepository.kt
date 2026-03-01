@@ -15,6 +15,7 @@ import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
+import org.slf4j.LoggerFactory
 import java.time.Clock
 import java.util.UUID
 
@@ -22,6 +23,7 @@ class SqlResourceRepository(
   private val clock: Clock,
   private val exposedDatabase: ExposedDatabase,
 ) : ResourceRepository {
+  private val logger = LoggerFactory.getLogger(SqlResourceRepository::class.java)
 
   override fun create(request: CreateResourceRequest): Either<CreateResourceRepositoryException, Resource> =
     Either.catch {
@@ -73,8 +75,7 @@ class SqlResourceRepository(
           .map { row ->
             row.toResource().fold(
               { error ->
-                println("ERROR: Failed to parse resource row: ${row[ResourceTable.id].value} - ${error.message}")
-                error.printStackTrace()
+                logger.error("Failed to parse resource row: ${row[ResourceTable.id].value}", error)
                 throw error
               },
               { it },

@@ -1,4 +1,4 @@
-package com.happyrow.core.infrastructure.event.common.error
+package com.happyrow.core.infrastructure.common.error
 
 import kotlin.reflect.KClass
 

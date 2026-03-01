@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.flatMap
 import com.happyrow.core.domain.resource.create.CreateResourceUseCase
 import com.happyrow.core.domain.resource.create.error.CreateResourceException
-import com.happyrow.core.infrastructure.event.common.error.BadRequestException
+import com.happyrow.core.infrastructure.common.error.BadRequestException
 import com.happyrow.core.infrastructure.resource.common.dto.toDto
 import com.happyrow.core.infrastructure.resource.create.driving.dto.CreateResourceRequestDto
 import com.happyrow.core.infrastructure.technical.auth.authenticatedUser

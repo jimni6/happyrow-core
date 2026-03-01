@@ -1,4 +1,4 @@
-package com.happyrow.core.modules.infrastucture
+package com.happyrow.core.modules.infrastructure
 
 import com.happyrow.core.infrastructure.technical.auth.SupabaseJwtConfig
 import com.happyrow.core.infrastructure.technical.auth.SupabaseJwtService

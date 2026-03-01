@@ -66,6 +66,7 @@ ktor-server-double-receive = { group = "io.ktor", name = "ktor-server-double-rec
 ktor-server-netty = { group = "io.ktor", name = "ktor-server-netty", version.ref = "ktor" }
 ktor-server-partial-content = { group = "io.ktor", name = "ktor-server-partial-content", version.ref = "ktor" }
 ktor-server-resources = { group = "io.ktor", name = "ktor-server-resources", version.ref = "ktor" }
+ktor-server-status-pages = { group = "io.ktor", name = "ktor-server-status-pages", version.ref = "ktor" }
 ktor-server-test-host = { group = "io.ktor", name = "ktor-server-test-host", version.ref = "ktor" }
 ktor-server-swagger = { group = "io.ktor", name = "ktor-server-swagger", version.ref = "ktor" }
 
@@ -112,6 +113,7 @@ ktor-server = [
     "ktor-server-partial-content",
     "ktor-server-netty",
     "ktor-server-resources",
+    "ktor-server-status-pages",
     "ktor-server-swagger"
 ]
 

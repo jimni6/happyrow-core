@@ -18,6 +18,7 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
+import org.slf4j.LoggerFactory
 import java.time.Clock
 import java.util.UUID
 
@@ -27,6 +28,7 @@ class SqlContributionRepository(
   private val participantRepository: ParticipantRepository,
   private val resourceRepository: ResourceRepository,
 ) : ContributionRepository {
+  private val logger = LoggerFactory.getLogger(SqlContributionRepository::class.java)
 
   override fun addOrUpdate(request: AddContributionRequest): Either<ContributionRepositoryException, Contribution> {
     return participantRepository.findOrCreate(request.userEmail, request.eventId)
@@ -247,8 +249,7 @@ class SqlContributionRepository(
           .map { row ->
             row.toContribution().fold(
               { error ->
-                println("ERROR: Failed to parse contribution row: ${row[ContributionTable.id].value}")
-                error.printStackTrace()
+                logger.error("Failed to parse contribution row: ${row[ContributionTable.id].value}", error)
                 throw error
               },
               { it },

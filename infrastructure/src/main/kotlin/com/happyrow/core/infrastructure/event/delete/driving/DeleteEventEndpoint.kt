@@ -6,7 +6,7 @@ import com.happyrow.core.domain.event.common.error.DeleteEventRepositoryExceptio
 import com.happyrow.core.domain.event.common.error.EventNotFoundException
 import com.happyrow.core.domain.event.delete.DeleteEventUseCase
 import com.happyrow.core.domain.event.delete.error.DeleteEventException
-import com.happyrow.core.infrastructure.event.common.error.BadRequestException
+import com.happyrow.core.infrastructure.common.error.BadRequestException
 import com.happyrow.core.infrastructure.event.delete.error.UnauthorizedDeleteException
 import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage

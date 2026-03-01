@@ -4,9 +4,9 @@ import arrow.core.Either
 import arrow.core.flatMap
 import com.happyrow.core.domain.event.create.CreateEventUseCase
 import com.happyrow.core.domain.event.create.error.CreateEventException
-import com.happyrow.core.domain.event.create.error.CreateEventRepositoryException
+import com.happyrow.core.domain.event.common.error.CreateEventRepositoryException
 import com.happyrow.core.infrastructure.event.common.dto.toDto
-import com.happyrow.core.infrastructure.event.common.error.BadRequestException
+import com.happyrow.core.infrastructure.common.error.BadRequestException
 import com.happyrow.core.infrastructure.event.create.driving.dto.CreateEventRequestDto
 import com.happyrow.core.infrastructure.event.create.error.UnicityConflictException
 import com.happyrow.core.infrastructure.technical.auth.authenticatedUser

@@ -28,7 +28,7 @@ class CreateEventUseCaseTestUT {
   }
 
   @Test
-  fun `should create and get audience`() {
+  fun `should create event and auto-add creator as participant`() {
     givenACreateRequest()
       .andAWorkingCreation()
       .whenCreating()
@@ -38,7 +38,7 @@ class CreateEventUseCaseTestUT {
   }
 
   @Test
-  fun `should transfer error from audience repository`() {
+  fun `should transfer error from event repository`() {
     val error = CreateEventRepositoryException(Persona.Event.aCreateEventRequest)
 
     givenACreateRequest()
