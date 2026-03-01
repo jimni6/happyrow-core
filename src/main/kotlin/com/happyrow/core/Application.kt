@@ -6,13 +6,14 @@ import com.happyrow.core.infrastructure.technical.config.DatabaseInitializer
 import com.happyrow.core.infrastructure.technical.config.shutdownDataSource
 import com.happyrow.core.infrastructure.technical.jackson.JsonObjectMapper
 import com.happyrow.core.modules.domainModule
-import com.happyrow.core.modules.infrastucture.authModule
-import com.happyrow.core.modules.infrastucture.infrastructureModule
+import com.happyrow.core.modules.infrastructure.authModule
+import com.happyrow.core.modules.infrastructure.infrastructureModule
 import com.happyrow.core.modules.internal.clockModule
 import com.happyrow.core.modules.internal.configurationModule
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.jackson.JacksonConverter
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationStopPreparing
@@ -23,7 +24,9 @@ import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.doublereceive.DoubleReceive
 import io.ktor.server.plugins.partialcontent.PartialContent
+import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.resources.Resources
+import io.ktor.server.response.respond
 import kotlinx.coroutines.runBlocking
 import org.koin.core.logger.Level
 import org.koin.core.logger.PrintLogger
@@ -66,6 +69,22 @@ fun Application.application() {
       ContentType.Application.Json,
       JacksonConverter(JsonObjectMapper.defaultMapper),
     )
+  }
+
+  install(StatusPages) {
+    exception<IllegalArgumentException> { call, cause ->
+      call.respond(
+        HttpStatusCode.BadRequest,
+        mapOf("type" to "BAD_REQUEST", "detail" to (cause.message ?: "Invalid request")),
+      )
+    }
+    exception<Throwable> { call, cause ->
+      LoggerFactory.getLogger("StatusPages").error("Unhandled exception", cause)
+      call.respond(
+        HttpStatusCode.InternalServerError,
+        mapOf("type" to "TECHNICAL_ERROR", "detail" to "An unexpected error occurred"),
+      )
+    }
   }
 
   val jwtService by inject<SupabaseJwtService>()

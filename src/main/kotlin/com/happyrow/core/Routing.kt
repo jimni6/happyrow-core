@@ -52,11 +52,8 @@ fun Application.configureRouting() {
     }
 
     get("/") {
-      call.respondText("Hello from happyrow-core! 🎉", ContentType.Text.Plain)
+      call.respondText("Hello from happyrow-core!", ContentType.Text.Plain)
     }
-//    get("/health") {
-//      handleHealthCheck(call)
-//    }
 
     get("/info") {
       call.respond(
@@ -70,42 +67,3 @@ fun Application.configureRouting() {
     }
   }
 }
-
-//private suspend fun handleHealthCheck(call: ApplicationCall) {
-//  val dataSource by inject<DataSource>()
-//  try {
-//    // Test database connection
-//    dataSource.connection.use { connection ->
-//      val isValid = connection.isValid(DB_CONNECTION_TIMEOUT_SECONDS)
-//      if (isValid) {
-//        call.respond(
-//          HttpStatusCode.OK,
-//          mapOf(
-//            "status" to "healthy",
-//            "database" to "connected",
-//            "timestamp" to System.currentTimeMillis(),
-//          ),
-//        )
-//      } else {
-//        call.respond(
-//          HttpStatusCode.ServiceUnavailable,
-//          mapOf(
-//            "status" to "unhealthy",
-//            "database" to "connection_invalid",
-//            "timestamp" to System.currentTimeMillis(),
-//          ),
-//        )
-//      }
-//    }
-//  } catch (e: SQLException) {
-//    call.respond(
-//      HttpStatusCode.ServiceUnavailable,
-//      mapOf(
-//        "status" to "unhealthy",
-//        "database" to "connection_failed",
-//        "error" to e.message,
-//        "timestamp" to System.currentTimeMillis(),
-//      ),
-//    )
-//  }
-//}

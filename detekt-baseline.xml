@@ -1,8 +1,5 @@
 <?xml version="1.0" ?>
 <SmellBaseline>
   <ManuallySuppressedIssues></ManuallySuppressedIssues>
-  <CurrentIssues>
-    <ID>ImportOrdering:Application.kt$import com.happyrow.core.infrastructure.technical.config.shutdownDataSource import com.happyrow.core.infrastructure.technical.jackson.JsonObjectMapper import com.happyrow.core.modules.infrastucture.infrastructureModule import com.happyrow.core.modules.internal.clockModule import com.happyrow.core.modules.internal.configurationModule import io.ktor.http.ContentType import io.ktor.http.HttpHeaders import io.ktor.http.HttpMethod import io.ktor.serialization.jackson.JacksonConverter import io.ktor.server.application.Application import io.ktor.server.application.ApplicationStopPreparing import io.ktor.server.application.install import io.ktor.server.netty.EngineMain import io.ktor.server.plugins.autohead.AutoHeadResponse import io.ktor.server.plugins.contentnegotiation.ContentNegotiation import io.ktor.server.plugins.cors.routing.CORS import io.ktor.server.plugins.doublereceive.DoubleReceive import io.ktor.server.plugins.partialcontent.PartialContent import io.ktor.server.resources.Resources import javax.sql.DataSource import kotlin.system.exitProcess import kotlinx.coroutines.runBlocking import org.koin.core.logger.Level import org.koin.core.logger.PrintLogger import org.koin.ktor.ext.inject import org.koin.ktor.plugin.Koin import org.slf4j.LoggerFactory</ID>
-    <ID>ImportOrdering:PostgreSQLModule.kt$import com.happyrow.core.AppConfig import com.happyrow.core.infrastructure.technical.config.ExposedDatabase import com.happyrow.core.infrastructure.technical.config.dataSource import java.sql.SQLException import org.koin.core.module.dsl.singleOf import org.koin.dsl.module</ID>
-  </CurrentIssues>
+  <CurrentIssues></CurrentIssues>
 </SmellBaseline>

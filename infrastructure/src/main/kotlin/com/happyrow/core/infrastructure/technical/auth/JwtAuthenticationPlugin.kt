@@ -1,5 +1,6 @@
 package com.happyrow.core.infrastructure.technical.auth
 
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.createApplicationPlugin
@@ -7,6 +8,8 @@ import io.ktor.server.response.respond
 import io.ktor.util.AttributeKey
 
 private const val BEARER_PREFIX_LENGTH = 7
+
+private val PUBLIC_PATHS = setOf("/", "/info")
 
 val SupabaseAuthKey = AttributeKey<AuthenticatedUser>("SupabaseAuth")
 
@@ -17,6 +20,10 @@ val JwtAuthenticationPlugin = createApplicationPlugin(
   val jwtService = pluginConfig.jwtService
 
   onCall { call ->
+    if (call.request.local.method == HttpMethod.Options || call.request.local.uri in PUBLIC_PATHS) {
+      return@onCall
+    }
+
     val token = extractBearerToken(call)
 
     if (token == null) {
