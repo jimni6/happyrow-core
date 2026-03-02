@@ -78,6 +78,8 @@ logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgres" }
 testcontainers = { group = "org.testcontainers", name = "testcontainers", version.ref = "testcontainers" }
+testcontainers-postgresql = { group = "org.testcontainers", name = "postgresql", version.ref = "testcontainers" }
+testcontainers-junit-jupiter = { group = "org.testcontainers", name = "junit-jupiter", version.ref = "testcontainers" }
 
 [bundles]
 
