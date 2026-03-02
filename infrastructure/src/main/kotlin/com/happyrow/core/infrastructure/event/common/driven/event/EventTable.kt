@@ -5,7 +5,7 @@ import arrow.core.getOrElse
 import com.happyrow.core.domain.event.common.model.event.Event
 import com.happyrow.core.domain.event.common.model.event.EventType
 import com.happyrow.core.domain.event.creator.model.Creator
-import com.happyrow.core.infrastructure.event.common.error.EntityParsingException
+import com.happyrow.core.infrastructure.common.error.EntityParsingException
 import com.happyrow.core.infrastructure.event.common.util.toEventType
 import com.happyrow.core.infrastructure.technical.exposed.PGEnum
 import com.happyrow.core.infrastructure.technical.exposed.array
@@ -20,7 +20,7 @@ private const val VARCHAR_LENGTH = 256
 
 object EventTable : UUIDTable("configuration.event", "identifier") {
   val name: Column<String> = varchar("name", VARCHAR_LENGTH)
-  val description: Column<String> = varchar("description", VARCHAR_LENGTH)
+  val description: Column<String> = text("description")
   val eventDate = timestamp("event_date")
   val creator = varchar("creator", VARCHAR_LENGTH)
   val location: Column<String> = varchar("location", VARCHAR_LENGTH)

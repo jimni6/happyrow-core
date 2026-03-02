@@ -11,8 +11,6 @@ import com.happyrow.core.infrastructure.event.update.driving.updateEventEndpoint
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
 
-const val CREATOR_HEADER = "x-user-id"
-
 fun Route.eventEndpoints(
   createEventUseCase: CreateEventUseCase,
   getEventsByOrganizerUseCase: GetEventsByOrganizerUseCase,

@@ -31,7 +31,6 @@ allprojects {
 
     repositories {
         mavenCentral()
-//        maven { url = uri("https://repository.betclic.net/artifactory/maven/") }
     }
 
     dependencies {
@@ -114,6 +113,11 @@ dependencies {
     implementation(libs.bundles.ktor.client)
     testImplementation(libs.bundles.ktor.test)
     testImplementation(libs.kotest.assertions.json)
+    testImplementation(libs.testcontainers)
+    testImplementation(libs.testcontainers.postgresql)
+    testImplementation(libs.testcontainers.junit.jupiter)
+    testImplementation(libs.postgresql)
+    testImplementation(libs.auth0.jwt)
     testFixturesApi(libs.koin.test.junit5)
 
     testImplementation(testFixtures(project(":infrastructure")))
@@ -164,8 +168,8 @@ publishing {
 
     publications {
         create<MavenPublication>("maven") {
-            groupId = "com.betclic"
-            artifactId = "audience-config-service"
+      groupId = "com.happyrow"
+      artifactId = "happyrow-core"
             version = artifactVersion
 
             from(components["java"])

@@ -13,13 +13,17 @@ class CreateEventRequestDto(
   val type: EventType,
   val members: List<Creator> = listOf(),
 ) {
-  fun toDomain(creator: String) = CreateEventRequest(
-    name.trim(),
-    description,
-    Instant.parse(eventDate),
-    Creator(creator),
-    location,
-    type,
-    members,
-  )
+  fun toDomain(creator: String): CreateEventRequest {
+    require(name.isNotBlank()) { "Event name must not be blank" }
+    require(location.isNotBlank()) { "Event location must not be blank" }
+    return CreateEventRequest(
+      name.trim(),
+      description,
+      Instant.parse(eventDate),
+      Creator(creator),
+      location.trim(),
+      type,
+      members,
+    )
+  }
 }

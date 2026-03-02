@@ -2,16 +2,6 @@
 <SmellBaseline>
   <ManuallySuppressedIssues></ManuallySuppressedIssues>
   <CurrentIssues>
-    <ID>FinalNewline:ConfigurationManager.kt$com.happyrow.core.infrastructure.ConfigurationManager.kt</ID>
-    <ID>ImportOrdering:ExposedDatabase.kt$import javax.sql.DataSource import org.jetbrains.exposed.sql.Database</ID>
-    <ID>Indentation:ApplicationInfo.kt$ApplicationInfo$ </ID>
-    <ID>Indentation:DataSource.kt$ </ID>
-    <ID>Indentation:ExternalApiConfig.kt$ExternalApiConfig$ </ID>
-    <ID>Indentation:JsonObjectMapper.kt$ </ID>
-    <ID>Indentation:JsonObjectMapper.kt$JsonObjectMapper$ </ID>
-    <ID>Indentation:MissionApiConfig.kt$MissionApiConfig$ </ID>
-    <ID>NewLineAtEndOfFile:ConfigurationManager.kt$com.happyrow.core.infrastructure.ConfigurationManager.kt</ID>
-    <ID>NoTrailingSpaces:DataSource.kt$ </ID>
     <ID>ThrowsCount:ConfigurationManager.kt$ConfigurationManager$private fun parseRenderDatabaseUrl(databaseUrl: String): DatabaseConfig</ID>
     <ID>UseRequire:ConfigurationManager.kt$ConfigurationManager$throw IllegalArgumentException("Invalid DATABASE_URL connection format")</ID>
     <ID>UseRequire:ConfigurationManager.kt$ConfigurationManager$throw IllegalArgumentException("Invalid DATABASE_URL credentials format")</ID>
