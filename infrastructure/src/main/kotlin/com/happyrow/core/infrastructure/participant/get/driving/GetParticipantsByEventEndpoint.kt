@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.flatMap
 import com.happyrow.core.domain.participant.get.GetParticipantsByEventUseCase
 import com.happyrow.core.domain.participant.get.error.GetParticipantsException
-import com.happyrow.core.infrastructure.event.common.error.BadRequestException
+import com.happyrow.core.infrastructure.common.error.BadRequestException
 import com.happyrow.core.infrastructure.participant.common.dto.toDto
 import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage

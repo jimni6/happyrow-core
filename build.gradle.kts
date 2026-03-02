@@ -31,7 +31,6 @@ allprojects {
 
     repositories {
         mavenCentral()
-//        maven { url = uri("https://repository.betclic.net/artifactory/maven/") }
     }
 
     dependencies {
@@ -164,8 +163,8 @@ publishing {
 
     publications {
         create<MavenPublication>("maven") {
-            groupId = "com.betclic"
-            artifactId = "audience-config-service"
+      groupId = "com.happyrow"
+      artifactId = "happyrow-core"
             version = artifactVersion
 
             from(components["java"])

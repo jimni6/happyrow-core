@@ -3,10 +3,11 @@ package com.happyrow.core.infrastructure.technical.config
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import com.zaxxer.hikari.pool.HikariPool
-import io.ktor.server.application.Application
 import org.slf4j.LoggerFactory
 import java.sql.SQLException
 import javax.sql.DataSource
+
+private val logger = LoggerFactory.getLogger("com.happyrow.core.infrastructure.technical.config.DataSource")
 
 private const val DEFAULT_CONNECTION_TIMEOUT = 30000L
 private const val DEFAULT_IDLE_TIMEOUT = 600000L
@@ -42,7 +43,6 @@ fun dataSource(sqlDatabaseConfig: SqlDatabaseConfig): DataSource {
     isAutoCommit = false
     validate()
   }
-  val logger = LoggerFactory.getLogger(Application::class.java)
   logger.info("Attempting to connect to database:")
   logger.info("  JDBC URL: ${config.jdbcUrl}")
   logger.info("  Username: ${config.username}")
@@ -124,8 +124,6 @@ private fun parsePostgreSQLUrl(jdbcUrl: String, username: String, password: Stri
   }
 }
 
-fun Application.shutdownDataSource(dataSource: DataSource) {
-//  logger.info("Closing $dataSource...")
+fun shutdownDataSource(dataSource: DataSource) {
   (dataSource as HikariDataSource).close()
-//  logger.info("Datasource $dataSource closed")
 }

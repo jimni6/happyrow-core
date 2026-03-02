@@ -21,6 +21,7 @@ class DatabaseInitializer(
       createEnums()
       createTables()
       migrateResourceCategory()
+      migrateEventDescription()
       logger.info("Database initialization completed successfully!")
     }
   }
@@ -60,6 +61,27 @@ class DatabaseInitializer(
     SchemaUtils.create(ParticipantTable)
     SchemaUtils.create(ResourceTable)
     SchemaUtils.create(ContributionTable)
+  }
+
+  private fun org.jetbrains.exposed.sql.Transaction.migrateEventDescription() {
+    logger.info("Migrating event.description column to TEXT if needed...")
+    exec(
+      """
+      DO $$ BEGIN
+        IF EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_schema = 'configuration'
+          AND table_name = 'event'
+          AND column_name = 'description'
+          AND data_type = 'character varying'
+        ) THEN
+          ALTER TABLE configuration.event
+          ALTER COLUMN description TYPE TEXT;
+          RAISE NOTICE 'Migrated event.description from varchar to text';
+        END IF;
+      END $$;
+      """.trimIndent(),
+    )
   }
 
   private fun org.jetbrains.exposed.sql.Transaction.migrateResourceCategory() {

@@ -1,4 +1,4 @@
-package com.happyrow.core.modules.infrastucture.driven
+package com.happyrow.core.modules.infrastructure.driven
 
 import com.happyrow.core.AppConfig
 import com.happyrow.core.domain.contribution.common.driven.ContributionRepository
@@ -15,37 +15,14 @@ import com.happyrow.core.infrastructure.technical.config.dataSource
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import java.sql.SQLException
 
 val postgresqlModule = module {
   single {
-    println("DEBUG: Creating SqlDatabaseConfig from AppConfig")
-    try {
-      val appConfig = get<AppConfig>()
-      println("DEBUG: AppConfig retrieved: $appConfig")
-      val sqlConfig = appConfig.sql
-      println("DEBUG: SqlDatabaseConfig created: $sqlConfig")
-      sqlConfig
-    } catch (e: SQLException) {
-      println("DEBUG: Failed to create SqlDatabaseConfig: ${e.message}")
-      e.printStackTrace()
-      throw e
-    }
+    get<AppConfig>().sql
   }
 
   single {
-    println("DEBUG: Creating DataSource")
-    try {
-      val sqlConfig = get<com.happyrow.core.infrastructure.technical.config.SqlDatabaseConfig>()
-      println("DEBUG: SqlDatabaseConfig for DataSource: $sqlConfig")
-      val ds = dataSource(sqlConfig)
-      println("DEBUG: DataSource created successfully: $ds")
-      ds
-    } catch (e: SQLException) {
-      println("DEBUG: Failed to create DataSource: ${e.message}")
-      e.printStackTrace()
-      throw e
-    }
+    dataSource(get<com.happyrow.core.infrastructure.technical.config.SqlDatabaseConfig>())
   }
 
   singleOf(::ExposedDatabase)

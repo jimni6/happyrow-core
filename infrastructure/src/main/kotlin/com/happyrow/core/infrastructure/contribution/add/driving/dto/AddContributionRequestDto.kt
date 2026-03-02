@@ -6,10 +6,13 @@ import java.util.UUID
 class AddContributionRequestDto(
   val quantity: Int,
 ) {
-  fun toDomain(userEmail: String, eventId: UUID, resourceId: UUID): AddContributionRequest = AddContributionRequest(
-    userEmail = userEmail,
-    eventId = eventId,
-    resourceId = resourceId,
-    quantity = this.quantity,
-  )
+  fun toDomain(userEmail: String, eventId: UUID, resourceId: UUID): AddContributionRequest {
+    require(quantity > 0) { "Quantity must be greater than 0" }
+    return AddContributionRequest(
+      userEmail = userEmail,
+      eventId = eventId,
+      resourceId = resourceId,
+      quantity = this.quantity,
+    )
+  }
 }

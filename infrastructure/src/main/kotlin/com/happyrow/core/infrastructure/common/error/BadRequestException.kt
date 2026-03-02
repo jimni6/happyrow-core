@@ -1,4 +1,4 @@
-package com.happyrow.core.infrastructure.event.common.error
+package com.happyrow.core.infrastructure.common.error
 
 sealed class BadRequestException(override val message: String, val type: String = "BAD_REQUEST") : Exception(message) {
 

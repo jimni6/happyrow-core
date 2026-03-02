@@ -15,6 +15,7 @@ import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
+import org.slf4j.LoggerFactory
 import java.time.Clock
 import java.util.UUID
 
@@ -22,6 +23,7 @@ class SqlParticipantRepository(
   private val clock: Clock,
   private val exposedDatabase: ExposedDatabase,
 ) : ParticipantRepository {
+  private val logger = LoggerFactory.getLogger(SqlParticipantRepository::class.java)
 
   override fun create(request: CreateParticipantRequest): Either<CreateParticipantRepositoryException, Participant> =
     Either.catch {
@@ -102,8 +104,7 @@ class SqlParticipantRepository(
           .map { row ->
             row.toParticipant().fold(
               { error ->
-                println("ERROR: Failed to parse participant row: ${row[ParticipantTable.id].value} - ${error.message}")
-                error.printStackTrace()
+                logger.error("Failed to parse participant row: ${row[ParticipantTable.id].value}", error)
                 throw error
               },
               { it },

@@ -7,7 +7,7 @@ import com.happyrow.core.domain.event.common.error.UpdateEventRepositoryExceptio
 import com.happyrow.core.domain.event.update.UpdateEventUseCase
 import com.happyrow.core.domain.event.update.error.UpdateEventException
 import com.happyrow.core.infrastructure.event.common.dto.toDto
-import com.happyrow.core.infrastructure.event.common.error.BadRequestException
+import com.happyrow.core.infrastructure.common.error.BadRequestException
 import com.happyrow.core.infrastructure.event.create.error.UnicityConflictException
 import com.happyrow.core.infrastructure.event.update.driving.dto.UpdateEventRequestDto
 import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
