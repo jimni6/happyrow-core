@@ -5,9 +5,9 @@ import arrow.core.flatMap
 import com.happyrow.core.domain.contribution.reduce.ReduceContributionUseCase
 import com.happyrow.core.domain.contribution.reduce.error.InsufficientContributionException
 import com.happyrow.core.domain.contribution.reduce.error.ReduceContributionException
+import com.happyrow.core.infrastructure.common.error.BadRequestException
 import com.happyrow.core.infrastructure.contribution.common.dto.toDto
 import com.happyrow.core.infrastructure.contribution.reduce.driving.dto.ReduceContributionRequestDto
-import com.happyrow.core.infrastructure.common.error.BadRequestException
 import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage
 import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
