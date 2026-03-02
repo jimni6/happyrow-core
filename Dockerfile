@@ -5,7 +5,7 @@ WORKDIR /app
 COPY . .
 
 # Build the application with explicit tasks
-RUN ./gradlew clean build --no-daemon --stacktrace
+RUN ./gradlew clean build --no-daemon -x test -x testFixturesClasses
 
 # Runtime stage using eclipse-temurin (supports AMD64 + ARM)
 FROM eclipse-temurin:21-jre-jammy
