@@ -113,6 +113,11 @@ dependencies {
     implementation(libs.bundles.ktor.client)
     testImplementation(libs.bundles.ktor.test)
     testImplementation(libs.kotest.assertions.json)
+    testImplementation(libs.testcontainers)
+    testImplementation(libs.testcontainers.postgresql)
+    testImplementation(libs.testcontainers.junit.jupiter)
+    testImplementation(libs.postgresql)
+    testImplementation(libs.auth0.jwt)
     testFixturesApi(libs.koin.test.junit5)
 
     testImplementation(testFixtures(project(":infrastructure")))
