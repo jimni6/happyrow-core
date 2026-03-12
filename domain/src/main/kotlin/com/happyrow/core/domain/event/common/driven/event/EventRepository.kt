@@ -17,4 +17,5 @@ interface EventRepository {
   fun delete(identifier: UUID, userId: String): Either<DeleteEventRepositoryException, Unit>
   fun find(identifier: UUID): Either<GetEventException, Event>
   fun findByOrganizer(organizer: Creator): Either<GetEventException, List<Event>>
+  fun findByUser(userEmail: String): Either<GetEventException, List<Event>>
 }

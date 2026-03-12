@@ -25,6 +25,8 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.or
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
@@ -177,6 +179,34 @@ class SqlEventRepository(
         transaction(exposedDatabase.database) {
           EventTable
             .selectAll().where { EventTable.creator eq organizer.toString() }
+            .map { row ->
+              row.toEvent().fold(
+                { error ->
+                  logger.error("Failed to parse event row: ${row[EventTable.id].value}", error)
+                  throw error
+                },
+                { it },
+              )
+            }
+        }
+      }
+      .mapLeft { GetEventException(null, it) }
+  }
+
+  override fun findByUser(userEmail: String): Either<GetEventException, List<Event>> {
+    return Either
+      .catch {
+        transaction(exposedDatabase.database) {
+          val participantEventIds = ParticipantTable
+            .select(ParticipantTable.eventId)
+            .where { ParticipantTable.userEmail eq userEmail }
+            .map { it[ParticipantTable.eventId] }
+
+          EventTable
+            .selectAll()
+            .where {
+              (EventTable.creator eq userEmail) or (EventTable.id inList participantEventIds)
+            }
             .map { row ->
               row.toEvent().fold(
                 { error ->

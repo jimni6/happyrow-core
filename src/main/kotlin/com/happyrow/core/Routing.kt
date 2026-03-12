@@ -5,7 +5,7 @@ import com.happyrow.core.domain.contribution.delete.DeleteContributionUseCase
 import com.happyrow.core.domain.contribution.reduce.ReduceContributionUseCase
 import com.happyrow.core.domain.event.create.CreateEventUseCase
 import com.happyrow.core.domain.event.delete.DeleteEventUseCase
-import com.happyrow.core.domain.event.get.GetEventsByOrganizerUseCase
+import com.happyrow.core.domain.event.get.GetEventsByUserUseCase
 import com.happyrow.core.domain.event.update.UpdateEventUseCase
 import com.happyrow.core.domain.participant.create.CreateParticipantUseCase
 import com.happyrow.core.domain.participant.get.GetParticipantsByEventUseCase
@@ -29,7 +29,7 @@ const val BASE_PATH = "/event/configuration"
 
 fun Application.configureRouting() {
   val createEventUseCase: CreateEventUseCase by inject()
-  val getEventsByOrganizerUseCase: GetEventsByOrganizerUseCase by inject()
+  val getEventsByUserUseCase: GetEventsByUserUseCase by inject()
   val updateEventUseCase: UpdateEventUseCase by inject()
   val deleteEventUseCase: DeleteEventUseCase by inject()
   val createParticipantUseCase: CreateParticipantUseCase by inject()
@@ -44,7 +44,7 @@ fun Application.configureRouting() {
   routing {
     route(BASE_PATH) {
       route("/api/v1") {
-        eventEndpoints(createEventUseCase, getEventsByOrganizerUseCase, updateEventUseCase, deleteEventUseCase)
+        eventEndpoints(createEventUseCase, getEventsByUserUseCase, updateEventUseCase, deleteEventUseCase)
         participantEndpoints(createParticipantUseCase, getParticipantsByEventUseCase, updateParticipantUseCase)
         resourceEndpoints(createResourceUseCase, getResourcesByEventUseCase)
         contributionEndpoints(addContributionUseCase, deleteContributionUseCase, reduceContributionUseCase)

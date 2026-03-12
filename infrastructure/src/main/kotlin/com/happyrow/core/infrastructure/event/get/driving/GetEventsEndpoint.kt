@@ -2,8 +2,7 @@ package com.happyrow.core.infrastructure.event.get.driving
 
 import arrow.core.Either
 import arrow.core.flatMap
-import com.happyrow.core.domain.event.creator.model.Creator
-import com.happyrow.core.domain.event.get.GetEventsByOrganizerUseCase
+import com.happyrow.core.domain.event.get.GetEventsByUserUseCase
 import com.happyrow.core.domain.event.get.error.GetEventException
 import com.happyrow.core.infrastructure.event.common.dto.toDto
 import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
@@ -18,14 +17,13 @@ import io.ktor.server.routing.get
 
 private const val INVALID_ORGANIZER_ID_ERROR_TYPE = "INVALID_ORGANIZER_ID"
 
-fun Route.getEventsEndpoint(getEventsByOrganizerUseCase: GetEventsByOrganizerUseCase) {
+fun Route.getEventsEndpoint(getEventsByUserUseCase: GetEventsByUserUseCase) {
   get {
     Either.catch {
-      val user = call.authenticatedUser()
-      Creator(user.email)
+      call.authenticatedUser().email
     }
       .mapLeft { InvalidOrganizerIdException("authenticated_user", it) }
-      .flatMap { organizer -> getEventsByOrganizerUseCase.execute(organizer) }
+      .flatMap { userEmail -> getEventsByUserUseCase.execute(userEmail) }
       .map { events -> events.map { it.toDto() } }
       .fold(
         { it.handleFailure(call) },

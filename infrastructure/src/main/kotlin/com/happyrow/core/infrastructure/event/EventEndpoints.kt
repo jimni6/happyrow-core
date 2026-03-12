@@ -2,7 +2,7 @@ package com.happyrow.core.infrastructure.event
 
 import com.happyrow.core.domain.event.create.CreateEventUseCase
 import com.happyrow.core.domain.event.delete.DeleteEventUseCase
-import com.happyrow.core.domain.event.get.GetEventsByOrganizerUseCase
+import com.happyrow.core.domain.event.get.GetEventsByUserUseCase
 import com.happyrow.core.domain.event.update.UpdateEventUseCase
 import com.happyrow.core.infrastructure.event.create.driving.createEventEndpoint
 import com.happyrow.core.infrastructure.event.delete.driving.deleteEventEndpoint
@@ -13,12 +13,12 @@ import io.ktor.server.routing.route
 
 fun Route.eventEndpoints(
   createEventUseCase: CreateEventUseCase,
-  getEventsByOrganizerUseCase: GetEventsByOrganizerUseCase,
+  getEventsByUserUseCase: GetEventsByUserUseCase,
   updateEventUseCase: UpdateEventUseCase,
   deleteEventUseCase: DeleteEventUseCase,
 ) = route("/events") {
   createEventEndpoint(createEventUseCase)
-  getEventsEndpoint(getEventsByOrganizerUseCase)
+  getEventsEndpoint(getEventsByUserUseCase)
   updateEventEndpoint(updateEventUseCase)
   deleteEventEndpoint(deleteEventUseCase)
 }
