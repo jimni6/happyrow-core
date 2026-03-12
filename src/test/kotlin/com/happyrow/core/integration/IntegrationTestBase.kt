@@ -94,6 +94,14 @@ abstract class IntegrationTestBase {
       .withClaim("email", email)
       .withExpiresAt(Date.from(Instant.now().plusSeconds(3600)))
       .sign(algorithm)
+
+    fun generateExpiredToken(userId: String = TEST_USER_ID, email: String = TEST_USER_EMAIL): String = JWT.create()
+      .withIssuer(TEST_ISSUER)
+      .withAudience(TEST_AUDIENCE)
+      .withSubject(userId)
+      .withClaim("email", email)
+      .withExpiresAt(Date.from(Instant.now().minusSeconds(3600)))
+      .sign(algorithm)
   }
 
   @BeforeEach
@@ -170,6 +178,8 @@ abstract class IntegrationTestBase {
       register(ContentType.Application.Json, JacksonConverter(JsonObjectMapper.defaultMapper))
     }
   }
+
+  fun ApplicationTestBuilder.rawClient(): HttpClient = createClient {}
 
   fun authHeader(token: String = generateToken()) = "Bearer $token"
 }
