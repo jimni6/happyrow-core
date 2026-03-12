@@ -3,6 +3,8 @@ package com.happyrow.core.infrastructure.participant.update.driving
 import arrow.core.Either
 import arrow.core.flatMap
 import com.happyrow.core.domain.participant.update.UpdateParticipantUseCase
+import com.happyrow.core.domain.participant.update.error.ForbiddenParticipantUpdateException
+import com.happyrow.core.domain.participant.update.error.ParticipantNotFoundException
 import com.happyrow.core.domain.participant.update.error.UpdateParticipantException
 import com.happyrow.core.infrastructure.common.error.BadRequestException
 import com.happyrow.core.infrastructure.participant.common.dto.toDto
@@ -19,6 +21,9 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.put
 import java.util.UUID
 
+private const val FORBIDDEN_ERROR_TYPE = "FORBIDDEN"
+private const val NOT_FOUND_ERROR_TYPE = "NOT_FOUND"
+
 fun Route.updateParticipantEndpoint(updateParticipantUseCase: UpdateParticipantUseCase) {
   put {
     val eventId = call.parameters["eventId"]?.let { UUID.fromString(it) }
@@ -28,12 +33,15 @@ fun Route.updateParticipantEndpoint(updateParticipantUseCase: UpdateParticipantU
       ?: return@put call.respond(HttpStatusCode.BadRequest, "Missing userEmail")
 
     Either.catch {
-      call.authenticatedUser()
-      call.receive<UpdateParticipantRequestDto>()
+      val authenticatedEmail = call.authenticatedUser().email
+      val body = call.receive<UpdateParticipantRequestDto>()
+      authenticatedEmail to body
     }
       .mapLeft { BadRequestException.InvalidBodyException(it) }
-      .map { it.toDomain(userEmail, eventId) }
-      .flatMap { request -> updateParticipantUseCase.execute(request) }
+      .flatMap { (authenticatedEmail, body) ->
+        val request = body.toDomain(userEmail, eventId)
+        updateParticipantUseCase.execute(request, authenticatedEmail)
+      }
       .map { it.toDto() }
       .fold(
         { it.handleFailure(call) },
@@ -46,6 +54,24 @@ private suspend fun Exception.handleFailure(call: ApplicationCall) = when (this)
   is BadRequestException -> call.logAndRespond(
     status = HttpStatusCode.BadRequest,
     responseMessage = ClientErrorMessage.of(type = type, detail = message),
+    failure = this,
+  )
+
+  is ForbiddenParticipantUpdateException -> call.logAndRespond(
+    status = HttpStatusCode.Forbidden,
+    responseMessage = ClientErrorMessage.of(
+      type = FORBIDDEN_ERROR_TYPE,
+      detail = "Not authorized to update this participant's status",
+    ),
+    failure = this,
+  )
+
+  is ParticipantNotFoundException -> call.logAndRespond(
+    status = HttpStatusCode.NotFound,
+    responseMessage = ClientErrorMessage.of(
+      type = NOT_FOUND_ERROR_TYPE,
+      detail = "Participant ${this.userEmail} not found for event ${this.eventId}",
+    ),
     failure = this,
   )
 
