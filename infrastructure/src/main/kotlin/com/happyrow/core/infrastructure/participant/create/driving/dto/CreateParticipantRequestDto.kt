@@ -6,10 +6,12 @@ import java.util.UUID
 
 class CreateParticipantRequestDto(
   val userEmail: String,
+  val userName: String? = null,
   val status: String = "CONFIRMED",
 ) {
   fun toDomain(eventId: UUID): CreateParticipantRequest = CreateParticipantRequest(
     userEmail = this.userEmail,
+    userName = this.userName,
     eventId = eventId,
     status = ParticipantStatus.valueOf(this.status),
   )

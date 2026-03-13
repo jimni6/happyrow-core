@@ -5,6 +5,7 @@ import java.util.UUID
 
 data class CreateParticipantRequest(
   val userEmail: String,
+  val userName: String? = null,
   val eventId: UUID,
   val status: ParticipantStatus = ParticipantStatus.CONFIRMED,
 )

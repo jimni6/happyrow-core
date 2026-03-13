@@ -22,6 +22,7 @@ class DatabaseInitializer(
       createTables()
       migrateResourceCategory()
       migrateEventDescription()
+      migrateParticipantUserName()
       logger.info("Database initialization completed successfully!")
     }
   }
@@ -78,6 +79,26 @@ class DatabaseInitializer(
           ALTER TABLE configuration.event
           ALTER COLUMN description TYPE TEXT;
           RAISE NOTICE 'Migrated event.description from varchar to text';
+        END IF;
+      END $$;
+      """.trimIndent(),
+    )
+  }
+
+  private fun org.jetbrains.exposed.sql.Transaction.migrateParticipantUserName() {
+    logger.info("Adding user_name column to participant table if needed...")
+    exec(
+      """
+      DO $$ BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_schema = 'configuration'
+          AND table_name = 'participant'
+          AND column_name = 'user_name'
+        ) THEN
+          ALTER TABLE configuration.participant
+          ADD COLUMN user_name VARCHAR(255) DEFAULT NULL;
+          RAISE NOTICE 'Added user_name column to participant table';
         END IF;
       END $$;
       """.trimIndent(),

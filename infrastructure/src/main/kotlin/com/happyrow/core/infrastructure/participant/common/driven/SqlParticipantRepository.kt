@@ -35,6 +35,7 @@ class SqlParticipantRepository(
       transaction(exposedDatabase.database) {
         ParticipantTable.insertAndGetId {
           it[userEmail] = request.userEmail
+          it[userName] = request.userName
           it[eventId] = request.eventId
           it[status] = request.status.name
           it[joinedAt] = clock.instant()
@@ -130,7 +131,9 @@ class SqlParticipantRepository(
     eventId: UUID,
   ): Either<CreateParticipantRepositoryException, Participant> {
     return find(userEmail, eventId)
-      .mapLeft { CreateParticipantRepositoryException(CreateParticipantRequest(userEmail, eventId), it) }
+      .mapLeft {
+        CreateParticipantRepositoryException(CreateParticipantRequest(userEmail = userEmail, eventId = eventId), it)
+      }
       .flatMap { existing ->
         if (existing != null) {
           Either.Right(existing)

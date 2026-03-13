@@ -9,6 +9,7 @@ fun ResultRow.toParticipant(): Either<Throwable, Participant> = Either.catch {
   Participant(
     identifier = this[ParticipantTable.id].value,
     userEmail = this[ParticipantTable.userEmail],
+    userName = this[ParticipantTable.userName],
     eventId = this[ParticipantTable.eventId],
     status = ParticipantStatus.valueOf(this[ParticipantTable.status]),
     joinedAt = this[ParticipantTable.joinedAt],
