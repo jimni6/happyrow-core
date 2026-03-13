@@ -1,0 +1,27 @@
+graph LR
+    subgraph Driving ["Adapters Driving (REST)"]
+        E1["EventEndpoints"]
+        E2["ParticipantEndpoints"]
+        E3["ResourceEndpoints"]
+        E4["ContributionEndpoints"]
+    end
+
+    subgraph Domain ["Domain — Use Cases + Ports"]
+        direction TB
+        D1["CreateEvent"]
+        D2["GetEventsByOrganizer"]
+        D3["AddContribution"]
+        D4["ReduceContribution"]
+    end
+
+    subgraph Driven ["Adapters Driven (SQL)"]
+        R1["SqlEventRepository"]
+        R2["SqlParticipantRepository"]
+        R3["SqlResourceRepository"]
+        R4["SqlContributionRepository"]
+    end
+
+    E1 --> D1 & D2
+    E4 --> D3 & D4
+    D1 & D2 --> R1
+    D3 & D4 --> R4

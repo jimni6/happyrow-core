@@ -1,0 +1,6 @@
+graph LR
+    Push["Push sur main"] --> Detekt["Detekt"]
+    Detekt -->|"OK"| Tests["Tests unitaires"]
+    Tests -->|"OK"| Deploy["Déploiement"]
+    Detekt -->|"KO"| Fail1["Pipeline bloqué"]
+    Tests -->|"KO"| Fail2["Pipeline bloqué"]

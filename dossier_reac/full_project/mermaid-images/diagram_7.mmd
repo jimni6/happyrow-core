@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant User as Utilisateur
+    participant Front as Front-end
+    participant Supa as Supabase Auth
+    participant API as HappyRow API
+    participant Plugin as JwtAuthPlugin
+
+    User->>Front: Email + Mot de passe
+    Front->>Supa: POST /auth/v1/token
+    Supa-->>Front: JWT signé (HMAC256)
+    Front->>API: GET /events (Authorization: Bearer token)
+    API->>Plugin: Interception de la requête
+    Plugin->>Plugin: Vérifier signature (HMAC256)
+    Plugin->>Plugin: Vérifier issuer, audience, expiration
+    Plugin->>Plugin: Extraire userId + email
+    Plugin-->>API: AuthenticatedUser dans les attributs
+    API-->>Front: 200 OK + données

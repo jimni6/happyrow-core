@@ -1,0 +1,16 @@
+graph LR
+    Login["Page de connexion<br/>(Supabase Auth)"]
+    Dashboard["Dashboard<br/>Liste des événements"]
+    CreateEvt["Modal Création<br/>événement"]
+    EventDetail["Détail événement<br/>Participants + Ressources"]
+    AddResource["Modal Ajout<br/>ressource"]
+    Contribute["Modal Contribution<br/>(quantité)"]
+
+    Login -->|"Authentification"| Dashboard
+    Dashboard -->|"Clic Créer"| CreateEvt
+    CreateEvt -->|"Valider"| Dashboard
+    Dashboard -->|"Clic événement"| EventDetail
+    EventDetail -->|"Ajouter ressource"| AddResource
+    AddResource -->|"Valider"| EventDetail
+    EventDetail -->|"Contribuer"| Contribute
+    Contribute -->|"Valider"| EventDetail

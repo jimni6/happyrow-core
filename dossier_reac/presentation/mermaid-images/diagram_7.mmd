@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant User as Utilisateur
+    participant Front as Front-end
+    participant Supa as Supabase Auth
+    participant API as HappyRow API
+
+    User->>Front: Email + Mot de passe
+    Front->>Supa: POST /auth/v1/token
+    Supa-->>Front: JWT signé HMAC256
+    Front->>API: Authorization: Bearer token
+    API->>API: Vérifier signature, issuer, audience, expiration
+    API->>API: Extraire userId + email des claims
+    API-->>Front: 200 OK + données

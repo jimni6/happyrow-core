@@ -1,0 +1,23 @@
+sequenceDiagram
+    participant Client as Front-end
+    participant EP as AddContributionEndpoint
+    participant UC as AddContributionUseCase
+    participant CR as SqlContributionRepository
+    participant RR as ResourceRepository
+    participant DB as PostgreSQL
+
+    Client->>EP: POST /events/{id}/resources/{rid}/contributions
+    EP->>UC: execute(request)
+    UC->>CR: addOrUpdate(request)
+    CR->>DB: SELECT contribution existante
+    CR->>DB: INSERT contribution (quantity=3)
+    CR->>RR: updateQuantity(resourceId, +3, version=0)
+    RR->>DB: UPDATE resource SET version=1 WHERE version=0
+    alt Version OK
+        DB-->>RR: 1 row updated
+        EP-->>Client: 200 OK
+    else Conflit concurrent
+        DB-->>RR: 0 rows updated
+        RR-->>EP: OptimisticLockException
+        EP-->>Client: 409 Conflict
+    end

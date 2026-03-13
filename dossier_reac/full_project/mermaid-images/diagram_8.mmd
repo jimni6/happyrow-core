@@ -1,0 +1,6 @@
+graph LR
+    Push["Push sur main"] --> Detekt["Detekt<br/>(analyse statique)"]
+    Detekt -->|"OK"| Tests["Tests unitaires<br/>(Kotest + MockK)"]
+    Tests -->|"OK"| Deploy["Déploiement<br/>(Render)"]
+    Detekt -->|"KO"| Fail1["Pipeline bloqué"]
+    Tests -->|"KO"| Fail2["Pipeline bloqué"]
