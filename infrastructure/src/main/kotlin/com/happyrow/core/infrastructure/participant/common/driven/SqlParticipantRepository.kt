@@ -4,13 +4,18 @@ import arrow.core.Either
 import arrow.core.flatMap
 import com.happyrow.core.domain.participant.common.driven.ParticipantRepository
 import com.happyrow.core.domain.participant.common.error.CreateParticipantRepositoryException
+import com.happyrow.core.domain.participant.common.error.DeleteParticipantRepositoryException
 import com.happyrow.core.domain.participant.common.error.GetParticipantRepositoryException
 import com.happyrow.core.domain.participant.common.error.UpdateParticipantRepositoryException
 import com.happyrow.core.domain.participant.common.model.Participant
 import com.happyrow.core.domain.participant.common.model.ParticipantStatus
 import com.happyrow.core.domain.participant.create.model.CreateParticipantRequest
+import com.happyrow.core.infrastructure.contribution.common.driven.ContributionTable
+import com.happyrow.core.infrastructure.resource.common.driven.ResourceTable
 import com.happyrow.core.infrastructure.technical.config.ExposedDatabase
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -78,6 +83,47 @@ class SqlParticipantRepository(
           }
       }
       .mapLeft { UpdateParticipantRepositoryException(participant.userEmail, participant.eventId, it) }
+
+  override fun delete(userEmail: String, eventId: UUID): Either<DeleteParticipantRepositoryException, Unit> =
+    Either.catch {
+      transaction(exposedDatabase.database) {
+        val participant = ParticipantTable
+          .selectAll().where { (ParticipantTable.userEmail eq userEmail) and (ParticipantTable.eventId eq eventId) }
+          .singleOrNull() ?: throw NoSuchElementException("Participant $userEmail not found for event $eventId")
+
+        val participantId = participant[ParticipantTable.id].value
+
+        val contributions = ContributionTable
+          .selectAll().where { ContributionTable.participantId eq participantId }
+          .toList()
+
+        for (contribution in contributions) {
+          val resourceId = contribution[ContributionTable.resourceId]
+          val contributedQty = contribution[ContributionTable.quantity]
+
+          val resource = ResourceTable
+            .selectAll().where { ResourceTable.id eq resourceId }
+            .singleOrNull()
+
+          if (resource != null) {
+            val currentQty = resource[ResourceTable.currentQuantity]
+            val currentVersion = resource[ResourceTable.version]
+            ResourceTable.update({ ResourceTable.id eq resourceId }) {
+              it[currentQuantity] = currentQty - contributedQty
+              it[version] = currentVersion + 1
+              it[updatedAt] = clock.instant()
+            }
+          }
+        }
+
+        ContributionTable.deleteWhere { ContributionTable.participantId eq participantId }
+
+        ParticipantTable.deleteWhere {
+          (ParticipantTable.userEmail eq userEmail) and (ParticipantTable.eventId eq eventId)
+        }
+        Unit
+      }
+    }.mapLeft { DeleteParticipantRepositoryException(userEmail, eventId, it) }
 
   override fun findOrCreate(
     userEmail: String,

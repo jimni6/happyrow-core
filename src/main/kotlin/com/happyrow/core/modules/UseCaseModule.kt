@@ -8,6 +8,7 @@ import com.happyrow.core.domain.event.delete.DeleteEventUseCase
 import com.happyrow.core.domain.event.get.GetEventsByUserUseCase
 import com.happyrow.core.domain.event.update.UpdateEventUseCase
 import com.happyrow.core.domain.participant.create.CreateParticipantUseCase
+import com.happyrow.core.domain.participant.delete.DeleteParticipantUseCase
 import com.happyrow.core.domain.participant.get.GetParticipantsByEventUseCase
 import com.happyrow.core.domain.participant.update.UpdateParticipantUseCase
 import com.happyrow.core.domain.resource.create.CreateResourceUseCase
@@ -22,6 +23,7 @@ val domainModule = module {
   single<CreateParticipantUseCase> { CreateParticipantUseCase(get()) }
   single<GetParticipantsByEventUseCase> { GetParticipantsByEventUseCase(get()) }
   single<UpdateParticipantUseCase> { UpdateParticipantUseCase(get(), get()) }
+  single<DeleteParticipantUseCase> { DeleteParticipantUseCase(get(), get()) }
   single<CreateResourceUseCase> { CreateResourceUseCase(get(), get()) }
   single<GetResourcesByEventUseCase> { GetResourcesByEventUseCase(get(), get(), get()) }
   single<AddContributionUseCase> { AddContributionUseCase(get()) }

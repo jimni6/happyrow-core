@@ -8,6 +8,7 @@ import com.happyrow.core.domain.event.delete.DeleteEventUseCase
 import com.happyrow.core.domain.event.get.GetEventsByUserUseCase
 import com.happyrow.core.domain.event.update.UpdateEventUseCase
 import com.happyrow.core.domain.participant.create.CreateParticipantUseCase
+import com.happyrow.core.domain.participant.delete.DeleteParticipantUseCase
 import com.happyrow.core.domain.participant.get.GetParticipantsByEventUseCase
 import com.happyrow.core.domain.participant.update.UpdateParticipantUseCase
 import com.happyrow.core.domain.resource.create.CreateResourceUseCase
@@ -35,6 +36,7 @@ fun Application.configureRouting() {
   val createParticipantUseCase: CreateParticipantUseCase by inject()
   val getParticipantsByEventUseCase: GetParticipantsByEventUseCase by inject()
   val updateParticipantUseCase: UpdateParticipantUseCase by inject()
+  val deleteParticipantUseCase: DeleteParticipantUseCase by inject()
   val createResourceUseCase: CreateResourceUseCase by inject()
   val getResourcesByEventUseCase: GetResourcesByEventUseCase by inject()
   val addContributionUseCase: AddContributionUseCase by inject()
@@ -45,7 +47,12 @@ fun Application.configureRouting() {
     route(BASE_PATH) {
       route("/api/v1") {
         eventEndpoints(createEventUseCase, getEventsByUserUseCase, updateEventUseCase, deleteEventUseCase)
-        participantEndpoints(createParticipantUseCase, getParticipantsByEventUseCase, updateParticipantUseCase)
+        participantEndpoints(
+          createParticipantUseCase,
+          getParticipantsByEventUseCase,
+          updateParticipantUseCase,
+          deleteParticipantUseCase,
+        )
         resourceEndpoints(createResourceUseCase, getResourcesByEventUseCase)
         contributionEndpoints(addContributionUseCase, deleteContributionUseCase, reduceContributionUseCase)
       }
