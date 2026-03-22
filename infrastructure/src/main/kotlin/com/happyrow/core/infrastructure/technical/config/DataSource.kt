@@ -43,22 +43,15 @@ fun dataSource(sqlDatabaseConfig: SqlDatabaseConfig): DataSource {
     isAutoCommit = false
     validate()
   }
-  logger.info("Attempting to connect to database:")
-  logger.info("  JDBC URL: ${config.jdbcUrl}")
-  logger.info("  Username: ${config.username}")
-  logger.info("  SSL Mode: require")
-  logger.info("  Driver: ${config.driverClassName}")
-  logger.info("  Max Pool Size: ${config.maximumPoolSize}")
+  logger.info("Connecting to database (pool size: ${config.maximumPoolSize})")
 
   return try {
     HikariDataSource(config)
   } catch (e: SQLException) {
-    logger.error("Failed to create database connection due to SQL error:", e)
-    logger.error("Connection details - URL: ${config.jdbcUrl}, Username: ${config.username}")
+    logger.error("Failed to create database connection due to SQL error", e)
     throw e
   } catch (e: HikariPool.PoolInitializationException) {
-    logger.error("Failed to initialize connection pool:", e)
-    logger.error("Connection details - URL: ${config.jdbcUrl}, Username: ${config.username}")
+    logger.error("Failed to initialize connection pool", e)
     throw e
   }
 }
