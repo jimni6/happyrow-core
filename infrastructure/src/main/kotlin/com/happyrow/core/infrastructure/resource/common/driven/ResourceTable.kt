@@ -13,7 +13,7 @@ object ResourceTable : UUIDTable("configuration.resource", "id") {
   val suggestedQuantity = integer("suggested_quantity").default(0)
   val currentQuantity = integer("current_quantity").default(0)
   val eventId = uuid("event_id").references(EventTable.id)
-  val version = integer("version").default(1)
+  val version = integer("version").default(0)
   val createdAt = timestamp("created_at")
   val updatedAt = timestamp("updated_at")
 
