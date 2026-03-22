@@ -66,9 +66,7 @@ fun Application.configureRouting() {
       call.respond(
         mapOf(
           "name" to "happyrow-core",
-          "version" to "1.0.0",
-          "environment" to (System.getenv("ENVIRONMENT") ?: "unknown"),
-          "timestamp" to System.currentTimeMillis(),
+          "status" to "running",
         ),
       )
     }
