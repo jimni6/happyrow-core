@@ -1,0 +1,49 @@
+erDiagram
+    EVENT {
+        UUID identifier PK
+        VARCHAR name
+        TEXT description
+        TIMESTAMP event_date
+        VARCHAR creator
+        VARCHAR location
+        EVENT_TYPE type
+        TIMESTAMP creation_date
+        TIMESTAMP update_date
+        UUID_ARRAY members
+    }
+
+    PARTICIPANT {
+        UUID id PK
+        VARCHAR user_email
+        UUID event_id FK
+        VARCHAR status
+        TIMESTAMP joined_at
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    RESOURCE {
+        UUID id PK
+        VARCHAR name
+        VARCHAR category
+        INT suggested_quantity
+        INT current_quantity
+        UUID event_id FK
+        INT version
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    CONTRIBUTION {
+        UUID id PK
+        UUID participant_id FK
+        UUID resource_id FK
+        INT quantity
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    EVENT ||--o{ PARTICIPANT : "héberge"
+    EVENT ||--o{ RESOURCE : "nécessite"
+    PARTICIPANT ||--o{ CONTRIBUTION : "apporte"
+    RESOURCE ||--o{ CONTRIBUTION : "reçoit"

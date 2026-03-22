@@ -62,6 +62,10 @@ fun Application.configureRouting() {
       call.respondText("Hello from happyrow-core!", ContentType.Text.Plain)
     }
 
+    get("/health") {
+      call.respond(mapOf("status" to "UP"))
+    }
+
     get("/info") {
       call.respond(
         mapOf(

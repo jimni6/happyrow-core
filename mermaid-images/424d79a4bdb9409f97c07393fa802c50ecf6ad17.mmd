@@ -1,0 +1,44 @@
+sequenceDiagram
+    participant Client as Front-end
+    participant EP as AddContributionEndpoint
+    participant UC as AddContributionUseCase
+    participant CR as SqlContributionRepository
+    participant PR as ParticipantRepository
+    participant RR as ResourceRepository
+    participant DB as PostgreSQL
+
+    Client->>EP: POST /events/{id}/resources/{rid}/contributions
+    EP->>EP: authenticatedUser() + receive body
+    EP->>UC: execute(AddContributionRequest)
+    UC->>CR: addOrUpdate(request)
+    CR->>PR: findOrCreate(userEmail, eventId)
+    PR->>DB: SELECT participant / INSERT si absent
+    DB-->>PR: Participant
+    PR-->>CR: Either.Right(Participant)
+    CR->>DB: SELECT contribution WHERE participant_id AND resource_id
+    alt Contribution existante
+        CR->>DB: UPDATE contribution SET quantity
+        CR->>RR: find(resourceId)
+        RR->>DB: SELECT resource
+        DB-->>RR: Resource (version = N)
+        CR->>RR: updateQuantity(resourceId, delta, version=N)
+        RR->>DB: UPDATE resource SET current_quantity, version=N+1 WHERE version=N
+        alt Version OK
+            DB-->>RR: 1 row updated
+            RR-->>CR: Either.Right(Resource)
+        else Version changée (accès concurrent)
+            DB-->>RR: 0 rows updated
+            RR-->>CR: Either.Left(OptimisticLockException)
+            CR-->>UC: Either.Left(error)
+            UC-->>EP: Either.Left(AddContributionException)
+            EP-->>Client: 409 Conflict OPTIMISTIC_LOCK_FAILURE
+        end
+    else Nouvelle contribution
+        CR->>DB: INSERT INTO contribution
+        CR->>RR: updateQuantity(resourceId, quantity, version)
+        RR->>DB: UPDATE resource WHERE version=N
+        DB-->>RR: Resource updated
+    end
+    CR-->>UC: Either.Right(Contribution)
+    UC-->>EP: Either.Right(Contribution)
+    EP-->>Client: 200 OK + ContributionDto

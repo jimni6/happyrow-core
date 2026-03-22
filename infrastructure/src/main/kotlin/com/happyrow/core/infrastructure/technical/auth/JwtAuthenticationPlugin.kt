@@ -9,7 +9,7 @@ import io.ktor.util.AttributeKey
 
 private const val BEARER_PREFIX_LENGTH = 7
 
-private val PUBLIC_PATHS = setOf("/", "/info")
+private val PUBLIC_PATHS = setOf("/", "/info", "/health")
 
 val SupabaseAuthKey = AttributeKey<AuthenticatedUser>("SupabaseAuth")
 

@@ -1,0 +1,49 @@
+erDiagram
+    EVENT {
+        UUID identifier PK "PRIMARY KEY"
+        VARCHAR_256 name "NOT NULL"
+        TEXT description "NOT NULL"
+        TIMESTAMP event_date "NOT NULL"
+        VARCHAR_256 creator "NOT NULL"
+        VARCHAR_256 location "NOT NULL"
+        EVENT_TYPE type "NOT NULL — ENUM (PARTY, BIRTHDAY, DINER, SNACK)"
+        TIMESTAMP creation_date "NOT NULL"
+        TIMESTAMP update_date "NOT NULL"
+        UUID_ARRAY members "Array de UUID"
+    }
+
+    PARTICIPANT {
+        UUID id PK "PRIMARY KEY"
+        VARCHAR_255 user_email "NOT NULL"
+        UUID event_id FK "NOT NULL — FK → event.identifier"
+        VARCHAR_50 status "NOT NULL — DEFAULT CONFIRMED"
+        TIMESTAMP joined_at "NOT NULL"
+        TIMESTAMP created_at "NOT NULL"
+        TIMESTAMP updated_at "NOT NULL"
+    }
+
+    RESOURCE {
+        UUID id PK "PRIMARY KEY"
+        VARCHAR_255 name "NOT NULL"
+        VARCHAR_50 category "NOT NULL"
+        INTEGER suggested_quantity "NOT NULL — DEFAULT 0"
+        INTEGER current_quantity "NOT NULL — DEFAULT 0"
+        UUID event_id FK "NOT NULL — FK → event.identifier"
+        INTEGER version "NOT NULL — DEFAULT 1 — verrou optimiste"
+        TIMESTAMP created_at "NOT NULL"
+        TIMESTAMP updated_at "NOT NULL"
+    }
+
+    CONTRIBUTION {
+        UUID id PK "PRIMARY KEY"
+        UUID participant_id FK "NOT NULL — FK → participant.id"
+        UUID resource_id FK "NOT NULL — FK → resource.id"
+        INTEGER quantity "NOT NULL — CHECK > 0"
+        TIMESTAMP created_at "NOT NULL"
+        TIMESTAMP updated_at "NOT NULL"
+    }
+
+    EVENT ||--o{ PARTICIPANT : "heberge (1:N)"
+    EVENT ||--o{ RESOURCE : "necessite (1:N)"
+    PARTICIPANT ||--o{ CONTRIBUTION : "apporte (1:N)"
+    RESOURCE ||--o{ CONTRIBUTION : "recoit (1:N)"
