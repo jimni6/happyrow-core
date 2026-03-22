@@ -10,16 +10,14 @@ class SupabaseJwtService(
   private val config: SupabaseJwtConfig,
 ) {
   private val algorithm = Algorithm.HMAC256(config.jwtSecret)
+  private val verifier = JWT.require(algorithm)
+    .withIssuer(config.issuer)
+    .withAudience(config.audience)
+    .build()
 
   fun validateToken(token: String): Either<Throwable, AuthenticatedUser> {
     return Either.catch {
-      val verifier = JWT.require(algorithm)
-        .withIssuer(config.issuer)
-        .withAudience(config.audience)
-        .build()
-
-      val verifiedJwt = verifier.verify(token)
-      extractUser(verifiedJwt)
+      extractUser(verifier.verify(token))
     }
   }
 
