@@ -62,7 +62,8 @@ private suspend fun Exception.handleFailure(call: ApplicationCall) = when (this)
 }
 
 private suspend fun AddContributionException.handleAddContributionFailure(call: ApplicationCall) {
-  val rootCause = generateSequence<Throwable>(this.cause) { it.cause }.lastOrNull()
+  val rootCause = generateSequence<Throwable>(this) { it.cause }
+    .firstOrNull { it is OptimisticLockException }
 
   when (rootCause) {
     is OptimisticLockException -> call.logAndRespond(
