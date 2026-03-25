@@ -128,7 +128,28 @@ tasks.withType<Jar> {
     manifest {
         attributes["Main-Class"] = "com.happyrow.core.ApplicationKt"
     }
-    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    val runtimeCp = configurations.runtimeClasspath
+    from(runtimeCp.get().map { if (it.isDirectory) it else zipTree(it) }) {
+        exclude("META-INF/services/**")
+        exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
+    }
+    doFirst {
+        val mergedDir = File(temporaryDir, "META-INF/services")
+        mergedDir.mkdirs()
+        val services = mutableMapOf<String, MutableSet<String>>()
+        runtimeCp.get().filter { it.isFile && it.extension == "jar" }.forEach { jar ->
+            project.zipTree(jar).matching { include("META-INF/services/**") }.visit {
+                if (!isDirectory) {
+                    val svcName = relativePath.pathString.removePrefix("META-INF/services/")
+                    file.readLines()
+                        .filter { line -> line.isNotBlank() && !line.startsWith("#") }
+                        .let { lines -> services.getOrPut(svcName) { mutableSetOf() }.addAll(lines) }
+                }
+            }
+        }
+        services.forEach { (name, impls) -> File(mergedDir, name).writeText(impls.joinToString("\n") + "\n") }
+    }
+    from(temporaryDir)
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
