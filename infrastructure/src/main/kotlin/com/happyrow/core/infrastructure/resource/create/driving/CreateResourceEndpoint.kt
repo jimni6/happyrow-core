@@ -10,8 +10,7 @@ import com.happyrow.core.infrastructure.common.error.BadRequestException
 import com.happyrow.core.infrastructure.resource.common.dto.toDto
 import com.happyrow.core.infrastructure.resource.create.driving.dto.CreateResourceRequestDto
 import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
-import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage
-import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
+import com.happyrow.core.infrastructure.technical.ktor.ProblemDetail
 import com.happyrow.core.infrastructure.technical.ktor.logAndRespond
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
@@ -52,14 +51,13 @@ fun Route.createResourceEndpoint(
 
 private suspend fun Exception.handleFailure(call: ApplicationCall) = when (this) {
   is BadRequestException -> call.logAndRespond(
-    status = HttpStatusCode.BadRequest,
-    responseMessage = ClientErrorMessage.of(type = type, detail = message),
+    problem = ProblemDetail.of(HttpStatusCode.BadRequest, type = type, detail = message),
     failure = this,
   )
 
   is ForbiddenAccessException -> call.logAndRespond(
-    status = HttpStatusCode.Forbidden,
-    responseMessage = ClientErrorMessage.of(
+    problem = ProblemDetail.of(
+      HttpStatusCode.Forbidden,
       type = FORBIDDEN_ERROR_TYPE,
       detail = "You do not have access to this event",
     ),
@@ -67,14 +65,12 @@ private suspend fun Exception.handleFailure(call: ApplicationCall) = when (this)
   )
 
   is CreateResourceException -> call.logAndRespond(
-    status = HttpStatusCode.InternalServerError,
-    responseMessage = technicalErrorMessage(),
+    problem = ProblemDetail.technicalError(),
     failure = this,
   )
 
   else -> call.logAndRespond(
-    status = HttpStatusCode.InternalServerError,
-    responseMessage = technicalErrorMessage(),
+    problem = ProblemDetail.technicalError(),
     failure = this,
   )
 }

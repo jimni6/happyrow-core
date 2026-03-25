@@ -6,8 +6,7 @@ import com.happyrow.core.domain.contribution.delete.DeleteContributionUseCase
 import com.happyrow.core.domain.contribution.delete.error.DeleteContributionException
 import com.happyrow.core.infrastructure.common.error.BadRequestException
 import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
-import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage
-import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
+import com.happyrow.core.infrastructure.technical.ktor.ProblemDetail
 import com.happyrow.core.infrastructure.technical.ktor.logAndRespond
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
@@ -41,20 +40,17 @@ fun Route.deleteContributionEndpoint(deleteContributionUseCase: DeleteContributi
 
 private suspend fun Exception.handleFailure(call: ApplicationCall) = when (this) {
   is BadRequestException -> call.logAndRespond(
-    status = HttpStatusCode.BadRequest,
-    responseMessage = ClientErrorMessage.of(type = type, detail = message),
+    problem = ProblemDetail.of(HttpStatusCode.BadRequest, type = type, detail = message),
     failure = this,
   )
 
   is DeleteContributionException -> call.logAndRespond(
-    status = HttpStatusCode.InternalServerError,
-    responseMessage = technicalErrorMessage(),
+    problem = ProblemDetail.technicalError(),
     failure = this,
   )
 
   else -> call.logAndRespond(
-    status = HttpStatusCode.InternalServerError,
-    responseMessage = technicalErrorMessage(),
+    problem = ProblemDetail.technicalError(),
     failure = this,
   )
 }

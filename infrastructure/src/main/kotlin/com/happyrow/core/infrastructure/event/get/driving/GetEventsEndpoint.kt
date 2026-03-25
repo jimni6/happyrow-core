@@ -6,8 +6,7 @@ import com.happyrow.core.domain.event.get.GetEventsByUserUseCase
 import com.happyrow.core.domain.event.get.error.GetEventException
 import com.happyrow.core.infrastructure.event.common.dto.toDto
 import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
-import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage
-import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
+import com.happyrow.core.infrastructure.technical.ktor.ProblemDetail
 import com.happyrow.core.infrastructure.technical.ktor.logAndRespond
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
@@ -35,8 +34,8 @@ fun Route.getEventsEndpoint(getEventsByUserUseCase: GetEventsByUserUseCase) {
 
 private suspend fun Exception.handleFailure(call: ApplicationCall) = when (this) {
   is InvalidOrganizerIdException -> call.logAndRespond(
-    status = HttpStatusCode.BadRequest,
-    responseMessage = ClientErrorMessage.of(
+    problem = ProblemDetail.of(
+      HttpStatusCode.BadRequest,
       type = INVALID_ORGANIZER_ID_ERROR_TYPE,
       detail = "Invalid organizerId: $organizerId",
     ),
@@ -44,14 +43,12 @@ private suspend fun Exception.handleFailure(call: ApplicationCall) = when (this)
   )
 
   is GetEventException -> call.logAndRespond(
-    status = HttpStatusCode.InternalServerError,
-    responseMessage = technicalErrorMessage(),
+    problem = ProblemDetail.technicalError(),
     failure = this,
   )
 
   else -> call.logAndRespond(
-    status = HttpStatusCode.InternalServerError,
-    responseMessage = technicalErrorMessage(),
+    problem = ProblemDetail.technicalError(),
     failure = this,
   )
 }

@@ -10,8 +10,7 @@ import com.happyrow.core.infrastructure.event.common.dto.toDto
 import com.happyrow.core.infrastructure.event.create.driving.dto.CreateEventRequestDto
 import com.happyrow.core.infrastructure.event.create.error.UnicityConflictException
 import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
-import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage
-import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
+import com.happyrow.core.infrastructure.technical.ktor.ProblemDetail
 import com.happyrow.core.infrastructure.technical.ktor.logAndRespond
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
@@ -42,16 +41,14 @@ fun Route.createEventEndpoint(createEventUseCase: CreateEventUseCase) = route(""
 
 private suspend fun Exception.handleFailure(call: ApplicationCall) = when (this) {
   is BadRequestException -> call.logAndRespond(
-    status = HttpStatusCode.BadRequest,
-    responseMessage = ClientErrorMessage.of(type = type, detail = message),
+    problem = ProblemDetail.of(HttpStatusCode.BadRequest, type = type, detail = message),
     failure = this,
   )
 
   is CreateEventException -> this.handleFailure(call)
 
   else -> call.logAndRespond(
-    status = HttpStatusCode.InternalServerError,
-    responseMessage = technicalErrorMessage(),
+    problem = ProblemDetail.technicalError(),
     failure = this,
   )
 }
@@ -60,16 +57,15 @@ private suspend fun CreateEventException.handleFailure(call: ApplicationCall) = 
   is CreateEventRepositoryException -> (cause as CreateEventRepositoryException).handleFailure(call)
 
   else -> call.logAndRespond(
-    status = HttpStatusCode.InternalServerError,
-    responseMessage = technicalErrorMessage(),
+    problem = ProblemDetail.technicalError(),
     failure = this,
   )
 }
 
 private suspend fun CreateEventRepositoryException.handleFailure(call: ApplicationCall) = when (cause) {
   is UnicityConflictException -> call.logAndRespond(
-    status = HttpStatusCode.Conflict,
-    responseMessage = ClientErrorMessage.of(
+    problem = ProblemDetail.of(
+      HttpStatusCode.Conflict,
       type = NAME_ALREADY_EXISTS_ERROR_TYPE,
       detail = request.name,
     ),
@@ -77,8 +73,7 @@ private suspend fun CreateEventRepositoryException.handleFailure(call: Applicati
   )
 
   else -> call.logAndRespond(
-    status = HttpStatusCode.InternalServerError,
-    responseMessage = technicalErrorMessage(),
+    problem = ProblemDetail.technicalError(),
     failure = this,
   )
 }

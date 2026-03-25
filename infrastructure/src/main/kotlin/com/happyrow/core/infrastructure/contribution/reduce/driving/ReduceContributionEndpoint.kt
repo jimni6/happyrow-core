@@ -9,8 +9,7 @@ import com.happyrow.core.infrastructure.common.error.BadRequestException
 import com.happyrow.core.infrastructure.contribution.common.dto.toDto
 import com.happyrow.core.infrastructure.contribution.reduce.driving.dto.ReduceContributionRequestDto
 import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
-import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage
-import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
+import com.happyrow.core.infrastructure.technical.ktor.ProblemDetail
 import com.happyrow.core.infrastructure.technical.ktor.logAndRespond
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
@@ -53,16 +52,14 @@ fun Route.reduceContributionEndpoint(reduceContributionUseCase: ReduceContributi
 
 private suspend fun Exception.handleFailure(call: ApplicationCall) = when (this) {
   is BadRequestException -> call.logAndRespond(
-    status = HttpStatusCode.BadRequest,
-    responseMessage = ClientErrorMessage.of(type = type, detail = message),
+    problem = ProblemDetail.of(HttpStatusCode.BadRequest, type = type, detail = message),
     failure = this,
   )
 
   is ReduceContributionException -> this.handleReduceContributionFailure(call)
 
   else -> call.logAndRespond(
-    status = HttpStatusCode.InternalServerError,
-    responseMessage = technicalErrorMessage(),
+    problem = ProblemDetail.technicalError(),
     failure = this,
   )
 }
@@ -72,8 +69,8 @@ private suspend fun ReduceContributionException.handleReduceContributionFailure(
 
   when (rootCause) {
     is InsufficientContributionException -> call.logAndRespond(
-      status = HttpStatusCode.BadRequest,
-      responseMessage = ClientErrorMessage.of(
+      problem = ProblemDetail.of(
+        HttpStatusCode.BadRequest,
         type = INSUFFICIENT_CONTRIBUTION_ERROR_TYPE,
         detail = rootCause.message ?: "Cannot reduce by requested quantity",
       ),
@@ -81,8 +78,7 @@ private suspend fun ReduceContributionException.handleReduceContributionFailure(
     )
 
     else -> call.logAndRespond(
-      status = HttpStatusCode.InternalServerError,
-      responseMessage = technicalErrorMessage(),
+      problem = ProblemDetail.technicalError(),
       failure = this,
     )
   }

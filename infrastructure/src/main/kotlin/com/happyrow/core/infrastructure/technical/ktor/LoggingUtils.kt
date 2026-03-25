@@ -10,19 +10,15 @@ val logger: Logger = LoggerFactory.getLogger(
   "com.happyrow.core.infrastructure.technical.ktor",
 )
 
-suspend inline fun ApplicationCall.logAndRespond(
-  status: HttpStatusCode,
-  responseMessage: ClientErrorMessage,
-  failure: Exception? = null,
-) {
+suspend inline fun ApplicationCall.logAndRespond(problem: ProblemDetail, failure: Exception? = null) {
   if (failure != null) {
-    logger.error("Call error: ${responseMessage.message}", failure)
+    logger.error("Call error: ${problem.detail}", failure)
   } else {
-    logger.error("Call error: ${responseMessage.message}")
+    logger.error("Call error: ${problem.detail}")
   }
 
   respond(
-    status = status,
-    responseMessage,
+    status = HttpStatusCode.fromValue(problem.status),
+    problem,
   )
 }

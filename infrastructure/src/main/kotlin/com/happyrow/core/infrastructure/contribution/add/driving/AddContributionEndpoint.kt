@@ -9,8 +9,7 @@ import com.happyrow.core.infrastructure.common.error.BadRequestException
 import com.happyrow.core.infrastructure.contribution.add.driving.dto.AddContributionRequestDto
 import com.happyrow.core.infrastructure.contribution.common.dto.toDto
 import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
-import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage
-import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
+import com.happyrow.core.infrastructure.technical.ktor.ProblemDetail
 import com.happyrow.core.infrastructure.technical.ktor.logAndRespond
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
@@ -47,16 +46,14 @@ fun Route.addContributionEndpoint(addContributionUseCase: AddContributionUseCase
 
 private suspend fun Exception.handleFailure(call: ApplicationCall) = when (this) {
   is BadRequestException -> call.logAndRespond(
-    status = HttpStatusCode.BadRequest,
-    responseMessage = ClientErrorMessage.of(type = type, detail = message),
+    problem = ProblemDetail.of(HttpStatusCode.BadRequest, type = type, detail = message),
     failure = this,
   )
 
   is AddContributionException -> this.handleAddContributionFailure(call)
 
   else -> call.logAndRespond(
-    status = HttpStatusCode.InternalServerError,
-    responseMessage = technicalErrorMessage(),
+    problem = ProblemDetail.technicalError(),
     failure = this,
   )
 }
@@ -67,8 +64,8 @@ private suspend fun AddContributionException.handleAddContributionFailure(call: 
 
   when (rootCause) {
     is OptimisticLockException -> call.logAndRespond(
-      status = HttpStatusCode.Conflict,
-      responseMessage = ClientErrorMessage.of(
+      problem = ProblemDetail.of(
+        HttpStatusCode.Conflict,
         type = OPTIMISTIC_LOCK_ERROR_TYPE,
         detail = "Resource was modified by another user. Please refresh and try again.",
       ),
@@ -76,8 +73,7 @@ private suspend fun AddContributionException.handleAddContributionFailure(call: 
     )
 
     else -> call.logAndRespond(
-      status = HttpStatusCode.InternalServerError,
-      responseMessage = technicalErrorMessage(),
+      problem = ProblemDetail.technicalError(),
       failure = this,
     )
   }

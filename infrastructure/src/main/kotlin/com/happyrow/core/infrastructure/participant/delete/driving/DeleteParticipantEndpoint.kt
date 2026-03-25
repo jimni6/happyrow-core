@@ -7,8 +7,7 @@ import com.happyrow.core.domain.participant.delete.error.DeleteParticipantExcept
 import com.happyrow.core.domain.participant.delete.error.ForbiddenParticipantDeleteException
 import com.happyrow.core.domain.participant.update.error.ParticipantNotFoundException
 import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
-import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage
-import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
+import com.happyrow.core.infrastructure.technical.ktor.ProblemDetail
 import com.happyrow.core.infrastructure.technical.ktor.logAndRespond
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
@@ -42,32 +41,30 @@ fun Route.deleteParticipantEndpoint(deleteParticipantUseCase: DeleteParticipantU
 
 private suspend fun Exception.handleFailure(call: ApplicationCall) = when (this) {
   is ForbiddenParticipantDeleteException -> call.logAndRespond(
-    status = HttpStatusCode.Forbidden,
-    responseMessage = ClientErrorMessage.of(
-      type = FORBIDDEN_ERROR_TYPE,
-      detail = "Only the organizer can remove participants",
+    problem = ProblemDetail.of(
+      HttpStatusCode.Forbidden,
+      FORBIDDEN_ERROR_TYPE,
+      "Only the organizer can remove participants",
     ),
     failure = this,
   )
 
   is ParticipantNotFoundException -> call.logAndRespond(
-    status = HttpStatusCode.NotFound,
-    responseMessage = ClientErrorMessage.of(
-      type = NOT_FOUND_ERROR_TYPE,
-      detail = "Participant ${this.userEmail} not found for event ${this.eventId}",
+    problem = ProblemDetail.of(
+      HttpStatusCode.NotFound,
+      NOT_FOUND_ERROR_TYPE,
+      "Participant ${this.userEmail} not found for event ${this.eventId}",
     ),
     failure = this,
   )
 
   is DeleteParticipantException -> call.logAndRespond(
-    status = HttpStatusCode.InternalServerError,
-    responseMessage = technicalErrorMessage(),
+    problem = ProblemDetail.technicalError(),
     failure = this,
   )
 
   else -> call.logAndRespond(
-    status = HttpStatusCode.InternalServerError,
-    responseMessage = technicalErrorMessage(),
+    problem = ProblemDetail.technicalError(),
     failure = this,
   )
 }

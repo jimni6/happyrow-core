@@ -9,8 +9,7 @@ import com.happyrow.core.domain.event.delete.error.DeleteEventException
 import com.happyrow.core.infrastructure.common.error.BadRequestException
 import com.happyrow.core.infrastructure.event.delete.error.UnauthorizedDeleteException
 import com.happyrow.core.infrastructure.technical.auth.authenticatedUser
-import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage
-import com.happyrow.core.infrastructure.technical.ktor.ClientErrorMessage.Companion.technicalErrorMessage
+import com.happyrow.core.infrastructure.technical.ktor.ProblemDetail
 import com.happyrow.core.infrastructure.technical.ktor.logAndRespond
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
@@ -45,16 +44,14 @@ fun Route.deleteEventEndpoint(deleteEventUseCase: DeleteEventUseCase) {
 
 private suspend fun Exception.handleFailure(call: ApplicationCall) = when (this) {
   is BadRequestException -> call.logAndRespond(
-    status = HttpStatusCode.BadRequest,
-    responseMessage = ClientErrorMessage.of(type = type, detail = message),
+    problem = ProblemDetail.of(HttpStatusCode.BadRequest, type = type, detail = message),
     failure = this,
   )
 
   is DeleteEventException -> this.handleFailure(call)
 
   else -> call.logAndRespond(
-    status = HttpStatusCode.InternalServerError,
-    responseMessage = technicalErrorMessage(),
+    problem = ProblemDetail.technicalError(),
     failure = this,
   )
 }
@@ -63,16 +60,15 @@ private suspend fun DeleteEventException.handleFailure(call: ApplicationCall) = 
   is DeleteEventRepositoryException -> (cause as DeleteEventRepositoryException).handleFailure(call)
 
   else -> call.logAndRespond(
-    status = HttpStatusCode.InternalServerError,
-    responseMessage = technicalErrorMessage(),
+    problem = ProblemDetail.technicalError(),
     failure = this,
   )
 }
 
 private suspend fun DeleteEventRepositoryException.handleFailure(call: ApplicationCall) = when (cause) {
   is EventNotFoundException -> call.logAndRespond(
-    status = HttpStatusCode.NotFound,
-    responseMessage = ClientErrorMessage.of(
+    problem = ProblemDetail.of(
+      HttpStatusCode.NotFound,
       type = EVENT_NOT_FOUND_ERROR_TYPE,
       detail = "Event with id $identifier not found",
     ),
@@ -80,8 +76,8 @@ private suspend fun DeleteEventRepositoryException.handleFailure(call: Applicati
   )
 
   is UnauthorizedDeleteException -> call.logAndRespond(
-    status = HttpStatusCode.Forbidden,
-    responseMessage = ClientErrorMessage.of(
+    problem = ProblemDetail.of(
+      HttpStatusCode.Forbidden,
       type = UNAUTHORIZED_DELETE_ERROR_TYPE,
       detail = "You are not authorized to delete this event. Only the creator can delete it.",
     ),
@@ -89,8 +85,7 @@ private suspend fun DeleteEventRepositoryException.handleFailure(call: Applicati
   )
 
   else -> call.logAndRespond(
-    status = HttpStatusCode.InternalServerError,
-    responseMessage = technicalErrorMessage(),
+    problem = ProblemDetail.technicalError(),
     failure = this,
   )
 }

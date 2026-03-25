@@ -5,6 +5,7 @@ import com.happyrow.core.infrastructure.technical.auth.SupabaseJwtService
 import com.happyrow.core.infrastructure.technical.config.DatabaseInitializer
 import com.happyrow.core.infrastructure.technical.config.shutdownDataSource
 import com.happyrow.core.infrastructure.technical.jackson.JsonObjectMapper
+import com.happyrow.core.infrastructure.technical.ktor.ProblemDetail
 import com.happyrow.core.modules.domainModule
 import com.happyrow.core.modules.infrastructure.authModule
 import com.happyrow.core.modules.infrastructure.infrastructureModule
@@ -75,14 +76,14 @@ fun Application.application() {
     exception<IllegalArgumentException> { call, cause ->
       call.respond(
         HttpStatusCode.BadRequest,
-        mapOf("type" to "BAD_REQUEST", "detail" to (cause.message ?: "Invalid request")),
+        ProblemDetail.of(HttpStatusCode.BadRequest, "BAD_REQUEST", cause.message ?: "Invalid request"),
       )
     }
     exception<Throwable> { call, cause ->
       LoggerFactory.getLogger("StatusPages").error("Unhandled exception", cause)
       call.respond(
         HttpStatusCode.InternalServerError,
-        mapOf("type" to "TECHNICAL_ERROR", "detail" to "An unexpected error occurred"),
+        ProblemDetail.technicalError(),
       )
     }
   }
