@@ -3,6 +3,7 @@ package com.happyrow.core.modules
 import com.happyrow.core.domain.contribution.add.AddContributionUseCase
 import com.happyrow.core.domain.contribution.delete.DeleteContributionUseCase
 import com.happyrow.core.domain.contribution.reduce.ReduceContributionUseCase
+import com.happyrow.core.domain.event.common.EventAccessControl
 import com.happyrow.core.domain.event.create.CreateEventUseCase
 import com.happyrow.core.domain.event.delete.DeleteEventUseCase
 import com.happyrow.core.domain.event.get.GetEventsByUserUseCase
@@ -16,6 +17,7 @@ import com.happyrow.core.domain.resource.get.GetResourcesByEventUseCase
 import org.koin.dsl.module
 
 val domainModule = module {
+  single<EventAccessControl> { EventAccessControl(get(), get()) }
   single<CreateEventUseCase> { CreateEventUseCase(get(), get()) }
   single<GetEventsByUserUseCase> { GetEventsByUserUseCase(get()) }
   single<UpdateEventUseCase> { UpdateEventUseCase(get()) }

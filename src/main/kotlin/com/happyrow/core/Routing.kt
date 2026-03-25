@@ -3,6 +3,7 @@ package com.happyrow.core
 import com.happyrow.core.domain.contribution.add.AddContributionUseCase
 import com.happyrow.core.domain.contribution.delete.DeleteContributionUseCase
 import com.happyrow.core.domain.contribution.reduce.ReduceContributionUseCase
+import com.happyrow.core.domain.event.common.EventAccessControl
 import com.happyrow.core.domain.event.create.CreateEventUseCase
 import com.happyrow.core.domain.event.delete.DeleteEventUseCase
 import com.happyrow.core.domain.event.get.GetEventsByUserUseCase
@@ -42,6 +43,7 @@ fun Application.configureRouting() {
   val addContributionUseCase: AddContributionUseCase by inject()
   val deleteContributionUseCase: DeleteContributionUseCase by inject()
   val reduceContributionUseCase: ReduceContributionUseCase by inject()
+  val eventAccessControl: EventAccessControl by inject()
 
   routing {
     route(BASE_PATH) {
@@ -52,8 +54,9 @@ fun Application.configureRouting() {
           getParticipantsByEventUseCase,
           updateParticipantUseCase,
           deleteParticipantUseCase,
+          eventAccessControl,
         )
-        resourceEndpoints(createResourceUseCase, getResourcesByEventUseCase)
+        resourceEndpoints(createResourceUseCase, getResourcesByEventUseCase, eventAccessControl)
         contributionEndpoints(addContributionUseCase, deleteContributionUseCase, reduceContributionUseCase)
       }
     }

@@ -1,5 +1,6 @@
 package com.happyrow.core.infrastructure.participant
 
+import com.happyrow.core.domain.event.common.EventAccessControl
 import com.happyrow.core.domain.participant.create.CreateParticipantUseCase
 import com.happyrow.core.domain.participant.delete.DeleteParticipantUseCase
 import com.happyrow.core.domain.participant.get.GetParticipantsByEventUseCase
@@ -16,9 +17,10 @@ fun Route.participantEndpoints(
   getParticipantsByEventUseCase: GetParticipantsByEventUseCase,
   updateParticipantUseCase: UpdateParticipantUseCase,
   deleteParticipantUseCase: DeleteParticipantUseCase,
+  eventAccessControl: EventAccessControl,
 ) = route("/events/{eventId}/participants") {
-  createParticipantEndpoint(createParticipantUseCase)
-  getParticipantsByEventEndpoint(getParticipantsByEventUseCase)
+  createParticipantEndpoint(createParticipantUseCase, eventAccessControl)
+  getParticipantsByEventEndpoint(getParticipantsByEventUseCase, eventAccessControl)
   route("/{userEmail}") {
     updateParticipantEndpoint(updateParticipantUseCase)
     deleteParticipantEndpoint(deleteParticipantUseCase)

@@ -2,6 +2,8 @@ package com.happyrow.core.infrastructure.participant.create.driving
 
 import arrow.core.Either
 import arrow.core.flatMap
+import com.happyrow.core.domain.event.common.EventAccessControl
+import com.happyrow.core.domain.event.common.error.ForbiddenAccessException
 import com.happyrow.core.domain.participant.create.CreateParticipantUseCase
 import com.happyrow.core.domain.participant.create.error.CreateParticipantException
 import com.happyrow.core.infrastructure.common.error.BadRequestException
@@ -19,16 +21,25 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import java.util.UUID
 
-fun Route.createParticipantEndpoint(createParticipantUseCase: CreateParticipantUseCase) {
+private const val FORBIDDEN_ERROR_TYPE = "FORBIDDEN"
+
+fun Route.createParticipantEndpoint(
+  createParticipantUseCase: CreateParticipantUseCase,
+  eventAccessControl: EventAccessControl,
+) {
   post {
     val eventId = call.parameters["eventId"]?.let { UUID.fromString(it) }
       ?: return@post call.respond(HttpStatusCode.BadRequest, "Missing eventId")
 
     Either.catch {
-      call.authenticatedUser()
-      call.receive<CreateParticipantRequestDto>()
+      val user = call.authenticatedUser()
+      Triple(user.userId, user.email, call.receive<CreateParticipantRequestDto>())
     }
       .mapLeft { BadRequestException.InvalidBodyException(it) }
+      .flatMap { (userId, email, requestDto) ->
+        eventAccessControl.assertUserHasAccess(userId, email, eventId)
+          .map { requestDto }
+      }
       .map { it.toDomain(eventId) }
       .flatMap { request -> createParticipantUseCase.execute(request) }
       .map { it.toDto() }
@@ -43,6 +54,15 @@ private suspend fun Exception.handleFailure(call: ApplicationCall) = when (this)
   is BadRequestException -> call.logAndRespond(
     status = HttpStatusCode.BadRequest,
     responseMessage = ClientErrorMessage.of(type = type, detail = message),
+    failure = this,
+  )
+
+  is ForbiddenAccessException -> call.logAndRespond(
+    status = HttpStatusCode.Forbidden,
+    responseMessage = ClientErrorMessage.of(
+      type = FORBIDDEN_ERROR_TYPE,
+      detail = "You do not have access to this event",
+    ),
     failure = this,
   )
 

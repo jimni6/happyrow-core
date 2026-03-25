@@ -2,6 +2,8 @@ package com.happyrow.core.infrastructure.resource.create.driving
 
 import arrow.core.Either
 import arrow.core.flatMap
+import com.happyrow.core.domain.event.common.EventAccessControl
+import com.happyrow.core.domain.event.common.error.ForbiddenAccessException
 import com.happyrow.core.domain.resource.create.CreateResourceUseCase
 import com.happyrow.core.domain.resource.create.error.CreateResourceException
 import com.happyrow.core.infrastructure.common.error.BadRequestException
@@ -19,7 +21,12 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import java.util.UUID
 
-fun Route.createResourceEndpoint(createResourceUseCase: CreateResourceUseCase) {
+private const val FORBIDDEN_ERROR_TYPE = "FORBIDDEN"
+
+fun Route.createResourceEndpoint(
+  createResourceUseCase: CreateResourceUseCase,
+  eventAccessControl: EventAccessControl,
+) {
   post {
     val eventId = call.parameters["eventId"]?.let { UUID.fromString(it) }
       ?: return@post call.respond(HttpStatusCode.BadRequest, "Missing eventId")
@@ -27,9 +34,13 @@ fun Route.createResourceEndpoint(createResourceUseCase: CreateResourceUseCase) {
     Either.catch {
       val user = call.authenticatedUser()
       val requestDto = call.receive<CreateResourceRequestDto>()
-      requestDto.toDomain(eventId, user.email)
+      Triple(user.userId, user.email, requestDto)
     }
       .mapLeft { BadRequestException.InvalidBodyException(it) }
+      .flatMap { (userId, email, requestDto) ->
+        eventAccessControl.assertUserHasAccess(userId, email, eventId)
+          .map { requestDto.toDomain(eventId, email) }
+      }
       .flatMap { request -> createResourceUseCase.execute(request) }
       .map { it.toDto() }
       .fold(
@@ -43,6 +54,15 @@ private suspend fun Exception.handleFailure(call: ApplicationCall) = when (this)
   is BadRequestException -> call.logAndRespond(
     status = HttpStatusCode.BadRequest,
     responseMessage = ClientErrorMessage.of(type = type, detail = message),
+    failure = this,
+  )
+
+  is ForbiddenAccessException -> call.logAndRespond(
+    status = HttpStatusCode.Forbidden,
+    responseMessage = ClientErrorMessage.of(
+      type = FORBIDDEN_ERROR_TYPE,
+      detail = "You do not have access to this event",
+    ),
     failure = this,
   )
 
