@@ -13,6 +13,11 @@ data class CreateResourceRequest(
 ) {
   init {
     require(name.isNotBlank()) { "Resource name must not be blank" }
-    require(initialQuantity > 0) { "Initial quantity must be positive" }
+    require(initialQuantity in 1..MAX_QUANTITY) { "Initial quantity must be between 1 and $MAX_QUANTITY" }
+    require(suggestedQuantity in 0..MAX_QUANTITY) { "Suggested quantity must be between 0 and $MAX_QUANTITY" }
+  }
+
+  companion object {
+    const val MAX_QUANTITY = 10_000
   }
 }

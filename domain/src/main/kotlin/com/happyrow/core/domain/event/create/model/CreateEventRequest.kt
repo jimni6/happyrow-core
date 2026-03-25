@@ -17,5 +17,6 @@ data class CreateEventRequest(
   init {
     require(name.isNotBlank()) { "Event name must not be blank" }
     require(location.isNotBlank()) { "Event location must not be blank" }
+    require(eventDate.isAfter(Instant.now())) { "Event date must be in the future" }
   }
 }
