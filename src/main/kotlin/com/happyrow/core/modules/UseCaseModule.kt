@@ -14,9 +14,11 @@ import com.happyrow.core.domain.participant.get.GetParticipantsByEventUseCase
 import com.happyrow.core.domain.participant.update.UpdateParticipantUseCase
 import com.happyrow.core.domain.resource.create.CreateResourceUseCase
 import com.happyrow.core.domain.resource.get.GetResourcesByEventUseCase
+import com.happyrow.core.domain.user.findorcreate.FindOrCreateUserUseCase
 import org.koin.dsl.module
 
 val domainModule = module {
+  single<FindOrCreateUserUseCase> { FindOrCreateUserUseCase(get()) }
   single<EventAccessControl> { EventAccessControl(get(), get()) }
   single<CreateEventUseCase> { CreateEventUseCase(get(), get()) }
   single<GetEventsByUserUseCase> { GetEventsByUserUseCase(get()) }
