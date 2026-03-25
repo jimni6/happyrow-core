@@ -8,6 +8,8 @@ import com.happyrow.core.infrastructure.event.create.driving.createEventEndpoint
 import com.happyrow.core.infrastructure.event.delete.driving.deleteEventEndpoint
 import com.happyrow.core.infrastructure.event.get.driving.getEventsEndpoint
 import com.happyrow.core.infrastructure.event.update.driving.updateEventEndpoint
+import io.ktor.server.plugins.ratelimit.RateLimitName
+import io.ktor.server.plugins.ratelimit.rateLimit
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
 
@@ -17,8 +19,10 @@ fun Route.eventEndpoints(
   updateEventUseCase: UpdateEventUseCase,
   deleteEventUseCase: DeleteEventUseCase,
 ) = route("/events") {
-  createEventEndpoint(createEventUseCase)
   getEventsEndpoint(getEventsByUserUseCase)
-  updateEventEndpoint(updateEventUseCase)
-  deleteEventEndpoint(deleteEventUseCase)
+  rateLimit(RateLimitName("mutation")) {
+    createEventEndpoint(createEventUseCase)
+    updateEventEndpoint(updateEventUseCase)
+    deleteEventEndpoint(deleteEventUseCase)
+  }
 }

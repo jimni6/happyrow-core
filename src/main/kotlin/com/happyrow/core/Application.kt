@@ -25,6 +25,8 @@ import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.doublereceive.DoubleReceive
 import io.ktor.server.plugins.partialcontent.PartialContent
+import io.ktor.server.plugins.ratelimit.RateLimit
+import io.ktor.server.plugins.ratelimit.RateLimitName
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.resources.Resources
 import io.ktor.server.response.respond
@@ -36,6 +38,7 @@ import org.koin.ktor.plugin.Koin
 import org.slf4j.LoggerFactory
 import javax.sql.DataSource
 import kotlin.system.exitProcess
+import kotlin.time.Duration.Companion.minutes
 
 fun main(args: Array<String>) {
   val logger = LoggerFactory.getLogger(Application::class.java)
@@ -72,7 +75,52 @@ fun Application.application() {
     )
   }
 
+  configureRateLimiting()
+  configureStatusPages()
+
+  val jwtService by inject<SupabaseJwtService>()
+  install(JwtAuthenticationPlugin) {
+    this.jwtService = jwtService
+  }
+
+  install(Resources)
+  install(PartialContent)
+  install(AutoHeadResponse)
+  configureRouting()
+}
+
+private fun Application.configureRateLimiting() {
+  install(RateLimit) {
+    global {
+      rateLimiter(limit = 100, refillPeriod = 1.minutes)
+      requestKey { call ->
+        call.request.headers["Authorization"]?.hashCode()?.toString()
+          ?: call.request.local.remoteAddress
+      }
+    }
+    register(RateLimitName("mutation")) {
+      rateLimiter(limit = 30, refillPeriod = 1.minutes)
+      requestKey { call ->
+        call.request.headers["Authorization"]?.hashCode()?.toString()
+          ?: call.request.local.remoteAddress
+      }
+    }
+  }
+}
+
+private fun Application.configureStatusPages() {
   install(StatusPages) {
+    status(HttpStatusCode.TooManyRequests) { call, _ ->
+      val retryAfter = call.response.headers["Retry-After"]
+      call.respond(
+        HttpStatusCode.TooManyRequests,
+        ProblemDetail.of(
+          HttpStatusCode.TooManyRequests,
+          "RATE_LIMIT_EXCEEDED",
+          "Too many requests. Retry after $retryAfter seconds.",
+        ),
+      )
+    }
     exception<IllegalArgumentException> { call, cause ->
       call.respond(
         HttpStatusCode.BadRequest,
@@ -87,16 +135,6 @@ fun Application.application() {
       )
     }
   }
-
-  val jwtService by inject<SupabaseJwtService>()
-  install(JwtAuthenticationPlugin) {
-    this.jwtService = jwtService
-  }
-
-  install(Resources)
-  install(PartialContent)
-  install(AutoHeadResponse)
-  configureRouting()
 }
 
 private fun Application.configureCors() {

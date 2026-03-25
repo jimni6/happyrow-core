@@ -9,6 +9,8 @@ import com.happyrow.core.infrastructure.participant.create.driving.createPartici
 import com.happyrow.core.infrastructure.participant.delete.driving.deleteParticipantEndpoint
 import com.happyrow.core.infrastructure.participant.get.driving.getParticipantsByEventEndpoint
 import com.happyrow.core.infrastructure.participant.update.driving.updateParticipantEndpoint
+import io.ktor.server.plugins.ratelimit.RateLimitName
+import io.ktor.server.plugins.ratelimit.rateLimit
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
 
@@ -19,10 +21,12 @@ fun Route.participantEndpoints(
   deleteParticipantUseCase: DeleteParticipantUseCase,
   eventAccessControl: EventAccessControl,
 ) = route("/events/{eventId}/participants") {
-  createParticipantEndpoint(createParticipantUseCase, eventAccessControl)
   getParticipantsByEventEndpoint(getParticipantsByEventUseCase, eventAccessControl)
-  route("/{userEmail}") {
-    updateParticipantEndpoint(updateParticipantUseCase)
-    deleteParticipantEndpoint(deleteParticipantUseCase)
+  rateLimit(RateLimitName("mutation")) {
+    createParticipantEndpoint(createParticipantUseCase, eventAccessControl)
+    route("/{userEmail}") {
+      updateParticipantEndpoint(updateParticipantUseCase)
+      deleteParticipantEndpoint(deleteParticipantUseCase)
+    }
   }
 }

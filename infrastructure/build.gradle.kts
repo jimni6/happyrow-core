@@ -11,6 +11,7 @@ dependencies {
     implementation(libs.koin.logger.slf4j)
 
     implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.rate.limit)
     implementation(libs.ktor.server.resources)
 
     implementation(libs.bundles.ktor.client)
