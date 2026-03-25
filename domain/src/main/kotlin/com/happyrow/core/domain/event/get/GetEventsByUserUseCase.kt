@@ -10,6 +10,6 @@ import com.happyrow.core.domain.event.get.error.GetEventException
 class GetEventsByUserUseCase(
   private val eventRepository: EventRepository,
 ) {
-  fun execute(userId: String, userEmail: String, pageRequest: PageRequest): Either<GetEventException, Page<Event>> =
-    eventRepository.findByUser(userId, userEmail, pageRequest)
+  fun execute(userId: String, pageRequest: PageRequest): Either<GetEventException, Page<Event>> =
+    eventRepository.findByUser(userId, pageRequest)
 }

@@ -64,7 +64,7 @@ class OptimisticLockIntegrationTest : IntegrationTestBase() {
   fun `should auto-create participant when unknown user contributes`() = integrationTest {
     val client = authenticatedClient()
     val user1Auth = authHeader(generateToken(email = TEST_USER_EMAIL))
-    val user2Auth = authHeader(generateToken(userId = "user-2", email = SECOND_USER_EMAIL))
+    val user2Auth = authHeader(generateToken(userId = IntegrationTestBase.SECOND_USER_ID, email = SECOND_USER_EMAIL))
 
     val (eventId, resourceId) = createEventAndResource(client, user1Auth)
 
@@ -80,7 +80,7 @@ class OptimisticLockIntegrationTest : IntegrationTestBase() {
     val participantsResponse = client.get("$eventsPath/$eventId/participants") {
       header("Authorization", user1Auth)
     }
-    participantsResponse.bodyAsText() shouldContain SECOND_USER_EMAIL
+    participantsResponse.bodyAsText() shouldContain IntegrationTestBase.SECOND_USER_ID
   }
 
   // ─── Test 3 : Mise à jour contribution existante avec delta correct ──
@@ -117,7 +117,7 @@ class OptimisticLockIntegrationTest : IntegrationTestBase() {
   fun `two users contributing sequentially should accumulate quantities`() = integrationTest {
     val client = authenticatedClient()
     val user1Auth = authHeader(generateToken(email = TEST_USER_EMAIL))
-    val user2Auth = authHeader(generateToken(userId = "user-2", email = SECOND_USER_EMAIL))
+    val user2Auth = authHeader(generateToken(userId = IntegrationTestBase.SECOND_USER_ID, email = SECOND_USER_EMAIL))
 
     val (eventId, resourceId) = createEventAndResource(client, user1Auth)
 
@@ -192,7 +192,8 @@ class OptimisticLockIntegrationTest : IntegrationTestBase() {
     val userCount = 5
     val quantityPerUser = 2
     val tokens = (1..userCount).map { i ->
-      authHeader(generateToken(userId = "user-$i", email = "user$i@happyrow.com"))
+      val uid = UUID.nameUUIDFromBytes("concurrent-contrib-$i".toByteArray())
+      authHeader(generateToken(userId = uid.toString(), email = "user$i@happyrow.com"))
     }
 
     val results = coroutineScope {

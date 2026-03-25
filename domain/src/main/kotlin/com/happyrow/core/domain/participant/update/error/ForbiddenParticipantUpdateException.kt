@@ -4,8 +4,8 @@ import java.util.UUID
 
 class ForbiddenParticipantUpdateException(
   val authenticatedUserId: String,
-  val targetEmail: String,
+  val targetUserId: UUID,
   val eventId: UUID,
 ) : Exception(
-  "User $authenticatedUserId is not authorized to update participant $targetEmail for event $eventId",
+  "User $authenticatedUserId is not authorized to update participant $targetUserId for event $eventId",
 )

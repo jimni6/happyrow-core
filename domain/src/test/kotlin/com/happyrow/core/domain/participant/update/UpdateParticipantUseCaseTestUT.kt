@@ -29,6 +29,8 @@ class UpdateParticipantUseCaseTestUT {
   private val eventRepository = mockk<EventRepository>()
   private val useCase = UpdateParticipantUseCase(participantRepository, eventRepository)
 
+  private val participantUserId = UUID.fromString("77777777-7777-7777-7777-777777777777")
+
   @BeforeEach
   fun beforeEach() {
     clearAllMocks()
@@ -38,7 +40,7 @@ class UpdateParticipantUseCaseTestUT {
   fun `should update when user is organizer`() {
     val aParticipant = Participant(
       identifier = UUID.fromString("11111111-1111-1111-1111-111111111111"),
-      userEmail = "participant@example.com",
+      userId = participantUserId,
       eventId = Persona.Event.Properties.identifier,
       status = ParticipantStatus.CONFIRMED,
       joinedAt = Persona.Time.now,
@@ -46,21 +48,20 @@ class UpdateParticipantUseCaseTestUT {
       updatedAt = Persona.Time.now,
     )
     val request = UpdateParticipantRequest(
-      userEmail = "participant@example.com",
+      userId = participantUserId,
       eventId = Persona.Event.Properties.identifier,
       status = ParticipantStatus.DECLINED,
     )
     val updated = aParticipant.copy(status = ParticipantStatus.DECLINED)
     every { eventRepository.find(Persona.Event.Properties.identifier) } returns Persona.Event.anEvent.right()
     every {
-      participantRepository.find("participant@example.com", Persona.Event.Properties.identifier)
+      participantRepository.find(participantUserId, Persona.Event.Properties.identifier)
     } returns Either.Right(aParticipant)
     every { participantRepository.update(any()) } returns updated.right()
 
     val result: Either<Exception, Participant> = useCase.execute(
       request,
       Persona.User.aUser.toString(),
-      "not-the-participant@example.com",
     )
 
     result shouldBeRight updated
@@ -71,7 +72,7 @@ class UpdateParticipantUseCaseTestUT {
   fun `should update when user is self`() {
     val aParticipant = Participant(
       identifier = UUID.fromString("11111111-1111-1111-1111-111111111111"),
-      userEmail = "participant@example.com",
+      userId = participantUserId,
       eventId = Persona.Event.Properties.identifier,
       status = ParticipantStatus.CONFIRMED,
       joinedAt = Persona.Time.now,
@@ -79,21 +80,20 @@ class UpdateParticipantUseCaseTestUT {
       updatedAt = Persona.Time.now,
     )
     val request = UpdateParticipantRequest(
-      userEmail = "participant@example.com",
+      userId = participantUserId,
       eventId = Persona.Event.Properties.identifier,
       status = ParticipantStatus.DECLINED,
     )
     val updated = aParticipant.copy(status = ParticipantStatus.DECLINED)
     every { eventRepository.find(Persona.Event.Properties.identifier) } returns Persona.Event.anEvent.right()
     every {
-      participantRepository.find("participant@example.com", Persona.Event.Properties.identifier)
+      participantRepository.find(participantUserId, Persona.Event.Properties.identifier)
     } returns Either.Right(aParticipant)
     every { participantRepository.update(any()) } returns updated.right()
 
-    val result: Either<Exception, Participant> = useCase.execute(
+    val result = useCase.execute(
       request,
-      "not-the-organizer",
-      "participant@example.com",
+      participantUserId.toString(),
     )
 
     result shouldBeRight updated
@@ -102,7 +102,7 @@ class UpdateParticipantUseCaseTestUT {
   @Test
   fun `should return ForbiddenParticipantUpdateException when user is neither organizer nor self`() {
     val request = UpdateParticipantRequest(
-      userEmail = "participant@example.com",
+      userId = participantUserId,
       eventId = Persona.Event.Properties.identifier,
       status = ParticipantStatus.DECLINED,
     )
@@ -111,7 +111,6 @@ class UpdateParticipantUseCaseTestUT {
     val result = useCase.execute(
       request,
       Persona.User.aRequesterUserId,
-      "someone-else@example.com",
     )
 
     val error = result.shouldBeLeft()
@@ -122,7 +121,7 @@ class UpdateParticipantUseCaseTestUT {
   @Test
   fun `should return ParticipantNotFoundException when event not found`() {
     val request = UpdateParticipantRequest(
-      userEmail = "participant@example.com",
+      userId = participantUserId,
       eventId = Persona.Event.Properties.identifier,
       status = ParticipantStatus.DECLINED,
     )
@@ -134,36 +133,34 @@ class UpdateParticipantUseCaseTestUT {
     val result = useCase.execute(
       request,
       Persona.User.aUser.toString(),
-      "participant@example.com",
     )
 
     val error = result.shouldBeLeft()
     error.shouldBeInstanceOf<ParticipantNotFoundException>()
-    (error as ParticipantNotFoundException).userEmail shouldBe request.userEmail
+    (error as ParticipantNotFoundException).userId shouldBe request.userId
     error.eventId shouldBe request.eventId
   }
 
   @Test
   fun `should return ParticipantNotFoundException when participant not found`() {
     val request = UpdateParticipantRequest(
-      userEmail = "participant@example.com",
+      userId = participantUserId,
       eventId = Persona.Event.Properties.identifier,
       status = ParticipantStatus.DECLINED,
     )
     every { eventRepository.find(Persona.Event.Properties.identifier) } returns Persona.Event.anEvent.right()
     every {
-      participantRepository.find("participant@example.com", Persona.Event.Properties.identifier)
+      participantRepository.find(participantUserId, Persona.Event.Properties.identifier)
     } returns Either.Right(null)
 
     val result = useCase.execute(
       request,
-      Persona.User.aUser.toString(),
-      "participant@example.com",
+      participantUserId.toString(),
     )
 
     val error = result.shouldBeLeft()
     error.shouldBeInstanceOf<ParticipantNotFoundException>()
-    (error as ParticipantNotFoundException).userEmail shouldBe request.userEmail
+    (error as ParticipantNotFoundException).userId shouldBe request.userId
     error.eventId shouldBe request.eventId
   }
 }

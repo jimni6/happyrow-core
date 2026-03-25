@@ -44,7 +44,7 @@ class AddContributionUseCaseTestUT {
   @Test
   fun `should add contribution successfully`() {
     val request = AddContributionRequest(
-      userEmail = "user@test.com",
+      userId = UUID.fromString("88888888-8888-8888-8888-888888888888"),
       eventId = eventId,
       resourceId = resourceId,
       quantity = 3,
@@ -60,7 +60,7 @@ class AddContributionUseCaseTestUT {
   @Test
   fun `should transfer error from repository`() {
     val request = AddContributionRequest(
-      userEmail = "user@test.com",
+      userId = UUID.fromString("88888888-8888-8888-8888-888888888888"),
       eventId = eventId,
       resourceId = resourceId,
       quantity = 3,

@@ -33,12 +33,12 @@ fun Route.createResourceEndpoint(
     Either.catch {
       val user = call.authenticatedUser()
       val requestDto = call.receive<CreateResourceRequestDto>()
-      Triple(user.userId, user.email, requestDto)
+      Pair(user.userId, requestDto)
     }
       .mapLeft { BadRequestException.InvalidBodyException(it) }
-      .flatMap { (userId, email, requestDto) ->
-        eventAccessControl.assertUserHasAccess(userId, email, eventId)
-          .map { requestDto.toDomain(eventId, email) }
+      .flatMap { (userId, requestDto) ->
+        eventAccessControl.assertUserHasAccess(userId, eventId)
+          .map { requestDto.toDomain(eventId, UUID.fromString(userId)) }
       }
       .flatMap { request -> createResourceUseCase.execute(request) }
       .map { it.toDto() }

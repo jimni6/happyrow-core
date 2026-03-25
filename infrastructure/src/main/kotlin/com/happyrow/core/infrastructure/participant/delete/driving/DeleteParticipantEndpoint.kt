@@ -24,13 +24,13 @@ fun Route.deleteParticipantEndpoint(deleteParticipantUseCase: DeleteParticipantU
     val eventId = call.parameters["eventId"]?.let { UUID.fromString(it) }
       ?: return@delete call.respond(HttpStatusCode.BadRequest, "Missing eventId")
 
-    val userEmail = call.parameters["userEmail"]
-      ?: return@delete call.respond(HttpStatusCode.BadRequest, "Missing userEmail")
+    val userId = call.parameters["userId"]?.let { UUID.fromString(it) }
+      ?: return@delete call.respond(HttpStatusCode.BadRequest, "Missing userId")
 
     Either.catch { call.authenticatedUser().userId }
       .mapLeft { Exception("Authentication failed", it) }
       .flatMap { authenticatedUserId ->
-        deleteParticipantUseCase.execute(userEmail, eventId, authenticatedUserId)
+        deleteParticipantUseCase.execute(userId, eventId, authenticatedUserId)
       }
       .fold(
         { it.handleFailure(call) },
@@ -53,7 +53,7 @@ private suspend fun Exception.handleFailure(call: ApplicationCall) = when (this)
     problem = ProblemDetail.of(
       HttpStatusCode.NotFound,
       NOT_FOUND_ERROR_TYPE,
-      "Participant ${this.userEmail} not found for event ${this.eventId}",
+      "Participant ${this.userId} not found for event ${this.eventId}",
     ),
     failure = this,
   )

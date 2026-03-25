@@ -3,7 +3,7 @@ package com.happyrow.core.domain.participant.common.error
 import java.util.UUID
 
 class DeleteParticipantRepositoryException(
-  val userEmail: String,
+  val userId: UUID,
   val eventId: UUID,
   override val cause: Throwable,
-) : Exception("Failed to delete participant $userEmail for event $eventId", cause)
+) : Exception("Failed to delete participant $userId for event $eventId", cause)

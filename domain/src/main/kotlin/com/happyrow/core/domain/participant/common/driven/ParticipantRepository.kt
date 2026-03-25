@@ -14,9 +14,9 @@ import java.util.UUID
 interface ParticipantRepository {
   fun create(request: CreateParticipantRequest): Either<CreateParticipantRepositoryException, Participant>
   fun update(participant: Participant): Either<UpdateParticipantRepositoryException, Participant>
-  fun delete(userEmail: String, eventId: UUID): Either<DeleteParticipantRepositoryException, Unit>
-  fun findOrCreate(userEmail: String, eventId: UUID): Either<CreateParticipantRepositoryException, Participant>
+  fun delete(userId: UUID, eventId: UUID): Either<DeleteParticipantRepositoryException, Unit>
+  fun findOrCreate(userId: UUID, eventId: UUID): Either<CreateParticipantRepositoryException, Participant>
   fun findByEvent(eventId: UUID, pageRequest: PageRequest): Either<GetParticipantRepositoryException, Page<Participant>>
-  fun find(userEmail: String, eventId: UUID): Either<GetParticipantRepositoryException, Participant?>
+  fun find(userId: UUID, eventId: UUID): Either<GetParticipantRepositoryException, Participant?>
   fun findById(participantId: UUID): Either<GetParticipantRepositoryException, Participant?>
 }

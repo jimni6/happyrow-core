@@ -174,17 +174,13 @@ class SqlEventRepository(
       .mapLeft { GetEventException(identifier, it) }
   }
 
-  override fun findByUser(
-    userId: String,
-    userEmail: String,
-    pageRequest: PageRequest,
-  ): Either<GetEventException, Page<Event>> {
+  override fun findByUser(userId: String, pageRequest: PageRequest): Either<GetEventException, Page<Event>> {
     return Either
       .catch {
         transaction(exposedDatabase.database) {
           val participantEventIds = ParticipantTable
             .select(ParticipantTable.eventId)
-            .where { ParticipantTable.userEmail eq userEmail }
+            .where { ParticipantTable.userId eq UUID.fromString(userId) }
             .map { it[ParticipantTable.eventId] }
 
           val condition = (EventTable.creator eq UUID.fromString(userId)) or (EventTable.id inList participantEventIds)

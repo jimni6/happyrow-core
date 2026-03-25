@@ -28,7 +28,7 @@ fun Route.getEventsEndpoint(getEventsByUserUseCase: GetEventsByUserUseCase) {
       .mapLeft { InvalidOrganizerIdException("authenticated_user", it) }
       .flatMap { (user, page, size) ->
         val pageRequest = PageRequest(page, size)
-        getEventsByUserUseCase.execute(user.userId, user.email, pageRequest)
+        getEventsByUserUseCase.execute(user.userId, pageRequest)
       }
       .map { page ->
         mapOf(

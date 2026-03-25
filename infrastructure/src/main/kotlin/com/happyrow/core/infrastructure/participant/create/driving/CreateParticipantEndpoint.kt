@@ -32,11 +32,11 @@ fun Route.createParticipantEndpoint(
 
     Either.catch {
       val user = call.authenticatedUser()
-      Triple(user.userId, user.email, call.receive<CreateParticipantRequestDto>())
+      Pair(user.userId, call.receive<CreateParticipantRequestDto>())
     }
       .mapLeft { BadRequestException.InvalidBodyException(it) }
-      .flatMap { (userId, email, requestDto) ->
-        eventAccessControl.assertUserHasAccess(userId, email, eventId)
+      .flatMap { (userId, requestDto) ->
+        eventAccessControl.assertUserHasAccess(userId, eventId)
           .map { requestDto }
       }
       .map { it.toDomain(eventId) }

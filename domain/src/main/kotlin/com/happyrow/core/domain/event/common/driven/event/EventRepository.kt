@@ -17,5 +17,5 @@ interface EventRepository {
   fun update(request: UpdateEventRequest): Either<UpdateEventRepositoryException, Event>
   fun delete(identifier: UUID, userId: String): Either<DeleteEventRepositoryException, Unit>
   fun find(identifier: UUID): Either<GetEventException, Event>
-  fun findByUser(userId: String, userEmail: String, pageRequest: PageRequest): Either<GetEventException, Page<Event>>
+  fun findByUser(userId: String, pageRequest: PageRequest): Either<GetEventException, Page<Event>>
 }

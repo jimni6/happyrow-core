@@ -93,7 +93,7 @@ class EventIntegrationTest : IntegrationTestBase() {
   fun `should not see events from other users`() = integrationTest {
     val client = authenticatedClient()
     val user1Token = authHeader(generateToken(email = TEST_USER_EMAIL))
-    val user2Token = authHeader(generateToken(userId = "other-user", email = SECOND_USER_EMAIL))
+    val user2Token = authHeader(generateToken(userId = IntegrationTestBase.SECOND_USER_ID, email = SECOND_USER_EMAIL))
 
     client.post(basePath) {
       header("Authorization", user1Token)
@@ -211,7 +211,7 @@ class EventIntegrationTest : IntegrationTestBase() {
   fun `should return 403 when non-creator tries to delete`() = integrationTest {
     val client = authenticatedClient()
     val creatorAuth = authHeader(generateToken(email = TEST_USER_EMAIL))
-    val otherAuth = authHeader(generateToken(userId = "other-user", email = SECOND_USER_EMAIL))
+    val otherAuth = authHeader(generateToken(userId = IntegrationTestBase.SECOND_USER_ID, email = SECOND_USER_EMAIL))
 
     val createResponse = client.post(basePath) {
       header("Authorization", creatorAuth)

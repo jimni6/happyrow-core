@@ -5,11 +5,10 @@ import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.javatime.timestamp
 
 private const val STATUS_MAX_LENGTH = 50
-private const val EMAIL_MAX_LENGTH = 255
 private const val NAME_MAX_LENGTH = 255
 
 object ParticipantTable : UUIDTable("configuration.participant", "id") {
-  val userEmail = varchar("user_email", EMAIL_MAX_LENGTH)
+  val userId = uuid("user_id")
   val userName = varchar("user_name", NAME_MAX_LENGTH).nullable().default(null)
   val eventId = uuid("event_id").references(EventTable.id)
   val status = varchar("status", STATUS_MAX_LENGTH).default("CONFIRMED")
@@ -18,8 +17,8 @@ object ParticipantTable : UUIDTable("configuration.participant", "id") {
   val updatedAt = timestamp("updated_at")
 
   init {
-    uniqueIndex("uq_participant_user_event", userEmail, eventId)
-    index("idx_participant_user", false, userEmail)
+    uniqueIndex("uq_participant_user_event", userId, eventId)
+    index("idx_participant_user", false, userId)
     index("idx_participant_event", false, eventId)
   }
 }

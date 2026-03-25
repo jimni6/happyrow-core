@@ -26,32 +26,30 @@ class GetEventsByUserUseCaseTestUT {
   }
 
   @Test
-  fun `should return events for user`() {
+  fun `should return events page from repository`() {
     val userId = Persona.User.aUser.toString()
-    val userEmail = Persona.User.aUserEmail
-    val pageRequest = PageRequest()
-    val event = Persona.Event.anEvent
-    val expectedPage = Page.of(listOf(event), pageRequest, 1L)
-    every { eventRepositoryMock.findByUser(userId, userEmail, pageRequest) } returns expectedPage.right()
+    val pageRequest = PageRequest(0, 20)
+    val expectedPage = Page.of(emptyList<com.happyrow.core.domain.event.common.model.event.Event>(), pageRequest, 0L)
 
-    val result = useCase.execute(userId, userEmail, pageRequest)
+    every { eventRepositoryMock.findByUser(userId, pageRequest) } returns expectedPage.right()
+
+    val result = useCase.execute(userId, pageRequest)
 
     result shouldBeRight expectedPage
-    verify { eventRepositoryMock.findByUser(userId, userEmail, pageRequest) }
+    verify { eventRepositoryMock.findByUser(userId, pageRequest) }
   }
 
   @Test
-  fun `should transfer error from repository`() {
+  fun `should propagate repository errors`() {
     val userId = Persona.User.aUser.toString()
-    val userEmail = Persona.User.aUserEmail
-    val pageRequest = PageRequest()
-    val cause = RuntimeException("repository failure")
-    val repositoryError = GetEventException(null, cause)
-    every { eventRepositoryMock.findByUser(userId, userEmail, pageRequest) } returns repositoryError.left()
+    val pageRequest = PageRequest(0, 20)
+    val repositoryError = GetEventException(null, RuntimeException("db error"))
 
-    val result = useCase.execute(userId, userEmail, pageRequest)
+    every { eventRepositoryMock.findByUser(userId, pageRequest) } returns repositoryError.left()
+
+    val result = useCase.execute(userId, pageRequest)
 
     result shouldBeLeft repositoryError
-    verify { eventRepositoryMock.findByUser(userId, userEmail, pageRequest) }
+    verify { eventRepositoryMock.findByUser(userId, pageRequest) }
   }
 }

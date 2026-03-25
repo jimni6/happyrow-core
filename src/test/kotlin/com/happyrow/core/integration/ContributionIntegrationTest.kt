@@ -176,7 +176,7 @@ class ContributionIntegrationTest : IntegrationTestBase() {
   fun `contribution from second user should increase resource quantity`() = integrationTest {
     val client = authenticatedClient()
     val user1Auth = authHeader(generateToken(email = TEST_USER_EMAIL))
-    val user2Auth = authHeader(generateToken(userId = "user-2", email = SECOND_USER_EMAIL))
+    val user2Auth = authHeader(generateToken(userId = IntegrationTestBase.SECOND_USER_ID, email = SECOND_USER_EMAIL))
 
     val (eventId, resourceId) = createEventAndResource(client, user1Auth)
 

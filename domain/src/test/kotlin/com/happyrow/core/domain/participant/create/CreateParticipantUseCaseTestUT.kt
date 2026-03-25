@@ -1,6 +1,5 @@
 package com.happyrow.core.domain.participant.create
 
-import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import com.happyrow.core.domain.participant.common.driven.ParticipantRepository
@@ -9,11 +8,8 @@ import com.happyrow.core.domain.participant.common.model.Participant
 import com.happyrow.core.domain.participant.common.model.ParticipantStatus
 import com.happyrow.core.domain.participant.create.error.CreateParticipantException
 import com.happyrow.core.domain.participant.create.model.CreateParticipantRequest
-import com.happyrow.core.persona.Persona
 import io.kotest.assertions.arrow.core.shouldBeLeft
 import io.kotest.assertions.arrow.core.shouldBeRight
-import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
@@ -33,22 +29,26 @@ class CreateParticipantUseCaseTestUT {
 
   @Test
   fun `should create participant`() {
+    val userId = UUID.fromString("33333333-3333-3333-3333-333333333333")
+    val eventId = UUID.fromString("44444444-4444-4444-4444-444444444444")
     val request = CreateParticipantRequest(
-      userEmail = "p@example.com",
-      eventId = Persona.Event.Properties.identifier,
+      userId = userId,
+      eventId = eventId,
+      status = ParticipantStatus.CONFIRMED,
     )
     val aParticipant = Participant(
-      identifier = UUID.fromString("11111111-1111-1111-1111-111111111111"),
-      userEmail = "p@example.com",
-      eventId = Persona.Event.Properties.identifier,
+      identifier = UUID.fromString("55555555-5555-5555-5555-555555555555"),
+      userId = userId,
+      eventId = eventId,
       status = ParticipantStatus.CONFIRMED,
-      joinedAt = Persona.Time.now,
-      createdAt = Persona.Time.now,
-      updatedAt = Persona.Time.now,
+      joinedAt = java.time.Instant.now(),
+      createdAt = java.time.Instant.now(),
+      updatedAt = java.time.Instant.now(),
     )
+
     every { participantRepository.create(request) } returns aParticipant.right()
 
-    val result: Either<CreateParticipantException, Participant> = useCase.execute(request)
+    val result = useCase.execute(request)
 
     result shouldBeRight aParticipant
     verify(exactly = 1) { participantRepository.create(request) }
@@ -57,18 +57,15 @@ class CreateParticipantUseCaseTestUT {
   @Test
   fun `should transfer error from participant repository`() {
     val request = CreateParticipantRequest(
-      userEmail = "p@example.com",
-      eventId = Persona.Event.Properties.identifier,
+      userId = UUID.fromString("33333333-3333-3333-3333-333333333333"),
+      eventId = UUID.fromString("44444444-4444-4444-4444-444444444444"),
     )
-    val cause = RuntimeException("db error")
-    val repoError = CreateParticipantRepositoryException(request, cause)
+    val repoError = CreateParticipantRepositoryException(request, RuntimeException("db error"))
+
     every { participantRepository.create(request) } returns repoError.left()
 
     val result = useCase.execute(request)
 
-    val error = result.shouldBeLeft()
-    error.shouldBeInstanceOf<CreateParticipantException>()
-    (error as CreateParticipantException).request shouldBe request
-    error.cause shouldBe repoError
+    result shouldBeLeft CreateParticipantException(request, repoError)
   }
 }

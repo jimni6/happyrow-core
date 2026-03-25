@@ -22,6 +22,7 @@ class DeleteContributionUseCaseTestUT {
 
   private val eventId = Persona.Event.Properties.identifier
   private val resourceId = UUID.fromString("22222222-2222-2222-2222-222222222222")
+  private val userId = UUID.fromString("88888888-8888-8888-8888-888888888888")
 
   @BeforeEach
   fun beforeEach() {
@@ -30,26 +31,23 @@ class DeleteContributionUseCaseTestUT {
 
   @Test
   fun `should delete contribution successfully`() {
-    val userEmail = "user@test.com"
+    every { contributionRepositoryMock.delete(userId, eventId, resourceId) } returns Unit.right()
 
-    every { contributionRepositoryMock.delete(userEmail, eventId, resourceId) } returns Unit.right()
-
-    val result = useCase.execute(userEmail, eventId, resourceId)
+    val result = useCase.execute(userId, eventId, resourceId)
 
     result shouldBeRight Unit
   }
 
   @Test
   fun `should transfer error from repository`() {
-    val userEmail = "user@test.com"
     val repositoryError = ContributionRepositoryException(resourceId, Exception("failed"))
 
-    every { contributionRepositoryMock.delete(userEmail, eventId, resourceId) } returns repositoryError.left()
+    every { contributionRepositoryMock.delete(userId, eventId, resourceId) } returns repositoryError.left()
 
-    val result = useCase.execute(userEmail, eventId, resourceId)
+    val result = useCase.execute(userId, eventId, resourceId)
     val ex: DeleteContributionException = result.shouldBeLeft()
 
-    ex.userEmail shouldBe userEmail
+    ex.userId shouldBe userId
     ex.resourceId shouldBe resourceId
     ex.cause shouldBe repositoryError
   }

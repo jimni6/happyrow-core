@@ -34,7 +34,7 @@ class SqlContributionRepository(
   override fun addOrUpdate(request: AddContributionRequest): Either<ContributionRepositoryException, Contribution> {
     return Either.catch {
       transaction(exposedDatabase.database) {
-        val participantId = findOrCreateParticipantInTx(request.userEmail, request.eventId)
+        val participantId = findOrCreateParticipantInTx(request.userId, request.eventId)
 
         val existing = ContributionTable
           .selectAll().where {
@@ -84,11 +84,11 @@ class SqlContributionRepository(
       transaction(exposedDatabase.database) {
         val participant = ParticipantTable
           .selectAll().where {
-            (ParticipantTable.userEmail eq request.userEmail) and
+            (ParticipantTable.userId eq request.userId) and
               (ParticipantTable.eventId eq request.eventId)
           }
           .singleOrNull() ?: throw NoSuchElementException(
-          "Participant ${request.userEmail} not found for event ${request.eventId}",
+          "Participant ${request.userId} not found for event ${request.eventId}",
         )
 
         val participantId = participant[ParticipantTable.id].value
@@ -137,16 +137,12 @@ class SqlContributionRepository(
     }.mapLeft { ContributionRepositoryException(request.resourceId, it) }
   }
 
-  override fun delete(
-    userEmail: String,
-    eventId: UUID,
-    resourceId: UUID,
-  ): Either<ContributionRepositoryException, Unit> {
+  override fun delete(userId: UUID, eventId: UUID, resourceId: UUID): Either<ContributionRepositoryException, Unit> {
     return Either.catch {
       transaction(exposedDatabase.database) {
         val participant = ParticipantTable
           .selectAll().where {
-            (ParticipantTable.userEmail eq userEmail) and (ParticipantTable.eventId eq eventId)
+            (ParticipantTable.userId eq userId) and (ParticipantTable.eventId eq eventId)
           }
           .singleOrNull() ?: return@transaction
 
@@ -186,19 +182,19 @@ class SqlContributionRepository(
     }.mapLeft { ContributionRepositoryException(resourceId, it) }
   }
 
-  private fun findOrCreateParticipantInTx(userEmail: String, eventId: UUID): UUID {
+  private fun findOrCreateParticipantInTx(userId: UUID, eventId: UUID): UUID {
     val existing = ParticipantTable
-      .selectAll().where { (ParticipantTable.userEmail eq userEmail) and (ParticipantTable.eventId eq eventId) }
+      .selectAll().where { (ParticipantTable.userId eq userId) and (ParticipantTable.eventId eq eventId) }
       .singleOrNull()
 
     return existing?.get(ParticipantTable.id)?.value
       ?: ParticipantTable.insertAndGetId {
-        it[ParticipantTable.userEmail] = userEmail
+        it[ParticipantTable.userId] = userId
         it[ParticipantTable.eventId] = eventId
-        it[status] = ParticipantStatus.CONFIRMED.name
-        it[joinedAt] = clock.instant()
-        it[createdAt] = clock.instant()
-        it[updatedAt] = clock.instant()
+        it[ParticipantTable.status] = ParticipantStatus.CONFIRMED.name
+        it[ParticipantTable.joinedAt] = clock.instant()
+        it[ParticipantTable.createdAt] = clock.instant()
+        it[ParticipantTable.updatedAt] = clock.instant()
       }.value
   }
 
@@ -214,9 +210,9 @@ class SqlContributionRepository(
     val updatedRows = ResourceTable.update({
       (ResourceTable.id eq resourceId) and (ResourceTable.version eq currentVersion)
     }) {
-      it[currentQuantity] = newQuantity
-      it[version] = currentVersion + 1
-      it[updatedAt] = clock.instant()
+      it[ResourceTable.currentQuantity] = newQuantity
+      it[ResourceTable.version] = currentVersion + 1
+      it[ResourceTable.updatedAt] = clock.instant()
     }
     if (updatedRows == 0) throw OptimisticLockException(resourceId, currentVersion)
   }

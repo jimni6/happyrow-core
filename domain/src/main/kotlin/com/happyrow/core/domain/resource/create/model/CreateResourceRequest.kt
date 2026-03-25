@@ -8,7 +8,7 @@ data class CreateResourceRequest(
   val category: ResourceCategory,
   val initialQuantity: Int,
   val eventId: UUID,
-  val userEmail: String,
+  val userId: UUID,
   val suggestedQuantity: Int = 0,
 ) {
   init {

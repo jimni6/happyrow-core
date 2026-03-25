@@ -10,7 +10,7 @@ class CreateResourceRequestDto(
   val quantity: Int,
   val suggestedQuantity: Int? = null,
 ) {
-  fun toDomain(eventId: UUID, userEmail: String): CreateResourceRequest {
+  fun toDomain(eventId: UUID, userId: UUID): CreateResourceRequest {
     require(name.isNotBlank()) { "Resource name must not be blank" }
     require(quantity > 0) { "Quantity must be greater than 0" }
     return CreateResourceRequest(
@@ -18,7 +18,7 @@ class CreateResourceRequestDto(
       category = ResourceCategory.valueOf(this.category),
       initialQuantity = this.quantity,
       eventId = eventId,
-      userEmail = userEmail,
+      userId = userId,
       suggestedQuantity = this.suggestedQuantity ?: this.quantity,
     )
   }

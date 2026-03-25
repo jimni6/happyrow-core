@@ -5,12 +5,12 @@ import com.happyrow.core.domain.participant.create.model.CreateParticipantReques
 import java.util.UUID
 
 class CreateParticipantRequestDto(
-  val userEmail: String,
+  val userId: String,
   val userName: String? = null,
   val status: String = "CONFIRMED",
 ) {
   fun toDomain(eventId: UUID): CreateParticipantRequest = CreateParticipantRequest(
-    userEmail = this.userEmail,
+    userId = UUID.fromString(this.userId),
     userName = this.userName,
     eventId = eventId,
     status = ParticipantStatus.valueOf(this.status),

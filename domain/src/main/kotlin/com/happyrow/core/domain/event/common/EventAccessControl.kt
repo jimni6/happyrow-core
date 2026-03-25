@@ -11,21 +11,20 @@ class EventAccessControl(
   private val eventRepository: EventRepository,
   private val participantRepository: ParticipantRepository,
 ) {
-  fun assertUserHasAccess(userId: String, userEmail: String, eventId: UUID): Either<Exception, Unit> =
-    eventRepository.find(eventId)
-      .mapLeft { ForbiddenAccessException(userId, eventId) as Exception }
-      .flatMap { event ->
-        val isCreator = event.creator.toString() == userId
-        if (isCreator) return@flatMap Either.Right(Unit)
+  fun assertUserHasAccess(userId: String, eventId: UUID): Either<Exception, Unit> = eventRepository.find(eventId)
+    .mapLeft { ForbiddenAccessException(userId, eventId) as Exception }
+    .flatMap { event ->
+      val isCreator = event.creator.toString() == userId
+      if (isCreator) return@flatMap Either.Right(Unit)
 
-        participantRepository.find(userEmail, eventId)
-          .mapLeft { ForbiddenAccessException(userId, eventId) as Exception }
-          .flatMap { participant ->
-            if (participant != null) {
-              Either.Right(Unit)
-            } else {
-              Either.Left(ForbiddenAccessException(userId, eventId))
-            }
+      participantRepository.find(UUID.fromString(userId), eventId)
+        .mapLeft { ForbiddenAccessException(userId, eventId) as Exception }
+        .flatMap { participant ->
+          if (participant != null) {
+            Either.Right(Unit)
+          } else {
+            Either.Left(ForbiddenAccessException(userId, eventId))
           }
-      }
+        }
+    }
 }

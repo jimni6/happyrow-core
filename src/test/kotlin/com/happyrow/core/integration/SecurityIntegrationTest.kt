@@ -105,10 +105,10 @@ class SecurityIntegrationTest : IntegrationTestBase() {
   // ─── S7 : Usurpation d'identité ──────────────────────────────────────
 
   @Test
-  fun `S7 — contribution should use email from JWT not from another user`() = integrationTest {
+  fun `S7 — contribution should use user id from JWT not email claim`() = integrationTest {
     val client = authenticatedClient()
     val userAAuth = authHeader(generateToken(email = TEST_USER_EMAIL))
-    val userBAuth = authHeader(generateToken(userId = "user-b", email = SECOND_USER_EMAIL))
+    val userBAuth = authHeader(generateToken(userId = IntegrationTestBase.SECOND_USER_ID, email = "user-b-fake-email"))
 
     val (eventId, resourceId) = createEventAndResource(client, userAAuth)
 
@@ -124,7 +124,7 @@ class SecurityIntegrationTest : IntegrationTestBase() {
       header("Authorization", userAAuth)
     }
     val participantsBody = participantsResponse.bodyAsText()
-    participantsBody shouldContain SECOND_USER_EMAIL
+    participantsBody shouldContain IntegrationTestBase.SECOND_USER_ID
     participantsBody shouldNotContain "user-b-fake-email"
   }
 

@@ -67,9 +67,10 @@ class GetResourcesByEventUseCaseTestUT {
   @Test
   fun `should return resources with contributors`() {
     val pageRequest = PageRequest()
+    val contributorUserId = UUID.fromString("88888888-8888-8888-8888-888888888888")
     val participant = Participant(
       identifier = aContribution.participantId,
-      userEmail = "user@test.com",
+      userId = contributorUserId,
       eventId = eventId,
       status = ParticipantStatus.CONFIRMED,
       joinedAt = Persona.Time.now,
@@ -82,7 +83,7 @@ class GetResourcesByEventUseCaseTestUT {
           resource = aResource,
           contributors = listOf(
             ContributorInfo(
-              userId = "user@test.com",
+              userId = contributorUserId.toString(),
               quantity = 3,
               contributedAt = aContribution.createdAt.toEpochMilli(),
             ),

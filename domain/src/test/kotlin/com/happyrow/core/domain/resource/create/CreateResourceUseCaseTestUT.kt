@@ -59,15 +59,16 @@ class CreateResourceUseCaseTestUT {
 
   @Test
   fun `should create resource and add initial contribution`() {
+    val contributorUserId = UUID.fromString("88888888-8888-8888-8888-888888888888")
     val request = CreateResourceRequest(
       name = "Chips",
       category = ResourceCategory.FOOD,
       initialQuantity = 3,
       eventId = eventId,
-      userEmail = "user@example.com",
+      userId = contributorUserId,
     )
     val addRequest = AddContributionRequest(
-      userEmail = request.userEmail,
+      userId = request.userId,
       eventId = request.eventId,
       resourceId = aResource.identifier,
       quantity = request.initialQuantity,
@@ -89,7 +90,7 @@ class CreateResourceUseCaseTestUT {
       category = ResourceCategory.FOOD,
       initialQuantity = 3,
       eventId = eventId,
-      userEmail = "user@example.com",
+      userId = UUID.fromString("88888888-8888-8888-8888-888888888888"),
     )
     val repositoryError = CreateResourceRepositoryException(request, Exception("db"))
 

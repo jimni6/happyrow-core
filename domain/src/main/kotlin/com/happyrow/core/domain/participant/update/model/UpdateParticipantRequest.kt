@@ -4,7 +4,7 @@ import com.happyrow.core.domain.participant.common.model.ParticipantStatus
 import java.util.UUID
 
 data class UpdateParticipantRequest(
-  val userEmail: String,
+  val userId: UUID,
   val eventId: UUID,
   val status: ParticipantStatus,
 )

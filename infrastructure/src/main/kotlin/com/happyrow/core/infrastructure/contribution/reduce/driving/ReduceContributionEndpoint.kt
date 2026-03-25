@@ -32,7 +32,7 @@ fun Route.reduceContributionEndpoint(reduceContributionUseCase: ReduceContributi
     Either.catch {
       val user = call.authenticatedUser()
       val requestDto = call.receive<ReduceContributionRequestDto>()
-      requestDto.toDomain(user.email, eventId, resourceId)
+      requestDto.toDomain(UUID.fromString(user.userId), eventId, resourceId)
     }
       .mapLeft { BadRequestException.InvalidBodyException(it) }
       .flatMap { request -> reduceContributionUseCase.execute(request) }

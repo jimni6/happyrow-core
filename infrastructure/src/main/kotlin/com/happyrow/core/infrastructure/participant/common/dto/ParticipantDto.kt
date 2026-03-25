@@ -4,7 +4,7 @@ import com.happyrow.core.domain.participant.common.model.Participant
 
 data class ParticipantDto(
   val identifier: String,
-  val userEmail: String,
+  val userId: String,
   val userName: String? = null,
   val eventId: String,
   val status: String,
@@ -15,7 +15,7 @@ data class ParticipantDto(
 
 fun Participant.toDto(): ParticipantDto = ParticipantDto(
   identifier = this.identifier.toString(),
-  userEmail = this.userEmail,
+  userId = this.userId.toString(),
   userName = this.userName,
   eventId = this.eventId.toString(),
   status = this.status.name,

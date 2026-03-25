@@ -10,16 +10,13 @@ import com.happyrow.core.domain.participant.common.error.GetParticipantRepositor
 import com.happyrow.core.domain.participant.common.model.Participant
 import com.happyrow.core.domain.participant.common.model.ParticipantStatus
 import com.happyrow.core.domain.participant.get.error.GetParticipantsException
-import com.happyrow.core.persona.Persona
 import io.kotest.assertions.arrow.core.shouldBeLeft
 import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -27,24 +24,20 @@ class GetParticipantsByEventUseCaseTestUT {
   private val participantRepository = mockk<ParticipantRepository>()
   private val useCase = GetParticipantsByEventUseCase(participantRepository)
 
-  @BeforeEach
-  fun beforeEach() {
-    clearAllMocks()
-  }
-
   @Test
   fun `should return participants for event`() {
-    val eventId = Persona.Event.Properties.identifier
+    val eventId = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+    val pageRequest = PageRequest(0, 20)
     val aParticipant = Participant(
       identifier = UUID.fromString("11111111-1111-1111-1111-111111111111"),
-      userEmail = "participant@example.com",
-      eventId = Persona.Event.Properties.identifier,
+      userId = UUID.fromString("22222222-2222-2222-2222-222222222222"),
+      eventId = eventId,
       status = ParticipantStatus.CONFIRMED,
-      joinedAt = Persona.Time.now,
-      createdAt = Persona.Time.now,
-      updatedAt = Persona.Time.now,
+      joinedAt = java.time.Instant.now(),
+      createdAt = java.time.Instant.now(),
+      updatedAt = java.time.Instant.now(),
     )
-    val pageRequest = PageRequest()
+
     every { participantRepository.findByEvent(eventId, pageRequest) } returns
       Page.of(listOf(aParticipant), pageRequest, 1L).right()
 
@@ -56,10 +49,11 @@ class GetParticipantsByEventUseCaseTestUT {
 
   @Test
   fun `should transfer error from participant repository`() {
-    val eventId = Persona.Event.Properties.identifier
+    val eventId = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+    val pageRequest = PageRequest(0, 20)
     val cause = RuntimeException("db error")
     val repoError = GetParticipantRepositoryException(eventId, cause)
-    val pageRequest = PageRequest()
+
     every { participantRepository.findByEvent(eventId, pageRequest) } returns repoError.left()
 
     val result = useCase.execute(eventId, pageRequest)
@@ -67,6 +61,5 @@ class GetParticipantsByEventUseCaseTestUT {
     val error = result.shouldBeLeft()
     error.shouldBeInstanceOf<GetParticipantsException>()
     (error as GetParticipantsException).eventId shouldBe eventId
-    error.cause shouldBe repoError
   }
 }

@@ -58,8 +58,9 @@ abstract class IntegrationTestBase {
     const val TEST_JWT_SECRET = "test-secret-key-for-integration-tests-minimum-256-bits-long"
     const val TEST_ISSUER = "http://localhost/auth/v1"
     const val TEST_AUDIENCE = "authenticated"
-    const val TEST_USER_ID = "test-user-id-123"
+    const val TEST_USER_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
     const val TEST_USER_EMAIL = "test@happyrow.com"
+    const val SECOND_USER_ID = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"
     const val SECOND_USER_EMAIL = "other@happyrow.com"
 
     private val algorithm = Algorithm.HMAC256(TEST_JWT_SECRET)

@@ -25,6 +25,7 @@ class ReduceContributionUseCaseTestUT {
   private val eventId = Persona.Event.Properties.identifier
   private val now: Instant = Persona.Time.now
   private val resourceId = UUID.fromString("22222222-2222-2222-2222-222222222222")
+  private val userId = UUID.fromString("88888888-8888-8888-8888-888888888888")
 
   private val aContribution = Contribution(
     identifier = UUID.fromString("33333333-3333-3333-3333-333333333333"),
@@ -43,7 +44,7 @@ class ReduceContributionUseCaseTestUT {
   @Test
   fun `should reduce contribution successfully`() {
     val request = ReduceContributionRequest(
-      userEmail = "user@test.com",
+      userId = userId,
       eventId = eventId,
       resourceId = resourceId,
       quantity = 1,
@@ -59,7 +60,7 @@ class ReduceContributionUseCaseTestUT {
   @Test
   fun `should return null when contribution fully reduced`() {
     val request = ReduceContributionRequest(
-      userEmail = "user@test.com",
+      userId = userId,
       eventId = eventId,
       resourceId = resourceId,
       quantity = 1,
@@ -75,7 +76,7 @@ class ReduceContributionUseCaseTestUT {
   @Test
   fun `should transfer error from repository`() {
     val request = ReduceContributionRequest(
-      userEmail = "user@test.com",
+      userId = userId,
       eventId = eventId,
       resourceId = resourceId,
       quantity = 1,

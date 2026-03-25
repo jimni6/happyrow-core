@@ -38,16 +38,16 @@ class GetResourcesByEventUseCase(
             is Either.Right -> {
               val contributions = contributionsResult.value
               val contributorInfos = contributions.mapNotNull { contribution ->
-                val userId = participantCache.getOrPut(contribution.participantId) {
+                val contributorUserId = participantCache.getOrPut(contribution.participantId) {
                   participantRepository.findById(contribution.participantId)
                     .fold(
                       { null },
-                      { it?.userEmail },
+                      { it?.userId?.toString() },
                     ) ?: return@mapNotNull null
                 }
 
                 ContributorInfo(
-                  userId = userId,
+                  userId = contributorUserId,
                   quantity = contribution.quantity,
                   contributedAt = contribution.createdAt.toEpochMilli(),
                 )

@@ -30,7 +30,7 @@ fun Route.getParticipantsByEventEndpoint(
       val user = call.authenticatedUser()
       val eventId = call.parameters["eventId"]?.let { UUID.fromString(it) }
         ?: throw IllegalArgumentException("Missing eventId")
-      Triple(user.userId, user.email, eventId)
+      Pair(user.userId, eventId)
     }
       .mapLeft {
         BadRequestException.InvalidParameterException(
@@ -38,8 +38,8 @@ fun Route.getParticipantsByEventEndpoint(
           it.message ?: "Authentication or eventId error",
         )
       }
-      .flatMap { (userId, email, eventId) ->
-        eventAccessControl.assertUserHasAccess(userId, email, eventId)
+      .flatMap { (userId, eventId) ->
+        eventAccessControl.assertUserHasAccess(userId, eventId)
           .map { eventId }
       }
       .flatMap { eventId ->

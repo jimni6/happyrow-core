@@ -13,25 +13,25 @@ class DeleteParticipantUseCase(
   private val participantRepository: ParticipantRepository,
   private val eventRepository: EventRepository,
 ) {
-  fun execute(userEmail: String, eventId: UUID, authenticatedUserId: String): Either<Exception, Unit> = Either.catch {
+  fun execute(userId: UUID, eventId: UUID, authenticatedUserId: String): Either<Exception, Unit> = Either.catch {
     val event = eventRepository.find(eventId).getOrNull()
-      ?: throw ParticipantNotFoundException(userEmail, eventId)
+      ?: throw ParticipantNotFoundException(userId, eventId)
 
     val isOrganizer = event.creator.toString() == authenticatedUserId
     if (!isOrganizer) {
-      throw ForbiddenParticipantDeleteException(authenticatedUserId, userEmail, eventId)
+      throw ForbiddenParticipantDeleteException(authenticatedUserId, userId, eventId)
     }
 
-    participantRepository.find(userEmail, eventId)
-      .getOrNull() ?: throw ParticipantNotFoundException(userEmail, eventId)
+    participantRepository.find(userId, eventId)
+      .getOrNull() ?: throw ParticipantNotFoundException(userId, eventId)
   }.mapLeft {
     when (it) {
       is ParticipantNotFoundException -> it
       is ForbiddenParticipantDeleteException -> it
-      else -> DeleteParticipantException(userEmail, eventId, it)
+      else -> DeleteParticipantException(userId, eventId, it)
     }
   }.flatMap {
-    participantRepository.delete(userEmail, eventId)
-      .mapLeft { DeleteParticipantException(userEmail, eventId, it) }
+    participantRepository.delete(userId, eventId)
+      .mapLeft { DeleteParticipantException(userId, eventId, it) }
   }
 }

@@ -1,5 +1,6 @@
 package com.happyrow.core.integration
 
+import com.happyrow.core.integration.IntegrationTestBase.Companion.TEST_USER_ID
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.ktor.client.request.get
@@ -14,11 +15,17 @@ import io.ktor.http.contentType
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.time.temporal.ChronoUnit
+import java.util.UUID
 
 class ParticipantIntegrationTest : IntegrationTestBase() {
 
   private val eventsPath = "/event/configuration/api/v1/events"
   private val futureDate = Instant.now().plus(7, ChronoUnit.DAYS).toString()
+
+  private val friendUserId = UUID.fromString("c1111111-1111-4111-8111-111111111111")
+  private val aliceUserId = UUID.fromString("a1111111-1111-4111-8111-111111111111")
+  private val bobUserId = UUID.fromString("b1111111-1111-4111-8111-111111111111")
+  private val guestUserId = UUID.fromString("g1111111-1111-4111-8111-111111111111")
 
   private fun participantsPath(eventId: String) = "$eventsPath/$eventId/participants"
 
@@ -47,7 +54,7 @@ class ParticipantIntegrationTest : IntegrationTestBase() {
     }
     response.status shouldBe HttpStatusCode.OK
     val body = response.bodyAsText()
-    body shouldContain TEST_USER_EMAIL
+    body shouldContain TEST_USER_ID
     body shouldContain "CONFIRMED"
   }
 
@@ -63,14 +70,14 @@ class ParticipantIntegrationTest : IntegrationTestBase() {
       contentType(ContentType.Application.Json)
       setBody(
         mapOf(
-          "user_email" to "friend@example.com",
+          "user_id" to friendUserId.toString(),
           "status" to "INVITED",
         ),
       )
     }
     response.status shouldBe HttpStatusCode.Created
     val body = response.bodyAsText()
-    body shouldContain "friend@example.com"
+    body shouldContain friendUserId.toString()
     body shouldContain "INVITED"
   }
 
@@ -84,12 +91,12 @@ class ParticipantIntegrationTest : IntegrationTestBase() {
     client.post(participantsPath(eventId)) {
       header("Authorization", auth)
       contentType(ContentType.Application.Json)
-      setBody(mapOf("user_email" to "alice@example.com", "status" to "CONFIRMED"))
+      setBody(mapOf("user_id" to aliceUserId.toString(), "status" to "CONFIRMED"))
     }
     client.post(participantsPath(eventId)) {
       header("Authorization", auth)
       contentType(ContentType.Application.Json)
-      setBody(mapOf("user_email" to "bob@example.com", "status" to "MAYBE"))
+      setBody(mapOf("user_id" to bobUserId.toString(), "status" to "MAYBE"))
     }
 
     val response = client.get(participantsPath(eventId)) {
@@ -97,9 +104,9 @@ class ParticipantIntegrationTest : IntegrationTestBase() {
     }
     response.status shouldBe HttpStatusCode.OK
     val body = response.bodyAsText()
-    body shouldContain TEST_USER_EMAIL
-    body shouldContain "alice@example.com"
-    body shouldContain "bob@example.com"
+    body shouldContain TEST_USER_ID
+    body shouldContain aliceUserId.toString()
+    body shouldContain bobUserId.toString()
   }
 
   @Test
@@ -112,10 +119,10 @@ class ParticipantIntegrationTest : IntegrationTestBase() {
     client.post(participantsPath(eventId)) {
       header("Authorization", auth)
       contentType(ContentType.Application.Json)
-      setBody(mapOf("user_email" to "guest@example.com", "status" to "INVITED"))
+      setBody(mapOf("user_id" to guestUserId.toString(), "status" to "INVITED"))
     }
 
-    val response = client.put("${participantsPath(eventId)}/guest@example.com") {
+    val response = client.put("${participantsPath(eventId)}/$guestUserId") {
       header("Authorization", auth)
       contentType(ContentType.Application.Json)
       setBody(mapOf("status" to "CONFIRMED"))

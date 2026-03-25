@@ -4,8 +4,8 @@ import java.util.UUID
 
 class ForbiddenParticipantDeleteException(
   val authenticatedUserId: String,
-  val targetEmail: String,
+  val targetUserId: UUID,
   val eventId: UUID,
 ) : Exception(
-  "User $authenticatedUserId is not authorized to delete participant $targetEmail from event $eventId",
+  "User $authenticatedUserId is not authorized to delete participant $targetUserId from event $eventId",
 )

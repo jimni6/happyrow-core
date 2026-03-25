@@ -34,7 +34,7 @@ fun Route.deleteEventEndpoint(deleteEventUseCase: DeleteEventUseCase) {
       }
         .mapLeft { BadRequestException.InvalidBodyException(it) }
     }
-      .flatMap { (id, userEmail) -> deleteEventUseCase.delete(id, userEmail) }
+      .flatMap { (id, userId) -> deleteEventUseCase.delete(id, userId) }
       .fold(
         { it.handleFailure(call) },
         { call.respond(HttpStatusCode.NoContent) },

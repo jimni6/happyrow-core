@@ -28,18 +28,18 @@ fun Route.updateParticipantEndpoint(updateParticipantUseCase: UpdateParticipantU
     val eventId = call.parameters["eventId"]?.let { UUID.fromString(it) }
       ?: return@put call.respond(HttpStatusCode.BadRequest, "Missing eventId")
 
-    val userEmail = call.parameters["userEmail"]
-      ?: return@put call.respond(HttpStatusCode.BadRequest, "Missing userEmail")
+    val userId = call.parameters["userId"]?.let { UUID.fromString(it) }
+      ?: return@put call.respond(HttpStatusCode.BadRequest, "Missing userId")
 
     Either.catch {
       val user = call.authenticatedUser()
       val body = call.receive<UpdateParticipantRequestDto>()
-      Triple(user.userId, user.email, body)
+      Pair(user.userId, body)
     }
       .mapLeft { BadRequestException.InvalidBodyException(it) }
-      .flatMap { (authenticatedUserId, authenticatedEmail, body) ->
-        val request = body.toDomain(userEmail, eventId)
-        updateParticipantUseCase.execute(request, authenticatedUserId, authenticatedEmail)
+      .flatMap { (authenticatedUserId, body) ->
+        val request = body.toDomain(userId, eventId)
+        updateParticipantUseCase.execute(request, authenticatedUserId)
       }
       .map { it.toDto() }
       .fold(
@@ -68,7 +68,7 @@ private suspend fun Exception.handleFailure(call: ApplicationCall) = when (this)
     problem = ProblemDetail.of(
       HttpStatusCode.NotFound,
       NOT_FOUND_ERROR_TYPE,
-      "Participant ${this.userEmail} not found for event ${this.eventId}",
+      "Participant ${this.userId} not found for event ${this.eventId}",
     ),
     failure = this,
   )
