@@ -10,6 +10,7 @@ import com.happyrow.core.domain.participant.common.error.UpdateParticipantReposi
 import com.happyrow.core.domain.participant.common.model.Participant
 import com.happyrow.core.domain.participant.common.model.ParticipantStatus
 import com.happyrow.core.domain.participant.create.model.CreateParticipantRequest
+import com.happyrow.core.domain.resource.common.error.OptimisticLockException
 import com.happyrow.core.infrastructure.contribution.common.driven.ContributionTable
 import com.happyrow.core.infrastructure.resource.common.driven.ResourceTable
 import com.happyrow.core.infrastructure.technical.config.ExposedDatabase
@@ -109,10 +110,16 @@ class SqlParticipantRepository(
           if (resource != null) {
             val currentQty = resource[ResourceTable.currentQuantity]
             val currentVersion = resource[ResourceTable.version]
-            ResourceTable.update({ ResourceTable.id eq resourceId }) {
-              it[currentQuantity] = currentQty - contributedQty
+            val newQty = maxOf(0, currentQty - contributedQty)
+            val updatedRows = ResourceTable.update({
+              (ResourceTable.id eq resourceId) and (ResourceTable.version eq currentVersion)
+            }) {
+              it[currentQuantity] = newQty
               it[version] = currentVersion + 1
               it[updatedAt] = clock.instant()
+            }
+            if (updatedRows == 0) {
+              throw OptimisticLockException(resourceId, currentVersion)
             }
           }
         }
