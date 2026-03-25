@@ -2,6 +2,8 @@ package com.happyrow.core.infrastructure.common.driven.event
 
 import arrow.core.Either
 import arrow.core.flatMap
+import com.happyrow.core.domain.common.model.Page
+import com.happyrow.core.domain.common.model.PageRequest
 import com.happyrow.core.domain.event.common.driven.event.EventRepository
 import com.happyrow.core.domain.event.common.error.CreateEventRepositoryException
 import com.happyrow.core.domain.event.common.error.DeleteEventRepositoryException
@@ -172,7 +174,11 @@ class SqlEventRepository(
       .mapLeft { GetEventException(identifier, it) }
   }
 
-  override fun findByUser(userId: String, userEmail: String): Either<GetEventException, List<Event>> {
+  override fun findByUser(
+    userId: String,
+    userEmail: String,
+    pageRequest: PageRequest,
+  ): Either<GetEventException, Page<Event>> {
     return Either
       .catch {
         transaction(exposedDatabase.database) {
@@ -181,11 +187,14 @@ class SqlEventRepository(
             .where { ParticipantTable.userEmail eq userEmail }
             .map { it[ParticipantTable.eventId] }
 
-          EventTable
-            .selectAll()
-            .where {
-              (EventTable.creator eq userId) or (EventTable.id inList participantEventIds)
-            }
+          val condition = (EventTable.creator eq userId) or (EventTable.id inList participantEventIds)
+
+          val totalElements = EventTable.selectAll().where { condition }.count()
+
+          val events = EventTable.selectAll()
+            .where { condition }
+            .limit(pageRequest.size)
+            .offset(pageRequest.offset)
             .map { row ->
               row.toEvent().fold(
                 { error ->
@@ -195,6 +204,8 @@ class SqlEventRepository(
                 { it },
               )
             }
+
+          Page.of(events, pageRequest, totalElements)
         }
       }
       .mapLeft { GetEventException(null, it) }

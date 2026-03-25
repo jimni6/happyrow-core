@@ -2,6 +2,7 @@ package com.happyrow.core.infrastructure.event.get.driving
 
 import arrow.core.Either
 import arrow.core.flatMap
+import com.happyrow.core.domain.common.model.PageRequest
 import com.happyrow.core.domain.event.get.GetEventsByUserUseCase
 import com.happyrow.core.domain.event.get.error.GetEventException
 import com.happyrow.core.infrastructure.event.common.dto.toDto
@@ -20,11 +21,24 @@ fun Route.getEventsEndpoint(getEventsByUserUseCase: GetEventsByUserUseCase) {
   get {
     Either.catch {
       val user = call.authenticatedUser()
-      Pair(user.userId, user.email)
+      val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 0
+      val size = call.request.queryParameters["size"]?.toIntOrNull() ?: PageRequest.DEFAULT_PAGE_SIZE
+      Triple(user, page, size)
     }
       .mapLeft { InvalidOrganizerIdException("authenticated_user", it) }
-      .flatMap { (userId, email) -> getEventsByUserUseCase.execute(userId, email) }
-      .map { events -> events.map { it.toDto() } }
+      .flatMap { (user, page, size) ->
+        val pageRequest = PageRequest(page, size)
+        getEventsByUserUseCase.execute(user.userId, user.email, pageRequest)
+      }
+      .map { page ->
+        mapOf(
+          "content" to page.content.map { it.toDto() },
+          "page" to page.page,
+          "size" to page.size,
+          "totalElements" to page.totalElements,
+          "totalPages" to page.totalPages,
+        )
+      }
       .fold(
         { it.handleFailure(call) },
         { call.respond(HttpStatusCode.OK, it) },

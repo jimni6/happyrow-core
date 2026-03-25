@@ -1,6 +1,8 @@
 package com.happyrow.core.domain.event.common.driven.event
 
 import arrow.core.Either
+import com.happyrow.core.domain.common.model.Page
+import com.happyrow.core.domain.common.model.PageRequest
 import com.happyrow.core.domain.event.common.error.CreateEventRepositoryException
 import com.happyrow.core.domain.event.common.error.DeleteEventRepositoryException
 import com.happyrow.core.domain.event.common.error.UpdateEventRepositoryException
@@ -15,5 +17,5 @@ interface EventRepository {
   fun update(request: UpdateEventRequest): Either<UpdateEventRepositoryException, Event>
   fun delete(identifier: UUID, userId: String): Either<DeleteEventRepositoryException, Unit>
   fun find(identifier: UUID): Either<GetEventException, Event>
-  fun findByUser(userId: String, userEmail: String): Either<GetEventException, List<Event>>
+  fun findByUser(userId: String, userEmail: String, pageRequest: PageRequest): Either<GetEventException, Page<Event>>
 }

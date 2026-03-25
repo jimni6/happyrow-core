@@ -2,6 +2,8 @@ package com.happyrow.core.infrastructure.participant.common.driven
 
 import arrow.core.Either
 import arrow.core.flatMap
+import com.happyrow.core.domain.common.model.Page
+import com.happyrow.core.domain.common.model.PageRequest
 import com.happyrow.core.domain.participant.common.driven.ParticipantRepository
 import com.happyrow.core.domain.participant.common.error.CreateParticipantRepositoryException
 import com.happyrow.core.domain.participant.common.error.DeleteParticipantRepositoryException
@@ -16,6 +18,7 @@ import com.happyrow.core.infrastructure.resource.common.driven.ResourceTable
 import com.happyrow.core.infrastructure.technical.config.ExposedDatabase
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.count
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.selectAll
@@ -152,11 +155,20 @@ class SqlParticipantRepository(
       }
   }
 
-  override fun findByEvent(eventId: UUID): Either<GetParticipantRepositoryException, List<Participant>> {
+  override fun findByEvent(
+    eventId: UUID,
+    pageRequest: PageRequest,
+  ): Either<GetParticipantRepositoryException, Page<Participant>> {
     return Either.catch {
       transaction(exposedDatabase.database) {
-        ParticipantTable
-          .selectAll().where { ParticipantTable.eventId eq eventId }
+        val condition = ParticipantTable.eventId eq eventId
+
+        val totalElements = ParticipantTable.selectAll().where { condition }.count()
+
+        val participants = ParticipantTable.selectAll()
+          .where { condition }
+          .limit(pageRequest.size)
+          .offset(pageRequest.offset)
           .map { row ->
             row.toParticipant().fold(
               { error ->
@@ -166,6 +178,8 @@ class SqlParticipantRepository(
               { it },
             )
           }
+
+        Page.of(participants, pageRequest, totalElements)
       }
     }.mapLeft { GetParticipantRepositoryException(eventId, it) }
   }

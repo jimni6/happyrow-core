@@ -3,6 +3,8 @@ package com.happyrow.core.domain.participant.get
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import com.happyrow.core.domain.common.model.Page
+import com.happyrow.core.domain.common.model.PageRequest
 import com.happyrow.core.domain.participant.common.driven.ParticipantRepository
 import com.happyrow.core.domain.participant.common.error.GetParticipantRepositoryException
 import com.happyrow.core.domain.participant.common.model.Participant
@@ -42,12 +44,14 @@ class GetParticipantsByEventUseCaseTestUT {
       createdAt = Persona.Time.now,
       updatedAt = Persona.Time.now,
     )
-    every { participantRepository.findByEvent(eventId) } returns listOf(aParticipant).right()
+    val pageRequest = PageRequest()
+    every { participantRepository.findByEvent(eventId, pageRequest) } returns
+      Page.of(listOf(aParticipant), pageRequest, 1L).right()
 
-    val result: Either<GetParticipantsException, List<Participant>> = useCase.execute(eventId)
+    val result: Either<GetParticipantsException, Page<Participant>> = useCase.execute(eventId, pageRequest)
 
-    result shouldBeRight listOf(aParticipant)
-    verify(exactly = 1) { participantRepository.findByEvent(eventId) }
+    result shouldBeRight Page.of(listOf(aParticipant), pageRequest, 1L)
+    verify(exactly = 1) { participantRepository.findByEvent(eventId, pageRequest) }
   }
 
   @Test
@@ -55,9 +59,10 @@ class GetParticipantsByEventUseCaseTestUT {
     val eventId = Persona.Event.Properties.identifier
     val cause = RuntimeException("db error")
     val repoError = GetParticipantRepositoryException(eventId, cause)
-    every { participantRepository.findByEvent(eventId) } returns repoError.left()
+    val pageRequest = PageRequest()
+    every { participantRepository.findByEvent(eventId, pageRequest) } returns repoError.left()
 
-    val result = useCase.execute(eventId)
+    val result = useCase.execute(eventId, pageRequest)
 
     val error = result.shouldBeLeft()
     error.shouldBeInstanceOf<GetParticipantsException>()

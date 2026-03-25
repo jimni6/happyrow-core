@@ -90,7 +90,9 @@ class ResourceIntegrationTest : IntegrationTestBase() {
     }
 
     response.status shouldBe HttpStatusCode.OK
-    response.bodyAsText() shouldBe "[]"
+    val body = response.bodyAsText()
+    body shouldContain "\"content\":[]"
+    body shouldContain "\"totalElements\":0"
   }
 
   @Test

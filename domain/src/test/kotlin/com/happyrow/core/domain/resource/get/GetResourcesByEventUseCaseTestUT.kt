@@ -2,6 +2,8 @@ package com.happyrow.core.domain.resource.get
 
 import arrow.core.left
 import arrow.core.right
+import com.happyrow.core.domain.common.model.Page
+import com.happyrow.core.domain.common.model.PageRequest
 import com.happyrow.core.domain.contribution.common.driven.ContributionRepository
 import com.happyrow.core.domain.contribution.common.model.Contribution
 import com.happyrow.core.domain.participant.common.driven.ParticipantRepository
@@ -64,6 +66,7 @@ class GetResourcesByEventUseCaseTestUT {
 
   @Test
   fun `should return resources with contributors`() {
+    val pageRequest = PageRequest()
     val participant = Participant(
       identifier = aContribution.participantId,
       userEmail = "user@test.com",
@@ -73,43 +76,52 @@ class GetResourcesByEventUseCaseTestUT {
       createdAt = Persona.Time.now,
       updatedAt = Persona.Time.now,
     )
-    val expected = listOf(
-      ResourceWithContributors(
-        resource = aResource,
-        contributors = listOf(
-          ContributorInfo(
-            userId = "user@test.com",
-            quantity = 3,
-            contributedAt = aContribution.createdAt.toEpochMilli(),
+    val expected = Page.of(
+      listOf(
+        ResourceWithContributors(
+          resource = aResource,
+          contributors = listOf(
+            ContributorInfo(
+              userId = "user@test.com",
+              quantity = 3,
+              contributedAt = aContribution.createdAt.toEpochMilli(),
+            ),
           ),
         ),
       ),
+      pageRequest,
+      1L,
     )
 
-    every { resourceRepositoryMock.findByEvent(eventId) } returns listOf(aResource).right()
+    every {
+      resourceRepositoryMock.findByEvent(eventId, pageRequest)
+    } returns Page.of(listOf(aResource), pageRequest, 1L).right()
     every { contributionRepositoryMock.findByResource(aResource.identifier) } returns listOf(aContribution).right()
     every { participantRepositoryMock.findById(aContribution.participantId) } returns participant.right()
 
-    val result = useCase.execute(eventId)
+    val result = useCase.execute(eventId, pageRequest)
 
     result shouldBeRight expected
   }
 
   @Test
   fun `should return empty list when no resources`() {
-    every { resourceRepositoryMock.findByEvent(eventId) } returns emptyList<Resource>().right()
+    val pageRequest = PageRequest()
+    every { resourceRepositoryMock.findByEvent(eventId, pageRequest) } returns
+      Page.of(emptyList<Resource>(), pageRequest, 0L).right()
 
-    val result = useCase.execute(eventId)
+    val result = useCase.execute(eventId, pageRequest)
 
-    result shouldBeRight emptyList()
+    result shouldBeRight Page.of(emptyList<ResourceWithContributors>(), pageRequest, 0L)
   }
 
   @Test
   fun `should transfer error when resource loading fails`() {
+    val pageRequest = PageRequest()
     val repositoryError = GetResourceRepositoryException(eventId, Exception("db"))
-    every { resourceRepositoryMock.findByEvent(eventId) } returns repositoryError.left()
+    every { resourceRepositoryMock.findByEvent(eventId, pageRequest) } returns repositoryError.left()
 
-    val result = useCase.execute(eventId)
+    val result = useCase.execute(eventId, pageRequest)
     val ex: GetResourcesException = result.shouldBeLeft()
 
     ex.eventId shouldBe eventId

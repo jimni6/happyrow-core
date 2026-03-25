@@ -1,5 +1,6 @@
 package com.happyrow.core.integration
 
+import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.ktor.client.request.delete
@@ -113,7 +114,15 @@ class EventIntegrationTest : IntegrationTestBase() {
     }
 
     response.status shouldBe HttpStatusCode.OK
-    response.bodyAsText() shouldBe "[]"
+    response.bodyAsText() shouldEqualJson """
+      {
+        "content": [],
+        "page": 0,
+        "size": 20,
+        "totalElements": 0,
+        "totalPages": 0
+      }
+    """.trimIndent()
   }
 
   @Test
@@ -187,7 +196,15 @@ class EventIntegrationTest : IntegrationTestBase() {
     val getResponse = client.get(basePath) {
       header("Authorization", auth)
     }
-    getResponse.bodyAsText() shouldBe "[]"
+    getResponse.bodyAsText() shouldEqualJson """
+      {
+        "content": [],
+        "page": 0,
+        "size": 20,
+        "totalElements": 0,
+        "totalPages": 0
+      }
+    """.trimIndent()
   }
 
   @Test

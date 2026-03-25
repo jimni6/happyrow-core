@@ -2,6 +2,7 @@ package com.happyrow.core.infrastructure.participant.get.driving
 
 import arrow.core.Either
 import arrow.core.flatMap
+import com.happyrow.core.domain.common.model.PageRequest
 import com.happyrow.core.domain.event.common.EventAccessControl
 import com.happyrow.core.domain.event.common.error.ForbiddenAccessException
 import com.happyrow.core.domain.participant.get.GetParticipantsByEventUseCase
@@ -41,8 +42,20 @@ fun Route.getParticipantsByEventEndpoint(
         eventAccessControl.assertUserHasAccess(userId, email, eventId)
           .map { eventId }
       }
-      .flatMap { eventId -> getParticipantsByEventUseCase.execute(eventId) }
-      .map { participants -> participants.map { it.toDto() } }
+      .flatMap { eventId ->
+        val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 0
+        val size = call.request.queryParameters["size"]?.toIntOrNull() ?: PageRequest.DEFAULT_PAGE_SIZE
+        getParticipantsByEventUseCase.execute(eventId, PageRequest(page, size))
+      }
+      .map { page ->
+        mapOf(
+          "content" to page.content.map { it.toDto() },
+          "page" to page.page,
+          "size" to page.size,
+          "totalElements" to page.totalElements,
+          "totalPages" to page.totalPages,
+        )
+      }
       .fold(
         { it.handleFailure(call) },
         { call.respond(HttpStatusCode.OK, it) },

@@ -2,6 +2,8 @@ package com.happyrow.core.infrastructure.resource.common.driven
 
 import arrow.core.Either
 import arrow.core.flatMap
+import com.happyrow.core.domain.common.model.Page
+import com.happyrow.core.domain.common.model.PageRequest
 import com.happyrow.core.domain.resource.common.driven.ResourceRepository
 import com.happyrow.core.domain.resource.common.error.CreateResourceRepositoryException
 import com.happyrow.core.domain.resource.common.error.GetResourceRepositoryException
@@ -10,6 +12,7 @@ import com.happyrow.core.domain.resource.common.error.ResourceNotFoundException
 import com.happyrow.core.domain.resource.common.model.Resource
 import com.happyrow.core.domain.resource.create.model.CreateResourceRequest
 import com.happyrow.core.infrastructure.technical.config.ExposedDatabase
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.selectAll
@@ -67,11 +70,19 @@ class SqlResourceRepository(
       .mapLeft { GetResourceRepositoryException(null, it) }
   }
 
-  override fun findByEvent(eventId: UUID): Either<GetResourceRepositoryException, List<Resource>> {
+  override fun findByEvent(
+    eventId: UUID,
+    pageRequest: PageRequest,
+  ): Either<GetResourceRepositoryException, Page<Resource>> {
     return Either.catch {
       transaction(exposedDatabase.database) {
-        ResourceTable
-          .selectAll().where { ResourceTable.eventId eq eventId }
+        val condition = ResourceTable.eventId eq eventId
+        val totalElements = ResourceTable.selectAll().where { condition }.count()
+
+        val resources = ResourceTable.selectAll()
+          .where { condition }
+          .limit(pageRequest.size)
+          .offset(pageRequest.offset)
           .map { row ->
             row.toResource().fold(
               { error ->
@@ -81,6 +92,8 @@ class SqlResourceRepository(
               { it },
             )
           }
+
+        Page.of(resources, pageRequest, totalElements)
       }
     }.mapLeft { GetResourceRepositoryException(eventId, it) }
   }
