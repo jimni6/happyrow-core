@@ -1,8 +1,8 @@
 package com.happyrow.core.domain.event.creator.model
 
+import java.util.UUID
+
 @JvmInline
-value class Creator(private val value: String) {
-  override fun toString(): String {
-    return value
-  }
+value class Creator(val value: UUID) {
+  override fun toString(): String = value.toString()
 }

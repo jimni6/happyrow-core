@@ -12,7 +12,7 @@ class UpdateEventRequestDto(
   val eventDate: String,
   val location: String,
   val type: EventType,
-  val members: List<Creator> = listOf(),
+  val members: List<String> = listOf(),
 ) {
   fun toDomain(identifier: UUID, updater: String): UpdateEventRequest {
     require(name.isNotBlank()) { "Event name must not be blank" }
@@ -24,8 +24,8 @@ class UpdateEventRequestDto(
       eventDate = Instant.parse(eventDate),
       location = location.trim(),
       type = type,
-      updater = Creator(updater),
-      members = members,
+      updater = Creator(UUID.fromString(updater)),
+      members = members.map { Creator(UUID.fromString(it)) },
     )
   }
 }

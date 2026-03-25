@@ -49,12 +49,12 @@ class SqlEventRepository(
           it[name] = request.name
           it[description] = request.description
           it[eventDate] = request.eventDate
-          it[creator] = request.creator.toString()
+          it[creator] = request.creator.value
           it[location] = request.location
           it[type] = request.type
           it[creationDate] = clock.instant()
           it[updateDate] = clock.instant()
-          it[members] = request.members.map { UUID.fromString(it.toString()) }
+          it[members] = request.members.map { it.value }
         }.value
       }
     }
@@ -80,7 +80,7 @@ class SqlEventRepository(
           it[location] = request.location
           it[type] = request.type
           it[updateDate] = clock.instant()
-          it[members] = request.members.map { member -> UUID.fromString(member.toString()) }
+          it[members] = request.members.map { member -> member.value }
         }
         if (updatedRows == 0) {
           throw EventNotFoundException(request.identifier)
@@ -111,7 +111,7 @@ class SqlEventRepository(
 
         // Check if user is the creator
         val creatorId = event[EventTable.creator]
-        if (creatorId != userId) {
+        if (creatorId.toString() != userId) {
           throw UnauthorizedDeleteException(identifier, userId)
         }
 
@@ -187,7 +187,7 @@ class SqlEventRepository(
             .where { ParticipantTable.userEmail eq userEmail }
             .map { it[ParticipantTable.eventId] }
 
-          val condition = (EventTable.creator eq userId) or (EventTable.id inList participantEventIds)
+          val condition = (EventTable.creator eq UUID.fromString(userId)) or (EventTable.id inList participantEventIds)
 
           val totalElements = EventTable.selectAll().where { condition }.count()
 

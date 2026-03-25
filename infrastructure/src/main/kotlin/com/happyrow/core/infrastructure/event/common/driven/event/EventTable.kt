@@ -22,7 +22,7 @@ object EventTable : UUIDTable("configuration.event", "identifier") {
   val name: Column<String> = varchar("name", VARCHAR_LENGTH)
   val description: Column<String> = text("description")
   val eventDate = timestamp("event_date")
-  val creator = varchar("creator", VARCHAR_LENGTH)
+  val creator = uuid("creator")
   val location: Column<String> = varchar("location", VARCHAR_LENGTH)
   val type: Column<EventType> = customEnumeration(
     name = "type",
@@ -46,7 +46,7 @@ fun ResultRow.toEvent(): Either<EntityParsingException, Event> = Either.catch {
     creator = Creator(this[EventTable.creator]),
     location = this[EventTable.location],
     type = this[EventTable.type],
-    members = this[EventTable.members].map { Creator(it.toString()) },
+    members = this[EventTable.members].map { Creator(it) },
   )
 }
   .mapLeft { EntityParsingException(Event::class, it) }
