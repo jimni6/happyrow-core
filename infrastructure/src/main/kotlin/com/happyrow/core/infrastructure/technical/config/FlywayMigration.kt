@@ -45,12 +45,9 @@ class FlywayMigration(private val dataSource: DataSource) {
       logger.error("[DEBUG-0ccd04] Flyway migration FAILED — exception class: {}", e.javaClass.name)
       logger.error("[DEBUG-0ccd04] Flyway migration FAILED — message: {}", e.message)
       logger.error("[DEBUG-0ccd04] Flyway migration FAILED — cause: {}", e.cause?.message)
-      logger.error(
-        "[DEBUG-0ccd04] Flyway migration FAILED — root cause: {}",
-        generateSequence(e as Throwable) {
-          it.cause
-        }.last().message,
-      )
+      var rootCause: Throwable = e
+      while (rootCause.cause != null) rootCause = rootCause.cause!!
+      logger.error("[DEBUG-0ccd04] Flyway migration FAILED — root cause: {}", rootCause.message)
       logger.error("[DEBUG-0ccd04] Flyway migration FAILED — full stack", e)
       throw e
     }
