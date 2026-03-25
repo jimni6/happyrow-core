@@ -26,6 +26,7 @@ object EventPersona {
     description = Properties.description,
     eventDate = Persona.Time.now.plus(7, ChronoUnit.DAYS),
     creator = Persona.User.aUser,
+    creatorEmail = Persona.User.aUserEmail,
     location = Properties.location,
     type = EventType.DINER,
     members = listOf(Persona.User.aUser),

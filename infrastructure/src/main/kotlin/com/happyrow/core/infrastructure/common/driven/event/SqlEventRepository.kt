@@ -193,7 +193,7 @@ class SqlEventRepository(
       .mapLeft { GetEventException(null, it) }
   }
 
-  override fun findByUser(userEmail: String): Either<GetEventException, List<Event>> {
+  override fun findByUser(userId: String, userEmail: String): Either<GetEventException, List<Event>> {
     return Either
       .catch {
         transaction(exposedDatabase.database) {
@@ -205,7 +205,7 @@ class SqlEventRepository(
           EventTable
             .selectAll()
             .where {
-              (EventTable.creator eq userEmail) or (EventTable.id inList participantEventIds)
+              (EventTable.creator eq userId) or (EventTable.id inList participantEventIds)
             }
             .map { row ->
               row.toEvent().fold(

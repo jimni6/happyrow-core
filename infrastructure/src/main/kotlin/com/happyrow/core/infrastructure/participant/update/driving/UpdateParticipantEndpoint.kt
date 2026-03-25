@@ -33,14 +33,14 @@ fun Route.updateParticipantEndpoint(updateParticipantUseCase: UpdateParticipantU
       ?: return@put call.respond(HttpStatusCode.BadRequest, "Missing userEmail")
 
     Either.catch {
-      val authenticatedEmail = call.authenticatedUser().email
+      val user = call.authenticatedUser()
       val body = call.receive<UpdateParticipantRequestDto>()
-      authenticatedEmail to body
+      Triple(user.userId, user.email, body)
     }
       .mapLeft { BadRequestException.InvalidBodyException(it) }
-      .flatMap { (authenticatedEmail, body) ->
+      .flatMap { (authenticatedUserId, authenticatedEmail, body) ->
         val request = body.toDomain(userEmail, eventId)
-        updateParticipantUseCase.execute(request, authenticatedEmail)
+        updateParticipantUseCase.execute(request, authenticatedUserId, authenticatedEmail)
       }
       .map { it.toDto() }
       .fold(

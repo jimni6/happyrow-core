@@ -7,7 +7,6 @@ import com.happyrow.core.domain.event.common.error.CreateEventRepositoryExceptio
 import com.happyrow.core.domain.event.create.error.CreateEventException
 import com.happyrow.core.domain.event.create.model.CreateEventRequest
 import com.happyrow.core.domain.participant.common.driven.ParticipantRepository
-import com.happyrow.core.extension.then
 import com.happyrow.core.persona.Persona
 import io.kotest.assertions.arrow.core.shouldBeLeft
 import io.kotest.assertions.arrow.core.shouldBeRight
@@ -32,8 +31,8 @@ class CreateEventUseCaseTestUT {
     givenACreateRequest()
       .andAWorkingCreation()
       .whenCreating()
-      .then { (result) ->
-        result shouldBeRight Persona.Event.anEvent
+      .let { pair ->
+        pair.first shouldBeRight Persona.Event.anEvent
       }
   }
 
@@ -44,8 +43,8 @@ class CreateEventUseCaseTestUT {
     givenACreateRequest()
       .andAFailingCreation(error)
       .whenCreating()
-      .then { (result, request) ->
-        result shouldBeLeft CreateEventException(request, error)
+      .let { pair ->
+        pair.first shouldBeLeft CreateEventException(pair.second, error)
       }
   }
 

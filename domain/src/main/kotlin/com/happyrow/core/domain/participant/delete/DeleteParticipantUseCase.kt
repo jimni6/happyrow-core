@@ -13,13 +13,13 @@ class DeleteParticipantUseCase(
   private val participantRepository: ParticipantRepository,
   private val eventRepository: EventRepository,
 ) {
-  fun execute(userEmail: String, eventId: UUID, authenticatedEmail: String): Either<Exception, Unit> = Either.catch {
+  fun execute(userEmail: String, eventId: UUID, authenticatedUserId: String): Either<Exception, Unit> = Either.catch {
     val event = eventRepository.find(eventId).getOrNull()
       ?: throw ParticipantNotFoundException(userEmail, eventId)
 
-    val isOrganizer = event.creator.toString() == authenticatedEmail
+    val isOrganizer = event.creator.toString() == authenticatedUserId
     if (!isOrganizer) {
-      throw ForbiddenParticipantDeleteException(authenticatedEmail, userEmail, eventId)
+      throw ForbiddenParticipantDeleteException(authenticatedUserId, userEmail, eventId)
     }
 
     participantRepository.find(userEmail, eventId)

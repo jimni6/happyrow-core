@@ -31,7 +31,7 @@ fun Route.deleteEventEndpoint(deleteEventUseCase: DeleteEventUseCase) {
     eventId.flatMap { id ->
       Either.catch {
         val user = call.authenticatedUser()
-        Pair(id, user.email)
+        Pair(id, user.userId)
       }
         .mapLeft { BadRequestException.InvalidBodyException(it) }
     }

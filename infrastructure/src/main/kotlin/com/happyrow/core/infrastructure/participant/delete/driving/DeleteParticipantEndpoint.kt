@@ -28,10 +28,10 @@ fun Route.deleteParticipantEndpoint(deleteParticipantUseCase: DeleteParticipantU
     val userEmail = call.parameters["userEmail"]
       ?: return@delete call.respond(HttpStatusCode.BadRequest, "Missing userEmail")
 
-    Either.catch { call.authenticatedUser().email }
+    Either.catch { call.authenticatedUser().userId }
       .mapLeft { Exception("Authentication failed", it) }
-      .flatMap { authenticatedEmail ->
-        deleteParticipantUseCase.execute(userEmail, eventId, authenticatedEmail)
+      .flatMap { authenticatedUserId ->
+        deleteParticipantUseCase.execute(userEmail, eventId, authenticatedUserId)
       }
       .fold(
         { it.handleFailure(call) },

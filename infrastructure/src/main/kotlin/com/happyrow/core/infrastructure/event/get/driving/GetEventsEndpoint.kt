@@ -20,10 +20,11 @@ private const val INVALID_ORGANIZER_ID_ERROR_TYPE = "INVALID_ORGANIZER_ID"
 fun Route.getEventsEndpoint(getEventsByUserUseCase: GetEventsByUserUseCase) {
   get {
     Either.catch {
-      call.authenticatedUser().email
+      val user = call.authenticatedUser()
+      Pair(user.userId, user.email)
     }
       .mapLeft { InvalidOrganizerIdException("authenticated_user", it) }
-      .flatMap { userEmail -> getEventsByUserUseCase.execute(userEmail) }
+      .flatMap { (userId, email) -> getEventsByUserUseCase.execute(userId, email) }
       .map { events -> events.map { it.toDto() } }
       .fold(
         { it.handleFailure(call) },

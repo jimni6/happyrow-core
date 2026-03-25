@@ -14,29 +14,32 @@ class UpdateParticipantUseCase(
   private val participantRepository: ParticipantRepository,
   private val eventRepository: EventRepository,
 ) {
-  fun execute(request: UpdateParticipantRequest, authenticatedEmail: String): Either<Exception, Participant> =
-    Either.catch {
-      val event = eventRepository.find(request.eventId).getOrNull()
-        ?: throw ParticipantNotFoundException(request.userEmail, request.eventId)
+  fun execute(
+    request: UpdateParticipantRequest,
+    authenticatedUserId: String,
+    authenticatedEmail: String,
+  ): Either<Exception, Participant> = Either.catch {
+    val event = eventRepository.find(request.eventId).getOrNull()
+      ?: throw ParticipantNotFoundException(request.userEmail, request.eventId)
 
-      val isOrganizer = event.creator.toString() == authenticatedEmail
-      val isSelf = request.userEmail == authenticatedEmail
+    val isOrganizer = event.creator.toString() == authenticatedUserId
+    val isSelf = request.userEmail == authenticatedEmail
 
-      if (!isOrganizer && !isSelf) {
-        throw ForbiddenParticipantUpdateException(authenticatedEmail, request.userEmail, request.eventId)
-      }
-
-      participantRepository.find(request.userEmail, request.eventId)
-        .getOrNull() ?: throw ParticipantNotFoundException(request.userEmail, request.eventId)
-    }.mapLeft {
-      when (it) {
-        is ParticipantNotFoundException -> it
-        is ForbiddenParticipantUpdateException -> it
-        else -> UpdateParticipantException(request.userEmail, request.eventId, it)
-      }
-    }.flatMap { participant ->
-      val updatedParticipant = participant.copy(status = request.status)
-      participantRepository.update(updatedParticipant)
-        .mapLeft { UpdateParticipantException(request.userEmail, request.eventId, it) }
+    if (!isOrganizer && !isSelf) {
+      throw ForbiddenParticipantUpdateException(authenticatedUserId, request.userEmail, request.eventId)
     }
+
+    participantRepository.find(request.userEmail, request.eventId)
+      .getOrNull() ?: throw ParticipantNotFoundException(request.userEmail, request.eventId)
+  }.mapLeft {
+    when (it) {
+      is ParticipantNotFoundException -> it
+      is ForbiddenParticipantUpdateException -> it
+      else -> UpdateParticipantException(request.userEmail, request.eventId, it)
+    }
+  }.flatMap { participant ->
+    val updatedParticipant = participant.copy(status = request.status)
+    participantRepository.update(updatedParticipant)
+      .mapLeft { UpdateParticipantException(request.userEmail, request.eventId, it) }
+  }
 }
