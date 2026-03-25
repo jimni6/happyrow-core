@@ -18,8 +18,8 @@ import com.happyrow.core.infrastructure.resource.common.driven.SqlResourceReposi
 import com.happyrow.core.infrastructure.technical.auth.JwtAuthenticationPlugin
 import com.happyrow.core.infrastructure.technical.auth.SupabaseJwtConfig
 import com.happyrow.core.infrastructure.technical.auth.SupabaseJwtService
-import com.happyrow.core.infrastructure.technical.config.DatabaseInitializer
 import com.happyrow.core.infrastructure.technical.config.ExposedDatabase
+import com.happyrow.core.infrastructure.technical.config.FlywayMigration
 import com.happyrow.core.infrastructure.technical.jackson.JsonObjectMapper
 import com.happyrow.core.modules.domainModule
 import com.zaxxer.hikari.HikariConfig
@@ -82,8 +82,7 @@ abstract class IntegrationTestBase {
     private val sharedDatabase: Database by lazy { Database.connect(sharedDataSource) }
 
     private val dbInitialized: Boolean by lazy {
-      val initializer = DatabaseInitializer(ExposedDatabase(sharedDataSource))
-      initializer.initializeDatabase()
+      FlywayMigration(sharedDataSource).migrate()
       true
     }
 
@@ -134,7 +133,7 @@ abstract class IntegrationTestBase {
         single<Clock> { Clock.system(ZoneId.systemDefault()) }
         single<DataSource> { sharedDataSource }
         single { ExposedDatabase(get()) }
-        single { DatabaseInitializer(get()) }
+        single { FlywayMigration(get()) }
         singleOf(::SqlEventRepository) bind EventRepository::class
         singleOf(::SqlParticipantRepository) bind ParticipantRepository::class
         singleOf(::SqlResourceRepository) bind ResourceRepository::class

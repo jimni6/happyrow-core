@@ -22,6 +22,9 @@ dependencies {
     implementation(platform(libs.exposed.bom))
     implementation(libs.bundles.exposed)
 
+    implementation(libs.flyway.core)
+    implementation(libs.flyway.postgresql)
+
     implementation(libs.bundles.jackson)
 
     implementation(libs.auth0.jwt)

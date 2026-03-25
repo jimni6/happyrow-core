@@ -2,7 +2,7 @@ package com.happyrow.core
 
 import com.happyrow.core.infrastructure.technical.auth.JwtAuthenticationPlugin
 import com.happyrow.core.infrastructure.technical.auth.SupabaseJwtService
-import com.happyrow.core.infrastructure.technical.config.DatabaseInitializer
+import com.happyrow.core.infrastructure.technical.config.FlywayMigration
 import com.happyrow.core.infrastructure.technical.config.shutdownDataSource
 import com.happyrow.core.infrastructure.technical.jackson.JsonObjectMapper
 import com.happyrow.core.infrastructure.technical.ktor.ProblemDetail
@@ -57,9 +57,8 @@ fun Application.module() {
     modules(clockModule, configurationModule, authModule, infrastructureModule, domainModule)
   }
 
-  // Initialize database schema for Render PostgreSQL
-  val databaseInitializer by inject<DatabaseInitializer>()
-  databaseInitializer.initializeDatabase()
+  val flywayMigration by inject<FlywayMigration>()
+  flywayMigration.migrate()
 
   application()
   addShutdownHook()

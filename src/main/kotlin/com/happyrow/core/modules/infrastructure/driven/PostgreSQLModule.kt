@@ -9,8 +9,8 @@ import com.happyrow.core.infrastructure.common.driven.event.SqlEventRepository
 import com.happyrow.core.infrastructure.contribution.common.driven.SqlContributionRepository
 import com.happyrow.core.infrastructure.participant.common.driven.SqlParticipantRepository
 import com.happyrow.core.infrastructure.resource.common.driven.SqlResourceRepository
-import com.happyrow.core.infrastructure.technical.config.DatabaseInitializer
 import com.happyrow.core.infrastructure.technical.config.ExposedDatabase
+import com.happyrow.core.infrastructure.technical.config.FlywayMigration
 import com.happyrow.core.infrastructure.technical.config.dataSource
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -26,7 +26,7 @@ val postgresqlModule = module {
   }
 
   singleOf(::ExposedDatabase)
-  singleOf(::DatabaseInitializer)
+  singleOf(::FlywayMigration)
   singleOf(::SqlEventRepository) bind EventRepository::class
   singleOf(::SqlParticipantRepository) bind ParticipantRepository::class
   singleOf(::SqlResourceRepository) bind ResourceRepository::class
