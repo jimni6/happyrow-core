@@ -1,5 +1,6 @@
 package com.happyrow.core.integration
 
+import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.ktor.client.request.get
@@ -90,9 +91,7 @@ class ResourceIntegrationTest : IntegrationTestBase() {
     }
 
     response.status shouldBe HttpStatusCode.OK
-    val body = response.bodyAsText()
-    body shouldContain "\"content\":[]"
-    body shouldContain "\"totalElements\":0"
+    response.bodyAsText() shouldEqualJson "[]"
   }
 
   @Test

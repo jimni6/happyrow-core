@@ -114,15 +114,7 @@ class EventIntegrationTest : IntegrationTestBase() {
     }
 
     response.status shouldBe HttpStatusCode.OK
-    response.bodyAsText() shouldEqualJson """
-      {
-        "content": [],
-        "page": 0,
-        "size": 20,
-        "totalElements": 0,
-        "totalPages": 0
-      }
-    """.trimIndent()
+    response.bodyAsText() shouldEqualJson "[]"
   }
 
   @Test
@@ -196,15 +188,7 @@ class EventIntegrationTest : IntegrationTestBase() {
     val getResponse = client.get(basePath) {
       header("Authorization", auth)
     }
-    getResponse.bodyAsText() shouldEqualJson """
-      {
-        "content": [],
-        "page": 0,
-        "size": 20,
-        "totalElements": 0,
-        "totalPages": 0
-      }
-    """.trimIndent()
+    getResponse.bodyAsText() shouldEqualJson "[]"
   }
 
   @Test

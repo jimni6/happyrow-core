@@ -30,18 +30,15 @@ fun Route.getEventsEndpoint(getEventsByUserUseCase: GetEventsByUserUseCase) {
         val pageRequest = PageRequest(page, size)
         getEventsByUserUseCase.execute(user.userId, pageRequest)
       }
-      .map { page ->
-        mapOf(
-          "content" to page.content.map { it.toDto() },
-          "page" to page.page,
-          "size" to page.size,
-          "totalElements" to page.totalElements,
-          "totalPages" to page.totalPages,
-        )
-      }
       .fold(
         { it.handleFailure(call) },
-        { call.respond(HttpStatusCode.OK, it) },
+        { page ->
+          call.response.headers.append("X-Page", page.page.toString())
+          call.response.headers.append("X-Size", page.size.toString())
+          call.response.headers.append("X-Total-Elements", page.totalElements.toString())
+          call.response.headers.append("X-Total-Pages", page.totalPages.toString())
+          call.respond(HttpStatusCode.OK, page.content.map { it.toDto() })
+        },
       )
   }
 }

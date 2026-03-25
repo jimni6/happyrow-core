@@ -187,6 +187,11 @@ private fun Application.configureCors() {
 
     allowCredentials = true
     allowNonSimpleContentTypes = true
+
+    exposeHeader("X-Page")
+    exposeHeader("X-Size")
+    exposeHeader("X-Total-Elements")
+    exposeHeader("X-Total-Pages")
   }
 }
 

@@ -47,18 +47,15 @@ fun Route.getResourcesByEventEndpoint(
         val size = call.request.queryParameters["size"]?.toIntOrNull() ?: PageRequest.DEFAULT_PAGE_SIZE
         getResourcesByEventUseCase.execute(eventId, PageRequest(page, size))
       }
-      .map { page ->
-        mapOf(
-          "content" to page.content.map { it.toDto() },
-          "page" to page.page,
-          "size" to page.size,
-          "totalElements" to page.totalElements,
-          "totalPages" to page.totalPages,
-        )
-      }
       .fold(
         { it.handleFailure(call) },
-        { call.respond(HttpStatusCode.OK, it) },
+        { page ->
+          call.response.headers.append("X-Page", page.page.toString())
+          call.response.headers.append("X-Size", page.size.toString())
+          call.response.headers.append("X-Total-Elements", page.totalElements.toString())
+          call.response.headers.append("X-Total-Pages", page.totalPages.toString())
+          call.respond(HttpStatusCode.OK, page.content.map { it.toDto() })
+        },
       )
   }
 }
