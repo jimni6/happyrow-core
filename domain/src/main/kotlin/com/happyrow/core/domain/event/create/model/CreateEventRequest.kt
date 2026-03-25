@@ -13,4 +13,9 @@ data class CreateEventRequest(
   val location: String,
   val type: EventType,
   val members: List<Creator> = listOf(),
-)
+) {
+  init {
+    require(name.isNotBlank()) { "Event name must not be blank" }
+    require(location.isNotBlank()) { "Event location must not be blank" }
+  }
+}

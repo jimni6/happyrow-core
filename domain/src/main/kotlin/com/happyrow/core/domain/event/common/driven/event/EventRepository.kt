@@ -6,7 +6,6 @@ import com.happyrow.core.domain.event.common.error.DeleteEventRepositoryExceptio
 import com.happyrow.core.domain.event.common.error.UpdateEventRepositoryException
 import com.happyrow.core.domain.event.common.model.event.Event
 import com.happyrow.core.domain.event.create.model.CreateEventRequest
-import com.happyrow.core.domain.event.creator.model.Creator
 import com.happyrow.core.domain.event.get.error.GetEventException
 import com.happyrow.core.domain.event.update.model.UpdateEventRequest
 import java.util.UUID
@@ -16,6 +15,5 @@ interface EventRepository {
   fun update(request: UpdateEventRequest): Either<UpdateEventRepositoryException, Event>
   fun delete(identifier: UUID, userId: String): Either<DeleteEventRepositoryException, Unit>
   fun find(identifier: UUID): Either<GetEventException, Event>
-  fun findByOrganizer(organizer: Creator): Either<GetEventException, List<Event>>
   fun findByUser(userId: String, userEmail: String): Either<GetEventException, List<Event>>
 }

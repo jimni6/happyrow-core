@@ -9,7 +9,6 @@ import com.happyrow.core.domain.event.common.error.EventNotFoundException
 import com.happyrow.core.domain.event.common.error.UpdateEventRepositoryException
 import com.happyrow.core.domain.event.common.model.event.Event
 import com.happyrow.core.domain.event.create.model.CreateEventRequest
-import com.happyrow.core.domain.event.creator.model.Creator
 import com.happyrow.core.domain.event.get.error.GetEventException
 import com.happyrow.core.domain.event.update.model.UpdateEventRequest
 import com.happyrow.core.infrastructure.contribution.common.driven.ContributionTable
@@ -171,26 +170,6 @@ class SqlEventRepository(
         it?.toEvent() ?: Either.Left(EventNotFoundException(identifier))
       }
       .mapLeft { GetEventException(identifier, it) }
-  }
-
-  override fun findByOrganizer(organizer: Creator): Either<GetEventException, List<Event>> {
-    return Either
-      .catch {
-        transaction(exposedDatabase.database) {
-          EventTable
-            .selectAll().where { EventTable.creator eq organizer.toString() }
-            .map { row ->
-              row.toEvent().fold(
-                { error ->
-                  logger.error("Failed to parse event row: ${row[EventTable.id].value}", error)
-                  throw error
-                },
-                { it },
-              )
-            }
-        }
-      }
-      .mapLeft { GetEventException(null, it) }
   }
 
   override fun findByUser(userId: String, userEmail: String): Either<GetEventException, List<Event>> {

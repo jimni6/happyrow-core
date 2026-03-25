@@ -14,4 +14,9 @@ data class UpdateEventRequest(
   val type: EventType,
   val updater: Creator,
   val members: List<Creator> = listOf(),
-)
+) {
+  init {
+    require(name.isNotBlank()) { "Event name must not be blank" }
+    require(location.isNotBlank()) { "Event location must not be blank" }
+  }
+}

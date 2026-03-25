@@ -99,24 +99,29 @@ fun Application.application() {
 }
 
 private fun Application.configureCors() {
+  val environment = System.getenv("ENVIRONMENT") ?: "development"
+  val isProduction = environment.equals("production", ignoreCase = true)
+
   install(CORS) {
-    allowHost("localhost:3000")
-    allowHost("localhost:3001")
-    allowHost("localhost:4200")
-    allowHost("localhost:5173")
-    allowHost("localhost:8080")
-    allowHost("localhost:8081")
-    allowHost("127.0.0.1:3000")
-    allowHost("127.0.0.1:3001")
-    allowHost("127.0.0.1:4200")
-    allowHost("127.0.0.1:5173")
-    allowHost("127.0.0.1:8080")
-    allowHost("127.0.0.1:8081")
-    allowHost("jimni6.github.io")
-    allowHost("happyrow-front-lyayzeci9-jimni6s-projects.vercel.app")
-    allowHost("happyrow-front-git-main-jimni6s-projects.vercel.app")
-    allowHost("happyrow-front.vercel.app")
-    allowHost("happyrow-front-jimni6s-projects.vercel.app")
+    if (!isProduction) {
+      allowHost("localhost:3000")
+      allowHost("localhost:3001")
+      allowHost("localhost:4200")
+      allowHost("localhost:5173")
+      allowHost("localhost:8080")
+      allowHost("localhost:8081")
+      allowHost("127.0.0.1:3000")
+      allowHost("127.0.0.1:3001")
+      allowHost("127.0.0.1:4200")
+      allowHost("127.0.0.1:5173")
+      allowHost("127.0.0.1:8080")
+      allowHost("127.0.0.1:8081")
+    }
+
+    allowHost("jimni6.github.io", schemes = listOf("https"))
+    allowHost("happyrow-front.vercel.app", schemes = listOf("https"))
+    allowHost("happyrow-front-jimni6s-projects.vercel.app", schemes = listOf("https"))
+    allowHost("happyrow-front-git-main-jimni6s-projects.vercel.app", schemes = listOf("https"))
 
     val allowedOrigins = System.getenv("ALLOWED_ORIGINS") ?: ""
     if (allowedOrigins.isNotEmpty()) {
@@ -124,7 +129,7 @@ private fun Application.configureCors() {
         val cleanOrigin = origin.trim()
         if (cleanOrigin.isNotEmpty()) {
           val host = cleanOrigin.removePrefix("https://").removePrefix("http://")
-          allowHost(host, schemes = listOf("http", "https"))
+          allowHost(host, schemes = listOf("https"))
         }
       }
     }

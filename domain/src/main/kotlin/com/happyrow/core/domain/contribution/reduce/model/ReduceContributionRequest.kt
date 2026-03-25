@@ -7,4 +7,8 @@ data class ReduceContributionRequest(
   val eventId: UUID,
   val resourceId: UUID,
   val quantity: Int,
-)
+) {
+  init {
+    require(quantity > 0) { "Reduction quantity must be positive" }
+  }
+}

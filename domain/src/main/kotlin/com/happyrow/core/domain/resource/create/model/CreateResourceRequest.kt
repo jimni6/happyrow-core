@@ -10,4 +10,9 @@ data class CreateResourceRequest(
   val eventId: UUID,
   val userEmail: String,
   val suggestedQuantity: Int = 0,
-)
+) {
+  init {
+    require(name.isNotBlank()) { "Resource name must not be blank" }
+    require(initialQuantity > 0) { "Initial quantity must be positive" }
+  }
+}
