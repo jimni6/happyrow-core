@@ -20,6 +20,7 @@ import java.time.Clock
 import java.util.UUID
 
 private const val TOKEN_LENGTH = 32
+private const val SECONDS_PER_DAY = 86400L
 
 class SqlInviteLinkRepository(
   private val clock: Clock,
@@ -31,7 +32,7 @@ class SqlInviteLinkRepository(
       transaction(exposedDatabase.database) {
         val now = clock.instant()
         val token = generateToken()
-        val expiresAt = now.plusSeconds(request.expiresInDays.toLong() * 86400)
+        val expiresAt = now.plusSeconds(request.expiresInDays.toLong() * SECONDS_PER_DAY)
 
         val id = EventInviteTable.insertAndGetId {
           it[EventInviteTable.token] = token
