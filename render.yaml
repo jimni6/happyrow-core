@@ -26,6 +26,8 @@ services:
         value: 1800000
       - key: DB_SSL_MODE
         value: require
+      - key: INVITE_URL_BASE
+        value: https://happyrow-front.vercel.app
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_JWT_SECRET
