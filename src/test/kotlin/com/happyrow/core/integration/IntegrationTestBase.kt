@@ -5,12 +5,16 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.happyrow.core.configureRouting
 import com.happyrow.core.domain.contribution.common.driven.ContributionRepository
 import com.happyrow.core.domain.event.common.driven.event.EventRepository
+import com.happyrow.core.domain.invite.common.driven.InviteLinkRepository
 import com.happyrow.core.domain.participant.common.driven.ParticipantRepository
 import com.happyrow.core.domain.resource.common.driven.ResourceRepository
+import com.happyrow.core.domain.user.common.driven.AppUserRepository
 import com.happyrow.core.infrastructure.common.driven.event.SqlEventRepository
 import com.happyrow.core.infrastructure.contribution.common.driven.ContributionTable
 import com.happyrow.core.infrastructure.contribution.common.driven.SqlContributionRepository
 import com.happyrow.core.infrastructure.event.common.driven.event.EventTable
+import com.happyrow.core.infrastructure.invite.common.driven.EventInviteTable
+import com.happyrow.core.infrastructure.invite.common.driven.SqlInviteLinkRepository
 import com.happyrow.core.infrastructure.participant.common.driven.ParticipantTable
 import com.happyrow.core.infrastructure.participant.common.driven.SqlParticipantRepository
 import com.happyrow.core.infrastructure.resource.common.driven.ResourceTable
@@ -21,6 +25,7 @@ import com.happyrow.core.infrastructure.technical.auth.SupabaseJwtService
 import com.happyrow.core.infrastructure.technical.config.ExposedDatabase
 import com.happyrow.core.infrastructure.technical.config.FlywayMigration
 import com.happyrow.core.infrastructure.technical.jackson.JsonObjectMapper
+import com.happyrow.core.infrastructure.user.common.driven.SqlAppUserRepository
 import com.happyrow.core.modules.domainModule
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -116,6 +121,7 @@ abstract class IntegrationTestBase {
       ContributionTable.deleteAll()
       ResourceTable.deleteAll()
       ParticipantTable.deleteAll()
+      EventInviteTable.deleteAll()
       EventTable.deleteAll()
     }
   }
@@ -139,6 +145,8 @@ abstract class IntegrationTestBase {
         singleOf(::SqlParticipantRepository) bind ParticipantRepository::class
         singleOf(::SqlResourceRepository) bind ResourceRepository::class
         singleOf(::SqlContributionRepository) bind ContributionRepository::class
+        singleOf(::SqlInviteLinkRepository) bind InviteLinkRepository::class
+        singleOf(::SqlAppUserRepository) bind AppUserRepository::class
       }
 
       install(Koin) {

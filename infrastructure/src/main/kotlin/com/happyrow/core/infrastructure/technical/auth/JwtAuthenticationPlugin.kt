@@ -10,6 +10,7 @@ import io.ktor.util.AttributeKey
 private const val BEARER_PREFIX_LENGTH = 7
 
 private val PUBLIC_PATHS = setOf("/", "/info", "/health")
+private val PUBLIC_INVITE_PATTERN = Regex("^/event/configuration/api/v1/invites/[^/]+$")
 
 val SupabaseAuthKey = AttributeKey<AuthenticatedUser>("SupabaseAuth")
 
@@ -20,7 +21,16 @@ val JwtAuthenticationPlugin = createApplicationPlugin(
   val jwtService = pluginConfig.jwtService
 
   onCall { call ->
-    if (call.request.local.method == HttpMethod.Options || call.request.local.uri in PUBLIC_PATHS) {
+    val isPublicInviteValidation =
+      call.request.local.method == HttpMethod.Get &&
+        PUBLIC_INVITE_PATTERN.matches(call.request.local.uri)
+
+    val shouldSkipAuth =
+      call.request.local.method == HttpMethod.Options ||
+        call.request.local.uri in PUBLIC_PATHS ||
+        isPublicInviteValidation
+
+    if (shouldSkipAuth) {
       return@onCall
     }
 

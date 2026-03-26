@@ -1,0 +1,78 @@
+---
+description: Naming conventions and mandatory template for creating GitHub issues
+alwaysApply: true
+---
+
+# Issue Conventions
+
+## Title format
+
+```
+[TYPE] Short description in English
+```
+
+### Allowed types
+
+| Type         | When to use                              |
+|--------------|------------------------------------------|
+| `[FEAT]`     | New feature or capability                |
+| `[BUG]`      | Something is broken                      |
+| `[DOCS]`     | Documentation changes                    |
+| `[REFACTOR]` | Code restructuring with no new behavior  |
+| `[TEST]`     | Adding or improving tests                |
+| `[CHORE]`    | Tooling, CI, dependencies, config        |
+
+### Title examples
+
+```
+[FEAT] Add JWT authentication
+[BUG] Login crashes on empty email input
+[DOCS] Add API endpoint reference
+[REFACTOR] Extract validation logic into shared module
+[CHORE] Upgrade Node.js to v20
+```
+
+## Body template (mandatory sections)
+
+Every issue MUST include these sections. Use this exact template:
+
+```
+gh issue create --title "[TYPE] Title" --body "$(cat <<'EOF'
+## Context
+Why this issue exists. What problem does it solve or what need does it address.
+
+## Expected behavior
+What should happen once this issue is resolved.
+
+## Acceptance criteria
+- [ ] Criterion 1
+- [ ] Criterion 2
+- [ ] Criterion 3
+
+## Notes
+Any technical details, constraints, links, or references.
+EOF
+)"
+```
+
+### Section rules
+
+- **Context**: Required. Explain the motivation, not the implementation.
+- **Expected behavior**: Required. Describe the end result from a user or system perspective.
+- **Acceptance criteria**: Required. At least one checkbox item. These are used to verify the issue is done.
+- **Notes**: Optional but encouraged. Add links, screenshots, technical constraints.
+
+## Labels
+
+Apply at least one label matching the type:
+
+| Type         | Label          |
+|--------------|----------------|
+| `[FEAT]`     | `enhancement`  |
+| `[BUG]`      | `bug`          |
+| `[DOCS]`     | `documentation`|
+| `[REFACTOR]` | `refactor`     |
+| `[TEST]`     | `test`         |
+| `[CHORE]`    | `chore`        |
+
+Add the label when creating: `gh issue create --label "enhancement" ...`

@@ -1,0 +1,45 @@
+---
+description: General code quality rules - naming, secrets, error handling, DRY
+alwaysApply: true
+---
+
+# Code Quality
+
+## Naming
+
+- Variables and functions: descriptive, no cryptic abbreviations (`getUserById` not `gUBI`)
+- Booleans: prefix with `is`, `has`, `should`, `can` (`isActive`, `hasPermission`)
+- Constants: UPPER_SNAKE_CASE (`MAX_RETRIES`, `DEFAULT_TIMEOUT`)
+- Files: match the primary export name and casing convention of the stack
+
+## Secrets and configuration
+
+- NEVER hardcode API keys, passwords, tokens, or connection strings
+- Use environment variables for all sensitive configuration
+- Always maintain a `.env.example` listing required variables with placeholder values
+- Add `.env` to `.gitignore` — never commit real secrets
+
+## DRY
+
+- If the same logic appears in 3+ places, extract it into a shared function or module
+- Prefer composition over inheritance for reuse
+- Shared utilities belong in a `shared/` or `common/` folder, not duplicated per feature
+
+## Functions
+
+- One responsibility per function
+- Limit parameters — if a function needs 4+ arguments, group them into an object/struct
+- Prefer pure functions (no side effects) where possible
+
+## Error handling
+
+- NEVER swallow exceptions silently (`catch (e) {}` is forbidden)
+- Always log or propagate errors with meaningful context
+- Use typed/custom errors for domain-specific failure cases
+- Handle expected failures explicitly, let unexpected ones bubble up
+
+## Comments
+
+- Do not write comments that repeat what the code says
+- Comments explain **why**, not **what**
+- If a comment is needed to explain what code does, the code should be refactored to be clearer

@@ -1,0 +1,66 @@
+---
+description: Clean Architecture principles - layered structure with inward dependencies only
+alwaysApply: true
+---
+
+# Clean Architecture
+
+All code MUST be organized in three layers with dependencies pointing inward only.
+
+```
+infrastructure  -->  application  -->  domain
+(outer)              (middle)          (inner)
+```
+
+## Layers
+
+### `domain/`
+
+The core. Pure business logic, zero external dependencies.
+
+- Entities, value objects, domain events, business rules
+- NEVER imports from `application/` or `infrastructure/`
+- No framework code, no database code, no I/O
+- Must be testable in complete isolation
+
+### `application/` (or `use-cases/`)
+
+Orchestration layer. Coordinates domain objects to fulfill use cases.
+
+- Depends only on `domain/`
+- Defines **ports** (interfaces/abstractions) that infrastructure must implement
+- Contains use case handlers, application services, DTOs
+- No concrete I/O — all external access goes through ports
+
+### `infrastructure/`
+
+Adapters to the outside world. Implements the ports defined by application.
+
+- Database repositories, HTTP clients, message queues, file system access
+- Framework configuration, controllers, routes
+- UI components (frontend) live here too — they are adapters
+- This is the ONLY layer allowed to depend on external libraries and frameworks
+
+## Recommended folder structure
+
+Adapt to the stack, but keep the layering:
+
+```
+src/
+  domain/
+    entities/
+    value-objects/
+    errors/
+  application/
+    use-cases/
+    ports/
+    dtos/
+  infrastructure/
+    persistence/
+    http/
+    config/
+```
+
+## The golden rule
+
+**Domain NEVER imports from infrastructure.** If you need an external resource in the domain, define a port (interface) in `application/` and implement it in `infrastructure/`.

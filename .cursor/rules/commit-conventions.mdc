@@ -1,0 +1,56 @@
+---
+description: Commit message format and discipline rules (Conventional Commits)
+alwaysApply: true
+---
+
+# Commit Conventions
+
+Use **Conventional Commits** format for every commit.
+
+## Format
+
+```
+type(scope): short description #<issue>
+```
+
+## Allowed types
+
+| Type       | When to use                        |
+|------------|------------------------------------|
+| `feat`     | New feature                        |
+| `fix`      | Bug fix                            |
+| `docs`     | Documentation only                 |
+| `refactor` | Code change with no new behavior   |
+| `test`     | Adding or updating tests           |
+| `chore`    | Build, CI, tooling, dependencies   |
+
+## Rules
+
+- One commit per logical change — no "big bang" commits mixing unrelated work
+- Message in English, concise, focused on **why** not **what**
+- Always reference the issue number: `feat(api): add user endpoint #12`
+- NEVER use `--no-verify` to skip hooks
+- NEVER use `--force` push to `main`
+- ALWAYS commit before switching branches or starting a new feature
+- Use HEREDOC for multi-line messages:
+  ```
+  git commit -m "$(cat <<'EOF'
+  feat(auth): add JWT refresh token flow #7
+
+  Tokens now auto-refresh 5 min before expiry to avoid
+  session interruptions during long operations.
+  EOF
+  )"
+  ```
+
+## Bad vs Good
+
+```
+# Bad
+git commit -m "stuff"
+git commit -m "fix things and also add feature and update docs"
+
+# Good
+git commit -m "fix(parser): handle empty input without crashing #23"
+git commit -m "feat(ui): add dark mode toggle #45"
+```

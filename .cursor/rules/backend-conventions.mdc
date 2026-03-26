@@ -1,0 +1,44 @@
+---
+description: Stack-agnostic backend conventions - API design, error handling, validation
+globs: backend/**,**/api/**,**/server/**
+alwaysApply: false
+---
+
+# Backend Conventions
+
+## API design
+
+- RESTful endpoints, resource-oriented
+- URL paths in **kebab-case**: `/user-profiles`, `/order-items`
+- Use correct HTTP verbs:
+  | Verb     | Purpose              |
+  |----------|----------------------|
+  | `GET`    | Read (no side effect)|
+  | `POST`   | Create               |
+  | `PUT`    | Full replace         |
+  | `PATCH`  | Partial update       |
+  | `DELETE` | Remove               |
+- Return appropriate status codes: `201` for creation, `204` for deletion, `400`/`422` for validation errors, `404` for not found, `500` only for unexpected errors
+- Consistent JSON response shape across all endpoints
+
+## Error handling
+
+- Always return an explicit HTTP status code with a structured error body
+- NEVER expose stack traces, internal paths, or implementation details in responses
+- Map domain errors to HTTP errors at the infrastructure layer, not in the domain
+
+## Configuration and secrets
+
+- All sensitive values (API keys, DB credentials, tokens) go in environment variables
+- NEVER hardcode secrets in source code
+- Provide a `.env.example` with all required variables (no real values)
+
+## Validation
+
+- Validate all inputs at the boundary (controllers / route handlers in infrastructure)
+- Business rule validation belongs in the domain layer
+- Return clear error messages indicating which field failed and why
+
+## Structure reminder
+
+Follow the clean-architecture rule: controllers and routes live in `infrastructure/`, use cases in `application/`, business logic in `domain/`.
