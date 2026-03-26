@@ -1,0 +1,39 @@
+---
+description: Workflow for working with GitHub issues - reading, branching, and closing
+alwaysApply: true
+---
+
+# GitHub Issues Workflow
+
+Every piece of work MUST be tied to a GitHub issue.
+
+## Starting work on an issue
+
+1. Read the issue: `gh issue view <number>`
+2. Create a branch from `main`:
+   ```
+   git checkout main && git pull
+   git checkout -b feat/<issue-number>-<short-description>
+   ```
+3. Branch naming examples:
+   - `feat/12-add-auth` for features
+   - `fix/34-null-pointer` for bug fixes
+   - `docs/5-update-readme` for documentation
+
+## During development
+
+- Reference the issue in every commit message: `feat(auth): add login endpoint #12`
+- Keep the branch focused on the issue scope — do not mix unrelated changes
+
+## Closing an issue
+
+- Use a closing keyword in the PR body or final commit:
+  ```
+  Closes #12
+  ```
+- Always open a PR linked to the issue rather than pushing directly to `main`
+
+## No issue? No work.
+
+If there is no issue for the task, create one first following the conventions
+defined in the **issue-conventions** rule (title format, mandatory body template, labels).

@@ -1,0 +1,22 @@
+---
+description: Ensures all git operations use the correct GitHub identity (jimni6)
+alwaysApply: true
+---
+
+# Git & GitHub Identity
+
+The GitHub account for this project is **jimni6**.
+
+## Before any push
+
+1. Run `git remote -v` and verify the URL contains `jimni6`
+2. Expected formats:
+   - `git@github.com:jimni6/<repo>.git`
+   - `https://github.com/jimni6/<repo>.git`
+3. If the remote points to a different account, stop and ask the user
+
+## Constraints
+
+- NEVER modify `git config --global`
+- NEVER push to a remote that does not belong to `jimni6`
+- When creating a new remote, always use: `git remote add origin git@github.com:jimni6/<repo>.git`

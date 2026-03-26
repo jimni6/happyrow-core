@@ -1,0 +1,105 @@
+---
+description: Process for discovering, decomposing, and planning a new feature before any code is written
+alwaysApply: true
+---
+
+# Feature Discovery & Decomposition
+
+When the user describes a new feature (vague or precise), follow these 4 phases **before writing any code**.
+
+## Phase 1 — Clarify
+
+Ask these questions to frame the feature. Do not skip this step.
+
+1. What user problem does this feature solve?
+2. Who are the target users?
+3. What does success look like? (measurable criteria)
+4. Are there known constraints? (tech, timeline, dependencies on other features)
+
+If the user cannot answer, propose concrete hypotheses and ask for validation. Never assume silently.
+
+## Phase 2 — Decompose into vertical slices
+
+Break the feature into **vertical slices**, not horizontal layers.
+
+### What is a vertical slice?
+
+A slice crosses all layers (domain, application, infrastructure/UI) and delivers value on its own.
+
+### Good vs Bad decomposition
+
+```
+# Bad — horizontal (by layer)
+Issue 1: Create database schema for orders
+Issue 2: Add order service logic
+Issue 3: Build order API endpoints
+Issue 4: Build order UI page
+
+# Good — vertical (by user value)
+Issue 1: User can place a minimal order (1 product, no payment)
+Issue 2: User can see their order history
+Issue 3: User can pay for an order
+Issue 4: User receives order confirmation email
+```
+
+### Rules
+
+- Each slice MUST be independently deployable and testable
+- Start with the **walking skeleton**: the simplest slice that proves the feature works end-to-end
+- Order slices by dependency — foundations first, enhancements after
+- Aim for 1-3 days of work per slice maximum
+
+## Phase 3 — Create issues in GitHub Projects
+
+For each slice, create a GitHub issue following the `issue-conventions` rule.
+
+### Steps
+
+1. If the feature has 3+ slices, create an **epic issue** first:
+   ```
+   gh issue create \
+     --title "[FEAT] Epic: Short feature name" \
+     --label "enhancement" \
+     --body "$(cat <<'EOF'
+   ## Context
+   High-level description of the full feature.
+
+   ## Slices
+   - [ ] #<slice-1-number> — Slice 1 title
+   - [ ] #<slice-2-number> — Slice 2 title
+   - [ ] #<slice-3-number> — Slice 3 title
+
+   ## Notes
+   Implementation order and dependencies between slices.
+   EOF
+   )"
+   ```
+   Update the epic body with real issue numbers after creating the slice issues.
+
+2. Create one issue per slice using the `issue-conventions` template.
+
+3. Add each issue to the GitHub Projects board:
+   ```
+   gh project item-add <PROJECT_NUMBER> --owner jimni6 --url <ISSUE_URL>
+   ```
+
+4. Order the issues on the board by dependency (walking skeleton first).
+
+## Phase 4 — Validate with the user
+
+Present a summary **before any coding starts**:
+
+```
+Feature: <name>
+Slices (in implementation order):
+  1. [S] #12 — <title> (walking skeleton)
+  2. [M] #13 — <title>
+  3. [M] #14 — <title>
+  4. [L] #15 — <title>
+
+S = small (<1 day), M = medium (1-2 days), L = large (2-3 days)
+```
+
+Wait for explicit user approval. Do not start implementation until the user confirms the plan.
+
+Once approved, implement each slice following the `feature-workflow` rule (branch, implement, test, commit, PR) — one slice at a time.

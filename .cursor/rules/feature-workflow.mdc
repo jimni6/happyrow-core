@@ -1,0 +1,42 @@
+---
+description: Step-by-step process for implementing a feature from issue to PR
+alwaysApply: true
+---
+
+# Feature Implementation Workflow
+
+Follow these steps **in order** for every feature.
+
+## 1. Understand
+
+- Read the GitHub issue thoroughly (`gh issue view <number>`)
+- Identify acceptance criteria and edge cases
+- If anything is unclear, ask before coding
+
+## 2. Branch
+
+- Create a branch from up-to-date `main` (see github-issues rule for naming)
+
+## 3. Implement
+
+- Work in small, focused increments
+- Each increment should leave the codebase in a working state
+- Do not change unrelated code in the same branch
+
+## 4. Test
+
+- Run existing tests before committing
+- Add tests for new behavior when applicable
+- Verify manually if no automated tests exist
+
+## 5. Commit
+
+- Commit after each logical unit of work (see commit-conventions rule)
+- **ALWAYS commit current work before switching to another feature or branch**
+- Never leave uncommitted changes when changing context
+
+## 6. Push & PR
+
+- Push the branch: `git push -u origin HEAD`
+- Open a PR linked to the issue: `gh pr create --title "..." --body "Closes #<number>"`
+- Wait for review — do not merge your own PR without approval

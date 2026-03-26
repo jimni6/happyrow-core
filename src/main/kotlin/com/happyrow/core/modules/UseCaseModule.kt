@@ -8,6 +8,11 @@ import com.happyrow.core.domain.event.create.CreateEventUseCase
 import com.happyrow.core.domain.event.delete.DeleteEventUseCase
 import com.happyrow.core.domain.event.get.GetEventsByUserUseCase
 import com.happyrow.core.domain.event.update.UpdateEventUseCase
+import com.happyrow.core.domain.invite.accept.AcceptInviteUseCase
+import com.happyrow.core.domain.invite.create.CreateInviteLinkUseCase
+import com.happyrow.core.domain.invite.getactive.GetActiveInviteLinkUseCase
+import com.happyrow.core.domain.invite.revoke.RevokeInviteLinkUseCase
+import com.happyrow.core.domain.invite.validate.ValidateInviteTokenUseCase
 import com.happyrow.core.domain.participant.create.CreateParticipantUseCase
 import com.happyrow.core.domain.participant.delete.DeleteParticipantUseCase
 import com.happyrow.core.domain.participant.get.GetParticipantsByEventUseCase
@@ -33,4 +38,9 @@ val domainModule = module {
   single<AddContributionUseCase> { AddContributionUseCase(get()) }
   single<DeleteContributionUseCase> { DeleteContributionUseCase(get()) }
   single<ReduceContributionUseCase> { ReduceContributionUseCase(get()) }
+  single<CreateInviteLinkUseCase> { CreateInviteLinkUseCase(get(), get()) }
+  single<ValidateInviteTokenUseCase> { ValidateInviteTokenUseCase(get(), get(), get(), get()) }
+  single<AcceptInviteUseCase> { AcceptInviteUseCase(get(), get(), get()) }
+  single<GetActiveInviteLinkUseCase> { GetActiveInviteLinkUseCase(get(), get()) }
+  single<RevokeInviteLinkUseCase> { RevokeInviteLinkUseCase(get(), get()) }
 }
