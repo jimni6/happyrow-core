@@ -17,20 +17,20 @@ Permettre aux organisateurs de générer un lien d'invitation unique (+ QR code)
 
 | Issue | Titre | Priorité | Estimation | Dépendances |
 |-------|-------|----------|------------|-------------|
-| [FEAT-001](frontend/FEAT-001-share-invite-link-button.md) | Bouton "Partager" et génération du lien | 🔴 Haute | M (3-5j) | BACK-001 |
-| [FEAT-002](frontend/FEAT-002-qr-code-component.md) | Composant QR Code | 🟡 Moyenne | S (1-2j) | FEAT-001 |
-| [FEAT-003](frontend/FEAT-003-invite-landing-page.md) | Landing page d'invitation (`/invite/:token`) | 🔴 Haute | L (5-8j) | BACK-002, BACK-003 |
-| [FEAT-004](frontend/FEAT-004-native-share-integration.md) | Web Share API & Copy to Clipboard | 🟡 Moyenne | S (1-2j) | FEAT-001 |
-| [FEAT-005](frontend/FEAT-005-invite-link-management.md) | Gestion des liens (révocation, régénération) | 🟢 Basse | M (2-3j) | BACK-004 |
+| [FEAT-001](../issues/invite-link-sharing/frontend/FEAT-001-share-invite-link-button.md) | Bouton "Partager" et génération du lien | 🔴 Haute | M (3-5j) | BACK-001 |
+| [FEAT-002](../issues/invite-link-sharing/frontend/FEAT-002-qr-code-component.md) | Composant QR Code | 🟡 Moyenne | S (1-2j) | FEAT-001 |
+| [FEAT-003](../issues/invite-link-sharing/frontend/FEAT-003-invite-landing-page.md) | Landing page d'invitation (`/invite/:token`) | 🔴 Haute | L (5-8j) | BACK-002, BACK-003 |
+| [FEAT-004](../issues/invite-link-sharing/frontend/FEAT-004-native-share-integration.md) | Web Share API & Copy to Clipboard | 🟡 Moyenne | S (1-2j) | FEAT-001 |
+| [FEAT-005](../issues/invite-link-sharing/frontend/FEAT-005-invite-link-management.md) | Gestion des liens (révocation, régénération) | 🟢 Basse | M (2-3j) | BACK-004 |
 
 ## Issues Backend
 
 | Issue | Titre | Priorité | Estimation | Dépendances |
 |-------|-------|----------|------------|-------------|
-| [BACK-001](backend/BACK-001-generate-invite-link-api.md) | API de génération du lien d'invitation | 🔴 Haute | M (2-3j) | — |
-| [BACK-002](backend/BACK-002-validate-invite-token-api.md) | API de validation du token (endpoint public) | 🔴 Haute | M (2-3j) | BACK-001 |
-| [BACK-003](backend/BACK-003-accept-invite-api.md) | API d'acceptation d'une invitation | 🔴 Haute | M (3-4j) | BACK-001, BACK-002 |
-| [BACK-004](backend/BACK-004-manage-invite-links-api.md) | API de gestion (get actif, révoquer) | 🟡 Moyenne | M (2-3j) | BACK-001 |
+| [BACK-001](../issues/invite-link-sharing/backend/BACK-001-generate-invite-link-api.md) | API de génération du lien d'invitation | 🔴 Haute | M (2-3j) | — |
+| [BACK-002](../issues/invite-link-sharing/backend/BACK-002-validate-invite-token-api.md) | API de validation du token (endpoint public) | 🔴 Haute | M (2-3j) | BACK-001 |
+| [BACK-003](../issues/invite-link-sharing/backend/BACK-003-accept-invite-api.md) | API d'acceptation d'une invitation | 🔴 Haute | M (3-4j) | BACK-001, BACK-002 |
+| [BACK-004](../issues/invite-link-sharing/backend/BACK-004-manage-invite-links-api.md) | API de gestion (get actif, révoquer) | 🟡 Moyenne | M (2-3j) | BACK-001 |
 
 ---
 
